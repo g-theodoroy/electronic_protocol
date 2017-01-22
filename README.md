@@ -59,6 +59,7 @@ sh install_electronic_protocol_Debian_php5.sh
 
 Θα σας ζητηθεί να δώσετε
 - απαντήσεις yes\no γιατη ρύθμιση mysql
+
 και
 - ένα όνομα για την εφαρμογή πχ: protocol, apousiesprotocol, elprotocol, ...
 - το password για το χρήστη root της mysql
