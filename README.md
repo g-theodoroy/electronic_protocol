@@ -121,7 +121,7 @@ sh install_electronic_protocol_Debian_php5.sh
 ```
 ###################################################################
 
-"Δώστε το password του χρήστη root για τη mysql :
+Δώστε το password του χρήστη root για τη mysql :
 ```
 
 ```
