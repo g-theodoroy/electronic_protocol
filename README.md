@@ -44,6 +44,7 @@ wget http://okiroi.no-ip.org/downloads/laravelprotocol_ubuntu_install.sh
 wget http://okiroi.no-ip.org/downloads/laravelprotocol_install_centos.sh
 ```
 
+
 Αν έχετε άλλη διανομή τροποποιήστε ένα συγγενές script σύμφωνα με τις ανάγκες της διανομής
 
 
