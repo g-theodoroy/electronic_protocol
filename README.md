@@ -151,8 +151,7 @@ sh install_electronic_protocol_Debian_php5.sh
 
 
 ## Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
-Μπορεί να γίνει. Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework.
-
+Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework. Υπάρχει αρκετή τεκμηρίωση και στο Google.
 Υπάρχουν διάφορες εναλλακτικές λύσεις εγκαταστάσεων και σε cloud servers και σε shared servers
 
 Μετά την εγκατάσταση του Laravel θα πρέπει να ανεβάσετε στο φάκελο που εγκαταστάθηκε το Laravel τα αρχεία του Ηλεκτρονικού πρωτοκόλλου.
