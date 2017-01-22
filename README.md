@@ -143,9 +143,9 @@ sh install_electronic_protocol_Debian_php5.sh
 ###################################################################
 ```
 
-#### Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php).
-#### Xampp
+#### Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
 Μπορεί να γίνει. Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework.
+
 Υπάρχουν διάφορες εναλλακτικές λύσεις εγκαταστάσεων και σε cloud servers και σε shared servers
 
 Μετά την εγκατάσταση του Laravel θα πρέπει να ανεβάσετε στο φάκελο που εγκαταστάθηκε το Laravel τα αρχεία του Ηλεκτρονικού πρωτοκόλλου.
@@ -165,7 +165,7 @@ sh install_electronic_protocol_Debian_php5.sh
  - γραμμή 7:      RewriteBase /**@ppn@me** (ή διαγραφή της γραμμής ανάλογα τη ρύθμιση)
  
  Επίσης να ρυθμίσετε τον Apache server να πηγαίνει στο αρχείο public/index.php
- Αυτό γίνεται δημιουργώντας ένα αρχείο {appname}.conf με το ακόλουθο περιεχόμενο:
+ Αυτό γίνεται δημιουργώντας ένα αρχείο $appname.conf με το ακόλουθο περιεχόμενο:
  ```
      # $appname default Apache configuration
 
@@ -178,7 +178,7 @@ sh install_electronic_protocol_Debian_php5.sh
         Require all granted
     </Directory>
  ```
- αντικαθιστώντας ανάλογα τις μρταβλητές $appname $appdir.
+ αντικαθιστώντας ανάλογα τις μεταβλητές **$appname**, **$appdir**.
   
  
 ## Ευχαριστίες
