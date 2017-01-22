@@ -25,6 +25,8 @@ ssh {username}@{ip_server}
 Γίνετε superuser
 ```su``` ή ```sudo su```
 
+Εγκαταστήστε αν δεν είναι ήδη εγκατεστημένο το **wget** 
+Debian, Ubuntu: ``` apt-get -y install wget ``` , Centos: ``` yum -y install wget```
 
 Κατεβάστε ένα από τα ακόλουθα script που ταιριάζει με τη διανομή σας
 - Debian με Php5
