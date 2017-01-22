@@ -29,19 +29,19 @@ ssh {username}@{ip_server}
 Κατεβάστε ένα από τα ακόλουθα script που ταιριάζει με τη διανομή σας
 - Debian με Php5
 ```
-wget https://drive.google.com/open?id=0B2ACFOVDi2ORU3p3ZXl6ekJISW8
+wget -O install_electronic_protocol_Debian_php5.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORU3p3ZXl6ekJISW8"
 ```
 - Debian με Php7
 ```
-wget https://drive.google.com/open?id=0B2ACFOVDi2ORLVJVazJtbmtUYzg
+wget -O install_electronic_protocol_Debian_php7.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORLVJVazJtbmtUYzg"
 ```
 - Ubuntu
 ```
-wget https://drive.google.com/open?id=0B2ACFOVDi2ORWmFmSVkwN2xqdjg
+wget -O install_electronic_protocol_Ubuntu.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORWmFmSVkwN2xqdjg"
 ```
 - Centos
 ```
-wget https://drive.google.com/open?id=0B2ACFOVDi2ORejZEVU1fQWJRSWc
+wget -O install_electronic_protocol_Centos.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORejZEVU1fQWJRSWc"
 ```
 
 
