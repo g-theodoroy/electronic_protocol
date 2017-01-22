@@ -16,7 +16,7 @@
 
 #### Εγκατάσταση σε φυσικό server του σχολείου όπου έχουμε πρόσβαση.
 
-#### Λειτουργικό σύστημα Linux (Debian, Centos, Ubuntu, ...) με εγκατεστημένο Lamp (Linux, Apache, Mysql, Php).
+### Λειτουργικό σύστημα Linux (Debian, Centos, Ubuntu, ...) με εγκατεστημένο Lamp (Linux, Apache, Mysql, Php).
 
 Μπείτε στον server ή συνδεθείτε με ssh μέσω terminal
 ```
@@ -143,7 +143,7 @@ sh install_electronic_protocol_Debian_php5.sh
 ###################################################################
 ```
 
-#### Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
+## Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
 Μπορεί να γίνει. Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework.
 
 Υπάρχουν διάφορες εναλλακτικές λύσεις εγκαταστάσεων και σε cloud servers και σε shared servers
