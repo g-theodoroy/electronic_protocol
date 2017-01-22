@@ -23,20 +23,15 @@
 ssh {username}@{ip_server}
 ```
 Γίνετε superuser
-```
-su
-```
-ή
-```
-sudo su
-```
+```su``` ή ```sudo su```
+
 
 Κατεβάστε ένα από τα ακόλουθα script που ταιριάζει με τη διανομή σας
-- Debian και Php5
+- Debian με Php5
 ```
 wget http://okiroi.no-ip.org/downloads/laravelprotocol_debian_php5.sh
 ```
-- Debian και Php7
+- Debian με Php7
 ```
 wget http://okiroi.no-ip.org/downloads/laravelprotocol_debian_php7.sh
 ```
@@ -48,7 +43,10 @@ wget http://okiroi.no-ip.org/downloads/laravelprotocol_ubuntu_install.sh
 ```
 wget http://okiroi.no-ip.org/downloads/laravelprotocol_install_centos.sh
 ```
-Αν έχετε άλλη διανομή τροποποιήστε ένα συγγενές script σύμφωνα με τις ανάγκες
+
+Αν έχετε άλλη διανομή τροποποιήστε ένα συγγενές script σύμφωνα με τις ανάγκες της διανομής
+
+
 
 ## Ευχαριστίες
 Το Ηλεκτρονικό Πρωτόκολλο χρησιμοποιεί με ευγνωμοσύνη τα:
