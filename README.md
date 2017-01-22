@@ -56,11 +56,15 @@ sh install_electronic_protocol_Debian_php5.sh
 
 Ακολουθήστε τις οδηγίες
 
-Θα σας ζητηθεί να δώσετε
-- password για το χρήστη root της mysql
-- username και password λογαριασμού gmail για αποστολή email
-- ένα όνομα για την εφαρμογή πχ: protocol, apousiesprotocol, elprotocol, ...
 
+Θα σας ζητηθεί να δώσετε
+- απαντήσεις yes\no γιατη ρύθμιση mysql
+και
+- ένα όνομα για την εφαρμογή πχ: protocol, apousiesprotocol, elprotocol, ...
+- το password για το χρήστη root της mysql
+- username και password λογαριασμού gmail για αποστολή email
+
+όπως φαίνεται στα παρακάτω αποσπάσματα κώδικα:
 ```
 ###################################################################
 
