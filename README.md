@@ -58,7 +58,7 @@ sh install_electronic_protocol_Debian_php5.sh
 
 
 Θα σας ζητηθεί να δώσετε
-- απαντήσεις yes\no γιατη ρύθμιση mysql
+- απαντήσεις yes\no για τη ρύθμιση της mysql
 
 και
 - ένα όνομα για την εφαρμογή πχ: protocol, apousiesprotocol, elprotocol, ...
@@ -84,6 +84,7 @@ sh install_electronic_protocol_Debian_php5.sh
 Θέλετε να προχωρήσετε; (y/n):
 ```
 
+
 ```
 ###################################################################
 
@@ -99,6 +100,7 @@ sh install_electronic_protocol_Debian_php5.sh
 Θέλετε να προχωρήσετε; (y/n):
 ```
 
+
 ```
 ###################################################################
 
@@ -112,11 +114,13 @@ sh install_electronic_protocol_Debian_php5.sh
 Θέλετε να προχωρήσετε; (y/n):
 ```
 
+
 ```
 ###################################################################
 
 Δώστε το όνομα της εφαρμογής :
 ```
+
 
 ```
 ###################################################################
@@ -124,12 +128,14 @@ sh install_electronic_protocol_Debian_php5.sh
 Δώστε το password του χρήστη root για τη mysql :
 ```
 
+
 ```
 ###################################################################
 
 Δώστε το username ενός λογαριασμού gmail για αποστολή email:
 Δώστε το password του λογαριασμού gmail για αποστολή email: 
 ```
+
 
 ```
 ###################################################################
@@ -142,6 +148,7 @@ sh install_electronic_protocol_Debian_php5.sh
 
 ###################################################################
 ```
+
 
 ## Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
 Μπορεί να γίνει. Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework.
@@ -164,8 +171,8 @@ sh install_electronic_protocol_Debian_php5.sh
 - public/.htaccess 
  - γραμμή 7:      RewriteBase /**@ppn@me** (ή διαγραφή της γραμμής ανάλογα τη ρύθμιση)
  
- Επίσης να ρυθμίσετε τον Apache server να πηγαίνει στο αρχείο public/index.php
- Αυτό γίνεται δημιουργώντας ένα αρχείο $appname.conf με το ακόλουθο περιεχόμενο:
+ Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο public/index.php
+ Αυτό μπορεί να γίνει δημιουργώντας ένα αρχείο protocol.conf στον φάκελο conf-availiable του Apache με το ακόλουθο περιεχόμενο:
  ```
      # $appname default Apache configuration
 
@@ -178,7 +185,7 @@ sh install_electronic_protocol_Debian_php5.sh
         Require all granted
     </Directory>
  ```
- αντικαθιστώντας ανάλογα τις μεταβλητές **$appname**, **$appdir**.
+ αντικαθιστώντας ανάλογα τις μεταβλητές **$appname**, **$appdir**. Ενεργοποιήστε τη ρύθμιση.
   
  
 ## Ευχαριστίες
