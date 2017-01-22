@@ -18,31 +18,37 @@
 
 Λειτουργικό σύστημα Linux (Debian, Centos, Ubuntu, ...) με εγκατεστημένο Lamp (Linux, Apache, Mysql, Php).
 
-Προτείνεται η εγκατάσταση στον κατάλογο \usr\share . Αν εσείς θέλετε μπορείτε να το εγκαταστήσετε σε οποιοδήποτε κατάλογο.
-Πρέπει να έχετε δικαιώματα εγγραφής στον κατάλογο γι αυτό ας γίνετε διαχειριστής.
-```su``` ή ```sudo su ``` και password
+Μπείτε στον server ή συνδεθείτε με ssh μέσω terminal
+```
+ssh {username}@{ip_server}
+```
+Γίνετε superuser
+```
+su
+```
+ή
+```
+sudo su
+```
 
-Πηγαίνετε στον κατάλογο που θέλετε 
+Κατεβάστε ένα από τα ακόλουθα script που ταιριάζει με τη διανομή σας
+- Debian και Php5
 ```
-cd /usr/share
+wget http://okiroi.no-ip.org/downloads/laravelprotocol_debian_php5.sh
 ```
-Κατεβάστε τον κώδικα
+- Debian και Php7
 ```
- git clone https://github.com/g-theodoroy/electronic_protocol.git
+wget http://okiroi.no-ip.org/downloads/laravelprotocol_debian_php7.sh
 ```
-Αν θέλετε να μετονομάσετε τον φακελο electronic_protocol σε κάτι άλλο (πχ protocol) εκτελέστε την επόμενη εντολή.
-Έτσι μπορούμε να έχουμε δύο διαφορετικά πρωτόκολλα ένα το Κύριο και ένα για τις απουσίες
+- Ubuntu
 ```
-mv electronic_protocol/ protocol
+wget http://okiroi.no-ip.org/downloads/laravelprotocol_ubuntu_install.sh
 ```
-Για να αντιγράψετε τον φάκελο
+- Centos
 ```
-cp -r electronic_protocol/ protocol
+wget http://okiroi.no-ip.org/downloads/laravelprotocol_install_centos.sh
 ```
-Τώρα έχετε electronic_protocol και protocol
-
-
-
+Αν έχετε άλλη διανομή τροποποιήστε ένα συγγενές script σύμφωνα με τις ανάγκες
 
 ## Ευχαριστίες
 Το Ηλεκτρονικό Πρωτόκολλο χρησιμοποιεί με ευγνωμοσύνη τα:
