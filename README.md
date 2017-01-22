@@ -29,19 +29,19 @@ ssh {username}@{ip_server}
 Κατεβάστε ένα από τα ακόλουθα script που ταιριάζει με τη διανομή σας
 - Debian με Php5
 ```
-wget http://okiroi.no-ip.org/downloads/laravelprotocol_debian_php5.sh
+wget https://drive.google.com/open?id=0B2ACFOVDi2ORU3p3ZXl6ekJISW8
 ```
 - Debian με Php7
 ```
-wget http://okiroi.no-ip.org/downloads/laravelprotocol_debian_php7.sh
+wget https://drive.google.com/open?id=0B2ACFOVDi2ORLVJVazJtbmtUYzg
 ```
 - Ubuntu
 ```
-wget http://okiroi.no-ip.org/downloads/laravelprotocol_ubuntu_install.sh
+wget https://drive.google.com/open?id=0B2ACFOVDi2ORWmFmSVkwN2xqdjg
 ```
 - Centos
 ```
-wget http://okiroi.no-ip.org/downloads/laravelprotocol_install_centos.sh
+wget https://drive.google.com/open?id=0B2ACFOVDi2ORejZEVU1fQWJRSWc
 ```
 
 
