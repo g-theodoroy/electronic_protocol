@@ -170,9 +170,10 @@ sh install_electronic_protocol_Debian_php5.sh
 - public/.htaccess 
  - γραμμή 7:      RewriteBase /**@ppn@me** (ή διαγραφή της γραμμής ανάλογα τη ρύθμιση)
  
- Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο public/index.php.
- Αυτό μπορεί να γίνει δημιουργώντας ένα αρχείο protocol.conf στον φάκελο conf-availiable του Apache με το ακόλουθο περιεχόμενο:
- ```
+ 
+Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο public/index.php.
+Αυτό μπορεί να γίνει δημιουργώντας ένα αρχείο protocol.conf στον φάκελο conf-availiable του Apache με το ακόλουθο περιεχόμενο:
+```
      # $appname default Apache configuration
 
     Alias /$appname $appdir/public
@@ -183,8 +184,8 @@ sh install_electronic_protocol_Debian_php5.sh
         Options FollowSymlinks
         Require all granted
     </Directory>
- ```
- αντικαθιστώντας ανάλογα τις μεταβλητές **$appname**, **$appdir**. Ενεργοποιήστε τη ρύθμιση.
+```
+αντικαθιστώντας ανάλογα τις μεταβλητές **$appname**, **$appdir**. Ενεργοποιήστε τη ρύθμιση.
   
  
 ## Ευχαριστίες
