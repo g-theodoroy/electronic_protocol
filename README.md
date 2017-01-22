@@ -16,7 +16,7 @@
 
 #### Εγκατάσταση σε φυσικό server του σχολείου όπου έχουμε πρόσβαση.
 
-Λειτουργικό σύστημα Linux (Debian, Centos, Ubuntu, ...) με εγκατεστημένο Lamp (Linux, Apache, Mysql, Php).
+#### Λειτουργικό σύστημα Linux (Debian, Centos, Ubuntu, ...) με εγκατεστημένο Lamp (Linux, Apache, Mysql, Php).
 
 Μπείτε στον server ή συνδεθείτε με ssh μέσω terminal
 ```
@@ -143,6 +143,44 @@ sh install_electronic_protocol_Debian_php5.sh
 ###################################################################
 ```
 
+#### Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php).
+#### Xampp
+Μπορεί να γίνει. Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework.
+Υπάρχουν διάφορες εναλλακτικές λύσεις εγκαταστάσεων και σε cloud servers και σε shared servers
+
+Μετά την εγκατάσταση του Laravel θα πρέπει να ανεβάσετε στο φάκελο που εγκαταστάθηκε το Laravel τα αρχεία του Ηλεκτρονικού πρωτοκόλλου.
+
+Θα πρέπει χειροκίνητα να αλλάξετε τιμές μεταβλητών στα ακόλουθα αρχεία:
+- .env
+ - γραμμή 10:      DB_DATABASE=**d@t@b@se**
+ - γραμμή 12:      DB_PASSWORD=**p@ssw@rd**
+ - γραμμή 26:      MAIL_USERNAME=**gm@ilusern@me**
+ - γραμμή 27:      MAIL_PASSWORD=**gm@ilp@ss**
+- config/database.php
+ - γραμμή 59:      'database' => env('DB_DATABASE', '**d@t@b@se**'),
+ - γραμμή 61:      'password' => env('DB_PASSWORD', '**p@ssw@rd**'),
+- config/session.php
+ - γραμμή 125:      'cookie' => '**laravel**_session',
+- public/.htaccess 
+ - γραμμή 7:      RewriteBase /**@ppn@me** (ή διαγραφή της γραμμής ανάλογα τη ρύθμιση)
+ 
+ Επίσης να ρυθμίσετε τον Apache server να πηγαίνει στο αρχείο public/index.php
+ Αυτό γίνεται δημιουργώντας ένα αρχείο {appname}.conf με το ακόλουθο περιεχόμενο:
+ ```
+     # $appname default Apache configuration
+
+    Alias /$appname $appdir/public
+
+    <Directory $appdir/public>
+        DirectoryIndex index.php
+        AllowOverride All
+        Options FollowSymlinks
+        Require all granted
+    </Directory>
+ ```
+ αντικαθιστώντας ανάλογα τις μρταβλητές $appname $appdir.
+  
+ 
 ## Ευχαριστίες
 Το Ηλεκτρονικό Πρωτόκολλο χρησιμοποιεί με ευγνωμοσύνη τα:
 - [Laravel](https://laravel.com/)
