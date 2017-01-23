@@ -174,8 +174,8 @@ sh install_electronic_protocol_Debian_php5.sh
 Εαν στο Λειτουργικό Σύστημα τίθεται θέμα ownership να κάνετε **εγγράψιμο** από όλους τον φάκελο ```storage``` και τους υποφακέλους του 
  
  
-Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο public/index.php.
-Αυτό μπορεί να γίνει δημιουργώντας ένα αρχείο protocol.conf στον φάκελο conf-availiable του Apache με το ακόλουθο περιεχόμενο:
+Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο ```public/index.php```.
+Αυτό μπορεί να γίνει δημιουργώντας ένα αρχείο ```protocol.conf``` στον φάκελο ```conf-availiable``` του Apache με το ακόλουθο περιεχόμενο:
 ```
      # $appname default Apache configuration
 
