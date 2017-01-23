@@ -150,7 +150,7 @@ sh install_electronic_protocol_Debian_php5.sh
 ```
 
 
-## Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
+## Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp ή Χειροκίνητα
 Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework. Υπάρχει αρκετή τεκμηρίωση και στο Google.
 Υπάρχουν διάφορες εναλλακτικές λύσεις εγκαταστάσεων και σε cloud servers και σε shared servers
 
@@ -169,6 +169,9 @@ sh install_electronic_protocol_Debian_php5.sh
  - γραμμή 125:      'cookie' => '**laravel**_session',
 - public/.htaccess 
  - γραμμή 7:      RewriteBase /**@ppn@me** (ή διαγραφή της γραμμής ανάλογα τη ρύθμιση)
+ 
+ 
+Εαν στο Λειτουργικό Σύστημα τίθεται θέμα ownership να κάνετε **εγγράψιμο** από όλους τον φάκελο ```storage``` και τους υποφακέλους του 
  
  
 Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο public/index.php.
