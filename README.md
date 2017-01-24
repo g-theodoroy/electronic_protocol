@@ -183,7 +183,7 @@ sh install_electronic_protocol_Debian_php5.sh
 - username root (αυτό δεν θέλει αλλαγή)
 - password      (κενό)
 
-Δώστε ένα όνομα στη d@t@b@ase πχ: protocol
+Δώστε ένα όνομα στη d@t@b@se πχ: protocol
 
 Ανοίξτε το πρόγραμμα phpadmin του Xampp και δημιουργήστε την βάση δεδομένων που μόλις ονομάσατε (πχ: protocol)
 
