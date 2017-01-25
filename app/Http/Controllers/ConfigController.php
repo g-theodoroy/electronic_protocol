@@ -86,8 +86,14 @@ class ConfigController extends Controller
         $config = new Config;
         $mysqldumpPath = $config->getConfigValueOf('mysqldumpPath');
 
-        $filename = storage_path('app/arxeio/backups') . "/{$database}_back_" . date ( "d-m-Y-H:m:s" ) . '.sql.gz';
-        exec ( "$mysqldumpPath --user=$username --password=$password --host=localhost $database | gzip > $filename", $out, $ret);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $filename = storage_path('app/arxeio/backups') . "/$database\_back_" . date ( "YmdHms" ) . '.sql';
+            $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database > $filename"
+        }else{
+            $filename = storage_path('app/arxeio/backups') . "/$database\_back_" . date ( "YmdHms" ) . '.sql.gz';
+            $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database | gzip > $filename"
+        }
+        exec ( $command, $out, $ret);
 
         if($ret == 0){
             $notification = array(
