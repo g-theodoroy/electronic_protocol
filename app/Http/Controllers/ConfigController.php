@@ -87,11 +87,11 @@ class ConfigController extends Controller
         $mysqldumpPath = $config->getConfigValueOf('mysqldumpPath');
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $filename = storage_path('app/arxeio/backups') . "/$database\_back_" . date ( "YmdHms" ) . '.sql';
-            $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database > $filename"
+            $filename = storage_path('app\arxeio\backups') . "\\" . $database . "_back_" . date ( "YmdHms" ) . '.sql';
+            $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database > $filename";
         }else{
-            $filename = storage_path('app/arxeio/backups') . "/$database\_back_" . date ( "YmdHms" ) . '.sql.gz';
-            $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database | gzip > $filename"
+            $filename = storage_path('app/arxeio/backups') . "/" . $database . "_back_" . date ( "YmdHms" ) . '.sql.gz';
+            $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database | gzip > $filename";
         }
         exec ( $command, $out, $ret);
 
