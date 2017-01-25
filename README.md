@@ -6,17 +6,19 @@
 - **Αναζήτηση** Πρωτοκόλλου, **Ανάκτηση - Διαγραφή** συνημμένων αρχείων
 - **Εκτύπωση Απόδειξης** Κατάθεσης Πρωτοκόλλου
 - Εκτύπωση Ηλεκτρονικού Πρωτοκόλλου για **βιβλιοδέτηση**
-- Εκτύπωση λίστας εγγράφων για **Εκκαθάριση Αρχείου** μετά τη λήξη Διατήρησής αυτών
+- Εκτύπωση λίστας εγγράφων για **Εκκαθάριση Αρχείου** μετά τη λήξη Διατήρησης αυτών
 - **Backup** βάσης δεδομένων, εύκολο κατέβασμα για φύλαξη αυτών
 - **Διαχείριση Χρηστών** με ρόλους "Διαχειριστής", "Συγγραφέας", "Αναγνώστης" και ανάλογη πρόσβαση
 
-## Εγκατάσταση
+#
+# Εγκατάσταση
 
-### Προτεινόμενη μέθοδος
+## Προτεινόμενη μέθοδος
 
-#### Εγκατάσταση σε φυσικό server του σχολείου όπου έχουμε πρόσβαση.
+Εγκατάσταση σε φυσικό server του σχολείου όπου έχουμε πρόσβαση.
 
-### Λειτουργικό σύστημα Linux (Debian, Centos, Ubuntu, ...) με εγκατεστημένο Lamp (Linux, Apache, Mysql, Php).
+#
+# Λειτουργικό σύστημα Linux με Lamp (Linux, Apache, Mysql, Php).
 
 Μπείτε στον server ή συνδεθείτε με ssh μέσω terminal
 ```
@@ -149,14 +151,21 @@ sh install_electronic_protocol_Debian_php5.sh
 ###################################################################
 ```
 
+#
+# Λειτουργικό σύστημα Windows με Xampp
 
-## Λειτουργικό σύστημα Windows με εγκατεστημένο Wamp (Windows, Apache, Mysql, Php) ή Xampp
-Ανατρέξτε στην τεκμηρίωση και εγκατάσταση του Laravel framework. Υπάρχει αρκετή τεκμηρίωση και στο Google.
-Υπάρχουν διάφορες εναλλακτικές λύσεις εγκαταστάσεων και σε cloud servers και σε shared servers
+Εγκαταστήστε το [Xampp] (https://www.apachefriends.org/)
 
-Μετά την εγκατάσταση του Laravel θα πρέπει να ανεβάσετε στο φάκελο που εγκαταστάθηκε το Laravel τα αρχεία του Ηλεκτρονικού πρωτοκόλλου.
 
-Θα πρέπει χειροκίνητα να αλλάξετε τιμές μεταβλητών στα ακόλουθα αρχεία:
+Εγκαταστήστε τον [Composer] (https://getcomposer.org/download/)
+
+
+Κατεβάστε το [Ηλεκτρονικό Πρωτόκολλο] (https://github.com/g-theodoroy/electronic_protocol/archive/master.zip)
+
+
+Αποσυμπιέστε το αρχείο **electronic_protocol-master.zip** στο φάκελο **C:/xampp/htdocs/**. Είναι ο εξορισμού φάκελος που το Xampp εγκαθιστά τις ιστοσελίδες. Εαν εγκαταστήσατε το Xampp αλλού πράξτε ανάλογα. Μετονομάστε το φάκελο σε ένα πιο σύντομο όνομα πχ protocol, ...  
+
+Αλλάξτε τις τιμές των παρακάτω μεταβλητών στα ακόλουθα αρχεία:
 - .env
  - γραμμή 10:      DB_DATABASE=**d@t@b@se**
  - γραμμή 12:      DB_PASSWORD=**p@ssw@rd**
@@ -168,27 +177,33 @@ sh install_electronic_protocol_Debian_php5.sh
 - config/session.php
  - γραμμή 125:      'cookie' => '**laravel**_session',
 - public/.htaccess 
- - γραμμή 7:      RewriteBase /**@ppn@me** (ή διαγραφή της γραμμής ανάλογα τη ρύθμιση)
+ - γραμμή 7:      **διαγράψτε τη γραμμή**
  
- 
-Επίσης να ρυθμίσετε τον Apache server να ανακατευθύνει στο αρχείο public/index.php.
-Αυτό μπορεί να γίνει δημιουργώντας ένα αρχείο protocol.conf στον φάκελο conf-availiable του Apache με το ακόλουθο περιεχόμενο:
-```
-     # $appname default Apache configuration
+Αν δεν αλλάξατε κάτι η mysql στο Xampp έχει εξορισμού:
+- username root (αυτό δεν θέλει αλλαγή)
+- password      (κενό)
 
-    Alias /$appname $appdir/public
+Δώστε ένα όνομα στη d@t@b@se πχ: protocol
 
-    <Directory $appdir/public>
-        DirectoryIndex index.php
-        AllowOverride All
-        Options FollowSymlinks
-        Require all granted
-    </Directory>
+Ανοίξτε το πρόγραμμα  phpMyAdmin του Xampp και δημιουργήστε την βάση δεδομένων που μόλις ονομάσατε (πχ: protocol)
+
+Ανοίξτε την κονσόλα των Windows: πρόγραμμα **Cmd**. Μεταβείτε στον φάκελο που έχετε βάλει το Ηλ.Πρωτόκολλο (πχ protocol).
 ```
-αντικαθιστώντας ανάλογα τις μεταβλητές **$appname**, **$appdir**. Ενεργοποιήστε τη ρύθμιση.
-  
- 
-## Ευχαριστίες
+cd C:\xampp\htdocs\protocol
+```
+Eκτελέστε τις παρακάτω εντολές:
+```
+composer install
+php artisan migrate:refresh --seed
+php artisan db:seed --class=KeepvaluesTableSeeder
+php artisan key:generate
+php artisan optimize
+```
+
+Κατευθύνετε τον φυλομετρητή σας στη σελίδα http://localhost/protocol/public
+
+# 
+# Ευχαριστίες
 Το Ηλεκτρονικό Πρωτόκολλο χρησιμοποιεί με ευγνωμοσύνη τα:
 - [Laravel](https://laravel.com/)
 - [Bootstarp](http://getbootstrap.com/)
