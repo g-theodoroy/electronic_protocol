@@ -163,9 +163,10 @@ sh install_electronic_protocol_Debian_php5.sh
 Κατεβάστε το [Ηλεκτρονικό Πρωτόκολλο] (https://github.com/g-theodoroy/electronic_protocol/archive/master.zip)
 
 
-Αποσυμπιέστε το αρχείο **electronic_protocol-master.zip** στο φάκελο **C:/xampp/htdocs/**. Είναι ο εξορισμού φάκελος που το Xampp εγκαθιστά τις ιστοσελίδες. Εαν εγκαταστήσατε το Xampp αλλού πράξτε ανάλογα. Μετονομάστε το φάκελο σε ένα πιο σύντομο όνομα πχ protocol, ...  
+Αποσυμπιέστε το αρχείο **electronic_protocol-master.zip** σε όποιο φάκελο επιθυμείτε. Εδώ θα χρησιμοποιήσουμε τον δίσκο **C:\\**. Μετονομάστε το φάκελο **C:\electronic_protocol-master** σε ένα πιο σύντομο όνομα πχ protocol, ...  Στο τέλος θα έχουμε τα αρχεία του Ηλ.Πρωτοκόλλου στον φάκελο **C:\protocol**.
 
-Αλλάξτε τις τιμές των παρακάτω μεταβλητών στα ακόλουθα αρχεία:
+
+Ανοίξτε τον φάκελο (**C:\protocol**) με την Εξερεύνηση των windows και αλλάξτε τις τιμές των παρακάτω μεταβλητών στα ακόλουθα αρχεία:
 - .env
  - γραμμή 10:      DB_DATABASE=**d@t@b@se**
  - γραμμή 12:      DB_PASSWORD=**p@ssw@rd**
@@ -177,7 +178,7 @@ sh install_electronic_protocol_Debian_php5.sh
 - config/session.php
  - γραμμή 125:      'cookie' => '**laravel**_session',
 - public/.htaccess 
- - γραμμή 7:      **διαγράψτε τη γραμμή**
+ - γραμμή 7:      RewriteBase /**@ppn@me**
  
 Αν δεν αλλάξατε κάτι η mysql στο Xampp έχει εξορισμού:
 - username root (αυτό δεν θέλει αλλαγή)
@@ -185,22 +186,54 @@ sh install_electronic_protocol_Debian_php5.sh
 
 Δώστε ένα όνομα στη d@t@b@se πχ: protocol
 
+
+
+#### Ρύθμιση Apache του Xampp να ανακατευθύνεται στο Ηλ. Πρωτόκολλο:
+
+Ανοίγουμε με την εξερεύνηση των Windows τον φάκελο ```C:\xampp\apache\conf```.
+
+Δημιουργούμε ένα Νέο φάκελο με όνομα ```alias```.
+
+Στον φάκελο ```C:\xampp\apache\conf\alias``` δημιουργούμε ένα αρχείο conf πχ: ```protocol.conf```. Ίσως είναι πιο εύκολο να αντιγράψουμε ένα άλλο αρχείο conf, να το μετονομάσουμε και να διαγράψουμε τα δεδομένα.
+
+Εισάγετε στο αρχείο ```C:\xampp\apache\conf\alias\protocol.conf``` που μόλις δημιουργήσατε τα παρακάτω και αποθηκεύστε:
+```
+Alias /protocol "C:\protocol\public"
+
+<Directory "C:\protocol\public">
+        DirectoryIndex index.php
+        AllowOverride All
+        Options FollowSymlinks
+        Require all granted
+</Directory>
+```
+Ανοίξτε το αρχείο ```C:\xampp\apache\conf\httpd.conf``` και για να συμπεριλάβετε τις ρυθμίσεις προσθέστε στο τέλος:
+```
+Include "conf/alias/*"
+```
+
+### Ρυθμίσεις
+
+Εκκινήστε το Xampp και τους servers apache και mysql 
+
 Ανοίξτε το πρόγραμμα  phpMyAdmin του Xampp και δημιουργήστε την βάση δεδομένων που μόλις ονομάσατε (πχ: protocol)
+
 
 Ανοίξτε την κονσόλα των Windows: πρόγραμμα **Cmd**. Μεταβείτε στον φάκελο που έχετε βάλει το Ηλ.Πρωτόκολλο (πχ protocol).
 ```
-cd C:\xampp\htdocs\protocol
+cd C:\protocol
 ```
-Eκτελέστε τις παρακάτω εντολές:
+Eκτελέστε τις παρακάτω εντολές για να εγκατασταθούν τα απαραίτητα:
 ```
 composer install
+
 php artisan migrate:refresh --seed
 php artisan db:seed --class=KeepvaluesTableSeeder
 php artisan key:generate
 php artisan optimize
 ```
 
-Κατευθύνετε τον φυλομετρητή σας στη σελίδα http://localhost/protocol/public
+Κατευθύνετε τον φυλομετρητή σας στη σελίδα http://localhost/protocol
 
 # 
 # Ευχαριστίες
