@@ -185,6 +185,7 @@ sh install_electronic_protocol_Debian_php5.sh
 - password      (κενό)
 
 Δώστε ένα όνομα στη d@t@b@se πχ: protocol
+Δώστε ένα όνομα στo @ppn@me πχ: protocol
 
 
 
