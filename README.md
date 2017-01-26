@@ -13,7 +13,8 @@
 #
 # Εγκατάσταση
 
-## Προτεινόμενη μέθοδος
+#
+# Προτεινόμενη μέθοδος
 
 Εγκατάσταση σε φυσικό server του σχολείου όπου έχουμε πρόσβαση.
 
@@ -152,7 +153,19 @@ sh install_electronic_protocol_Debian_php5.sh
 ```
 
 #
-# Λειτουργικό σύστημα Windows με Xampp
+# Εναλλακτικές λύσεις
+
+## Λειτουργικό σύστημα Windows με εγκατεστημένο Xampp, Wamp, ...
+
+
+Υπάρχουν διάφορες εφαρμογές που στήνουν στα Windows Apache και Mysql servers για παραγωγή και δοκιμή webapp όπως: Xampp, Wamp, ...
+
+
+Θα περιγράψουμε ενδεικτικά πως μπορεί να γίνει αυτό σε Xampp. Με παρόμοιο τρόπο μπορεί να γίνει και σε άλλες εναλλακτικές λύσεις.
+
+
+## Εγκατάσταση σε Xampp
+
 
 Εγκαταστήστε το [Xampp] (https://www.apachefriends.org/)
 
@@ -169,17 +182,26 @@ sh install_electronic_protocol_Debian_php5.sh
 
 Ανοίξτε τον φάκελο (**C:\protocol**) με την Εξερεύνηση των windows και αλλάξτε τις τιμές των παρακάτω μεταβλητών στα ακόλουθα αρχεία:
 - .env
- - γραμμή 10:      DB_DATABASE=**d@t@b@se**
- - γραμμή 12:      DB_PASSWORD=**p@ssw@rd**
- - γραμμή 26:      MAIL_USERNAME=**gm@ilusern@me**
- - γραμμή 27:      MAIL_PASSWORD=**gm@ilp@ss**
+ - γραμμή 10:
+   - DB_DATABASE=**d@t@b@se**
+ - γραμμή 12:
+  - DB_PASSWORD=**p@ssw@rd**
+ - γραμμή 26:
+  - MAIL_USERNAME=**gm@ilusern@me**
+ - γραμμή 27:
+  - MAIL_PASSWORD=**gm@ilp@ss**
 - config/database.php
- - γραμμή 59:      'database' => env('DB_DATABASE', '**d@t@b@se**'),
- - γραμμή 61:      'password' => env('DB_PASSWORD', '**p@ssw@rd**'),
+ - γραμμή 59:      
+  - 'database' => env('DB_DATABASE', '**d@t@b@se**'),
+ - γραμμή 61:      
+  - 'password' => env('DB_PASSWORD', '**p@ssw@rd**'),
 - config/session.php
- - γραμμή 125:      'cookie' => '**laravel**_session',
+ - γραμμή 125:      
+  - 'cookie' => '**laravel**_session',
 - public/.htaccess 
- - γραμμή 7:      RewriteBase /**@ppn@me**
+ - γραμμή 7:      
+  - RewriteBase /**@ppn@me**
+ 
  
 Αν δεν αλλάξατε κάτι η mysql στο Xampp έχει εξορισμού:
 - username root (αυτό δεν θέλει αλλαγή)
