@@ -87,10 +87,10 @@ class ConfigController extends Controller
         $mysqldumpPath = $config->getConfigValueOf('mysqldumpPath');
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $filename = storage_path('app\arxeio\backups') . "\\" . $database . "_back_" . date ( "YmdHms" ) . '.sql';
+            $filename = storage_path('app/arxeio/backups') . "/$database\_back_" . date ( "YmdHms" ) . '.sql';
             $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database > $filename";
         }else{
-            $filename = storage_path('app/arxeio/backups') . "/" . $database . "_back_" . date ( "YmdHms" ) . '.sql.gz';
+            $filename = storage_path('app/arxeio/backups') . "/$database\_back_" . date ( "YmdHms" ) . '.sql.gz';
             $command = "$mysqldumpPath --user=$username --password=$password --host=localhost $database | gzip > $filename";
         }
         exec ( $command, $out, $ret);
@@ -126,7 +126,8 @@ class ConfigController extends Controller
 
     public function arxeio(){
         $arxeianum = Attachment::where('expires', '<' , Carbon::now()->format('Ymd'))->count();
-        return view('arxeio', compact('arxeianum'));
+        $arxeiaNumTrash = Attachment::onlyTrashed()->count();
+        return view('arxeio', compact('arxeianum', 'arxeiaNumTrash'));
    }
 
     public function expired(){
@@ -156,9 +157,15 @@ class ConfigController extends Controller
     public function delExpired(){
         $arxeianum = Attachment::where('expires', '<' , Carbon::now()->format('Ymd'))->count();
         $arxeia = Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->get();
+        $arxeiaNumTrash = Attachment::whereNotNull('deleted_at')->count();
+        $arxeiaTrash = Attachment::whereNotNull('deleted_at')->get();
         foreach($arxeia as $arxeio){
             $savedPath = $arxeio->savedPath;
-            Storage::delete($savedPath);
+            $trashPath = str_replace('arxeio', 'trash', $savedPath);
+
+            Storage::move($savedPath, $trashPath);
+            Attachment::where('savedPath',$savedPath)->update(['savedPath' => $trashPath]);
+
         }
 
         Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->delete();
@@ -169,6 +176,13 @@ class ConfigController extends Controller
         );
         session()->flash('notification',$notification);
 
+        return back();
+    }
+
+    public function delDeleted(){
+        Attachment::onlyTrashed()->forceDelete();
+        Storage::deleteDirectory('trash');
+        Storage::makeDirectory('trash');
         return back();
     }
 

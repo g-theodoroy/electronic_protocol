@@ -443,7 +443,8 @@ class ProtocolController extends Controller
    public function attachDelete (Attachment $attachment){
     $protocol = $attachment->protocol;
     $savedPath = $attachment->savedPath;
-    Storage::delete($savedPath);
+    $trashPath = str_replace('arxeio', 'trash', $savedPath);
+    Storage::move($savedPath, $trashPath);
     $attachment->delete();
     return view('getArxeia', compact('protocol'));
    }
