@@ -21,7 +21,6 @@ class CreateAttachmentsTable extends Migration
             $table->string('mimeType')->required();
             $table->string('keep')->nullable();
             $table->integer('expires')->unsigned()->nullable();
-            $table->string('flag')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
