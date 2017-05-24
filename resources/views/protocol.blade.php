@@ -176,10 +176,10 @@ function periigisi(id){
                             <select id="fakelos" onchange='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty()' class="form-control " name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
                                 <option value=''></option>
                                 @foreach($fakeloi as $fakelos)
-                                @if ($fakelos == $protocol->fakelos)
-                                    <option value='{{$fakelos}}' selected >{{$fakelos}}</option>
+                                @if ($fakelos['fakelos'] == $protocol->fakelos)
+                                    <option value='{{$fakelos['fakelos']}}' selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @else
-                                    <option value='{{$fakelos}}' >{{$fakelos}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @endif
                                 @endforeach
                             </select>

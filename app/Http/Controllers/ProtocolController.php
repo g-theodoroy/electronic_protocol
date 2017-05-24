@@ -13,6 +13,7 @@ use URL;
 use Auth;
 use Illuminate\Validation\Rule;
 use Validator;
+use DB;
 
 /*
 
@@ -59,8 +60,7 @@ class ProtocolController extends Controller
  
     public function index( Protocol $protocol){
 
-        $fakeloi= Keepvalue::pluck('fakelos')->toArray();
-        natsort($fakeloi);
+        $fakeloi= Keepvalue::orderBy(DB::raw("MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0<>0 DESC, MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0, `fakelos`"))->select('fakelos', 'describe')->get();
 
         $config = new Config;
         $newetos = $config->getConfigValueOf('yearInUse')?$config->getConfigValueOf('yearInUse'):Carbon::now()->format('Y');
