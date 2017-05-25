@@ -177,9 +177,9 @@ function periigisi(id){
                                 <option value=''></option>
                                 @foreach($fakeloi as $fakelos)
                                 @if ($fakelos['fakelos'] == $protocol->fakelos)
-                                    <option value='{{$fakelos['fakelos']}}' selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['describe']}}' selected >{{$fakelos['fakelos']}} - {{substr($fakelos['describe'],0,200)}}</option>
                                 @else
-                                    <option value='{{$fakelos['fakelos']}}' >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['describe']}}' >{{$fakelos['fakelos']}} - {{substr($fakelos['describe'],0,200)}}</option>
                                 @endif
                                 @endforeach
                             </select>
