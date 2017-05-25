@@ -75,15 +75,15 @@ class UserController extends Controller
             'role_id' => $data['role_id'],
             'password' => bcrypt($data['password']),
         ]);
- 
+
          $notification = array(
-            'message' => 'Επιτυχημένη καταχώριση.', 
+            'message' => 'Επιτυχημένη καταχώριση.',
             'alert-type' => 'success'
         );
         session()->flash('notification',$notification);
 
     return back();
-    
+
     }
 
     public function update($id)
@@ -94,12 +94,12 @@ class UserController extends Controller
         'name' => 'required|max:255',
         'username' => "required|max:255|unique:users,username,$id,id",
         'email' => 'required|email|max:255',
-        'role_id' => 'required' 
+        'role_id' => 'required'
         ];
         $updatevalues=[
            'name' => $data['name'],
            'username' => $data['username'],
-           'email' => $data['email'] 
+           'email' => $data['email']
            ];
 
         if (request()->password ){
@@ -131,11 +131,11 @@ class UserController extends Controller
 
         if ($admin_count == 1 and $old_role_id == $admin_id and $data['role_id'] != $admin_id) {
             $notification = array(
-                'message' => 'Πρέπει να υπάρχει τουλάχιστον ένας χρήστης με το Ρόλο <b>\"Διαχειριστής\"</b>', 
+                'message' => 'Πρέπει να υπάρχει τουλάχιστον ένας χρήστης με το Ρόλο <b>\"Διαχειριστής\"</b>',
                 'alert-type' => 'error'
             );
             session()->flash('notification',$notification);
-          
+
             return back();
         }
 
@@ -144,13 +144,13 @@ class UserController extends Controller
         User::whereId($id)->update($updatevalues);
 
         $notification = array(
-            'message' => 'Επιτυχημένη ενημέρωση.', 
+            'message' => 'Επιτυχημένη ενημέρωση.',
             'alert-type' => 'success'
         );
         session()->flash('notification',$notification);
-      
+
         return back();
-    
+
     }
 
 
@@ -159,7 +159,7 @@ class UserController extends Controller
     {
 
         User::destroy ($user);
-     
+
         if (Role::where('role','Διαχειριστής')->has('users')->count() == 0){
             $file = storage_path('conf/.denyregister');
             if (file_exists($file ))unlink($file);
@@ -171,7 +171,7 @@ class UserController extends Controller
         }
 
         return redirect('users');
-    
+
     }
 
 }

@@ -65,5 +65,4 @@ class ResetPasswordController extends Controller
                     ->withErrors(['username' => trans($response)]);
     }
 
-
 }

@@ -173,13 +173,13 @@ function periigisi(id){
                             <strong>Φάκελος</strong> 
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
-                            <select id="fakelos" onchange='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty()' class="form-control " name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
+                            <select id="fakelos" onchange='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty()' class="form-control selectpicker" data-live-search="true" name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
                                 <option value=''></option>
                                 @foreach($fakeloi as $fakelos)
                                 @if ($fakelos['fakelos'] == $protocol->fakelos)
-                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['describe']}}' selected >{{$fakelos['fakelos']}} - {{substr($fakelos['describe'],0,200)}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @else
-                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['describe']}}' >{{$fakelos['fakelos']}} - {{substr($fakelos['describe'],0,200)}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @endif
                                 @endforeach
                             </select>
