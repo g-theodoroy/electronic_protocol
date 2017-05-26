@@ -102,7 +102,7 @@
 
                         <div class="row">
                             <div class="col-md-4 col-sm-4  ">
-                                <select id='searchField1' onchange="getFindData()"  name='searchField1' class="form-control"  title="Αναζήτηση στο πεδίο {{$fields[$searchField1]}}">
+                                <select id='searchField1' onchange="getFindData()"  name='searchField1' class="form-control selectpicker"  title="Αναζήτηση στο πεδίο {{$fields[$searchField1]}}">
                                 @foreach($fields as $key => $value)
                                 @if ($key == $searchField1)
                                 <option value="{{$key}}" selected >{{$value}}</option>
@@ -118,7 +118,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4 col-sm-4  ">
-                                <select id='searchField2' onchange="getFindData()"  name='searchField2' class="form-control"  title="Αναζήτηση στο πεδίο {{$fields[$searchField2]}}">
+                                <select id='searchField2' onchange="getFindData()"  name='searchField2' class="form-control selectpicker"  title="Αναζήτηση στο πεδίο {{$fields[$searchField2]}}">
                                 @foreach($fields as $key => $value)
                                 @if ($key == $searchField2)
                                 <option value="{{$key}}" selected >{{$value}}</option>
@@ -134,7 +134,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4 col-sm-4  ">
-                                <select id='searchField3' onchange="getFindData()"  name='searchField3' class="form-control"  title="Αναζήτηση στο πεδίο {{$fields[$searchField3]}}"  >
+                                <select id='searchField3' onchange="getFindData()"  name='searchField3' class="form-control selectpicker"  title="Αναζήτηση στο πεδίο {{$fields[$searchField3]}}"  >
                                 @foreach($fields as $key => $value)
                                 @if ($key == $searchField3)
                                 <option value="{{$key}}" selected >{{$value}}</option>
