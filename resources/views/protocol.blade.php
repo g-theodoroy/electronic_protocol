@@ -164,7 +164,7 @@ function periigisi(id){
                         </div>
                         <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                             <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 / ></a>
-                            <a href="javascript:document.forms['myProtocolForm'].submit();" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:$('#keep').removeAttr('disabled');document.forms['myProtocolForm'].submit();" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
                         </div>
                     </div>
 
@@ -173,13 +173,13 @@ function periigisi(id){
                             <strong>Φάκελος</strong> 
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
-                            <select id="fakelos" onchange='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty()' class="form-control selectpicker" data-live-search="true" name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
+                            <select id="fakelos" onchange='getKeep4Fakelos()' class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
                                 <option value=''></option>
                                 @foreach($fakeloi as $fakelos)
                                 @if ($fakelos['fakelos'] == $protocol->fakelos)
-                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}'  style="white-space: pre-wrap; width: 500px;" selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @else
-                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}'  style="white-space: pre-wrap; width: 500px;" >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
+                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @endif
                                 @endforeach
                             </select>
@@ -337,8 +337,43 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <input id="file_inputs_count" type="hidden" class="form-control" name="file_inputs_count"  value="0"  >
                             <a href="#" onclick="getFileInputs()" class="{{$submitVisible}}" role="button" title="Προσθήκη συνημμένων αρχείων" > <img src="{{ URL::to('/') }}/images/attachment.png" height=25 /></a>
-                            <a href="#" onclick='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty()' class="{{$submitVisible}}" role="button" title="Καθάρισμα συνημμένων αρχείων" > <img src="{{ URL::to('/') }}/images/clear.ico" height="20" /></a>
+                            <a href="#" onclick='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty();$("#keepdiv").addClass("hidden")' class="{{$submitVisible}}" role="button" title="Καθάρισμα συνημμένων αρχείων" > <img src="{{ URL::to('/') }}/images/clear.ico" height="20" /></a>
                         </div>
+                    </div>
+                    <div id="keepdiv" class="row hidden">
+                    <div class="col-md-4 col-sm-4 small form-control-static">
+                        <strong>Επιλογή αρχείων</strong> 
+                    </div>
+                        @if($allowUserChangeKeepSelect)
+                            <div class="col-md-4 col-sm-4 small text-right form-control-static">
+                                <strong>Χρόνος διατήρησης</strong> 
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                            <select id="keep" class="form-control small selectpicker" name="keep" title='Χρόνος Διατήρησης' >
+                        @else
+                            <div class="col-md-4 col-sm-4 small text-right form-control-static" title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
+                                <strong>Χρόνος διατήρησης</strong> 
+                            </div>
+                            <div class="col-md-4 col-sm-4" title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
+                            <select id="keep" class="form-control small selectpicker" data-value="{{$keepval}}" onchange="this.value = this.getAttribute('data-value');" name="keep" title='Χρόνος Διατήρησης' >
+                        @endif
+                            <option value=''></option>
+                            @foreach($years as $year)
+                                @if($year->keep == $keepval) 
+                                    <option value='{{$year->keep}}' title='{{$year->keep}} {{ $year->keep > 1 ? "χρόνια" : "χρόνο" }}' selected >{{$year->keep}} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }} </option>
+                                @else
+                                    <option value='{{$year->keep}}' title='{{$year->keep}} {{ $year->keep > 1 ? "χρόνια" : "χρόνο" }}' >{{$year->keep}} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }} </option>
+                                @endif
+                                @endforeach
+                            @foreach($words as $word)
+                                @if($word->keep_alt == $keepval) 
+                                    <option value='{{$word->keep_alt}}' title='{{$word->keep_alt}}' selected >{{$word->keep_alt}}</option>
+                                @else
+                                    <option value='{{$word->keep_alt}}' title='{{$word->keep_alt}}' >{{$word->keep_alt}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
                     </div>
                     <div class="row ">
                     <div id="show_protocol_file_inputs" class="col-md-12 col-sm-12"></div>
@@ -375,8 +410,16 @@ function getFileInputs() {
     }
     var num = $("#file_inputs_count").val()
     var fak = $("#fakelos").val()
+    $("#keepdiv").removeClass('hidden')
     $("#file_inputs_count").val(parseInt(num)+1)
-    $('#show_protocol_file_inputs').load("{{ URL::to('/') }}/getFileInputs/"+ num + "/" + fak);
+    $('#show_protocol_file_inputs').load("{{ URL::to('/') }}/getFileInputs/"+ num );
+}
+function getKeep4Fakelos(){
+    var fak = $("#fakelos").val()
+    $.get("{{ URL::to('/') }}/getKeep4Fakelos/" + fak, function(data){
+        $("#keep").val(data).change()
+        $("#keep").attr('data-value',data)
+    });
 }
 </script>
 

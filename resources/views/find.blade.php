@@ -129,7 +129,7 @@
                                 </select>
                             </div>
                             <div class="col-md-6 col-sm-6">
-                                <input id="searchData2" oninput="getFindData()"  type="text" class="form-control " name="searchData2" placeholder="Κείμενο προς αναζήτηση" value="" title='Κείμενο προς αναζήτηση'>
+                                <input id="searchData2" oninput="getFindData()"  type="text" class="form-control" name="searchData2" placeholder="Κείμενο προς αναζήτηση" value="" title='Κείμενο προς αναζήτηση'>
                             </div>
                         </div>
                         <div class="row">

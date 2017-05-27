@@ -16,8 +16,8 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
+     public function __construct()
+     {
         $this->middleware('auth');
         $this->middleware('web');
         $this->middleware('admin:home');
@@ -63,7 +63,7 @@ class UserController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'required|min:6|confirmed',
             'role_id' => 'required',
-        ]);
+            ]);
 
 
         $data = request()->all();
@@ -74,15 +74,15 @@ class UserController extends Controller
             'email' => $data['email'],
             'role_id' => $data['role_id'],
             'password' => bcrypt($data['password']),
-        ]);
+            ]);
 
-         $notification = array(
+        $notification = array(
             'message' => 'Επιτυχημένη καταχώριση.',
             'alert-type' => 'success'
-        );
+            );
         session()->flash('notification',$notification);
 
-    return back();
+        return back();
 
     }
 
@@ -97,14 +97,14 @@ class UserController extends Controller
         'role_id' => 'required'
         ];
         $updatevalues=[
-           'name' => $data['name'],
-           'username' => $data['username'],
-           'email' => $data['email']
-           ];
+        'name' => $data['name'],
+        'username' => $data['username'],
+        'email' => $data['email']
+        ];
 
         if (request()->password ){
-        $validatevalues['password'] = 'required|min:6|confirmed';
-        $updatevalues['password'] = bcrypt($data['password']);
+            $validatevalues['password'] = 'required|min:6|confirmed';
+            $updatevalues['password'] = bcrypt($data['password']);
         }
 
 
@@ -118,7 +118,7 @@ class UserController extends Controller
 
         // αν είναι πάνω από 1 admin ενημερώνω
         if ($admin_count >1 ){
-        $updatevalues['role_id'] = $data['role_id'];
+            $updatevalues['role_id'] = $data['role_id'];
         }
 
         // βρίσκω τον role_id του χρήστη που θα ενημέρώθεί
@@ -126,14 +126,14 @@ class UserController extends Controller
         // αν είναι μονο ένας admin και ο χρήστης
         // που θα ενημερωθεί δεν είναι αυτός ενημερώνω
         if ($admin_count == 1 and $old_role_id != $admin_id){
-        $updatevalues['role_id'] = $data['role_id'];
+            $updatevalues['role_id'] = $data['role_id'];
         }
 
         if ($admin_count == 1 and $old_role_id == $admin_id and $data['role_id'] != $admin_id) {
             $notification = array(
                 'message' => 'Πρέπει να υπάρχει τουλάχιστον ένας χρήστης με το Ρόλο <b>\"Διαχειριστής\"</b>',
                 'alert-type' => 'error'
-            );
+                );
             session()->flash('notification',$notification);
 
             return back();
@@ -146,7 +146,7 @@ class UserController extends Controller
         $notification = array(
             'message' => 'Επιτυχημένη ενημέρωση.',
             'alert-type' => 'success'
-        );
+            );
         session()->flash('notification',$notification);
 
         return back();

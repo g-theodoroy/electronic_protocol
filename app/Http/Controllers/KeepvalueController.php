@@ -93,8 +93,8 @@ class KeepvalueController extends Controller
         if(! $data['remarks']) $data['remarks'] = null;
 
         $validatevalues =[
-            'fakelos' => "required|max:255|unique:keepvalues,fakelos,$id,id",
-            'keep' => 'nullable|integer',
+        'fakelos' => "required|max:255|unique:keepvalues,fakelos,$id,id",
+        'keep' => 'nullable|integer',
         ]; // 'describe' => 'required', 
             // 'keep' => 'nullable|integer|required_without:keep_alt',
             // 'keep_alt' => 'nullable|max:255|required_without:keep',
@@ -102,15 +102,15 @@ class KeepvalueController extends Controller
         $validator = Validator::make(request()->all(), [
             'fakelos' => 'regex:/^Φ\.\w[\w ._-]*$/u',],  [
             'fakelos.regex' => "Το όνομα του φακέλου πρέπει να ξεκινάει με κεφαλαίο Φ και τελεία (<b>Φ.</b>) ακολουθούμενο από ένα αριθμό ή γράμμα.<br>Επιτρέπονται γράμματα, αριθμοί και οι χαρακτήρες τελεία, παύλα και κάτω παύλα ( <b>. - _</b> ).<br>&nbsp;",
-         ])->validate();
+        ])->validate();
 
         $updatevalues=[
-            'fakelos' => $data['fakelos'],
-            'keep' => $data['keep'],
-            'keep_alt' => $data['keep_alt'],
-            'describe' => $data['describe'],
-            'remarks' => $data['remarks'],
-           ];
+        'fakelos' => $data['fakelos'],
+        'keep' => $data['keep'],
+        'keep_alt' => $data['keep_alt'],
+        'describe' => $data['describe'],
+        'remarks' => $data['remarks'],
+        ];
 
         $this->validate(request(), $validatevalues);
         Keepvalue::whereId($id)->update($updatevalues);

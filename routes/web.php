@@ -55,7 +55,8 @@ Route::get('keep/del/{keepvalue}', 'KeepvalueController@delete');
 
 Route::get('/home','ProtocolController@index');
 Route::get('/home/{protocol}','ProtocolController@index');
-Route::get('getFileInputs/{num}/{fakelos}', 'ProtocolController@getFileInputs');
+Route::get('getFileInputs/{num}', 'ProtocolController@getFileInputs');
+Route::get('getKeep4Fakelos/{fakelos}', 'ProtocolController@getKeep4Fakelos');
 
 Route::post('/home', 'ProtocolController@store');
 Route::post('/home/{protocol}','ProtocolController@update');
