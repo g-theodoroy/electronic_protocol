@@ -121,8 +121,6 @@ use DB;
         $config = new Config;
         $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
 
-        // να φτιάξω τη λίστα με τα συνημμένα αρχεία
-
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
         
@@ -141,7 +139,6 @@ use DB;
 
 
     public function getFileInputs($num){
-    	
         $data = request()->all();
         return view('getFileInputs', compact('num', 'data'));
     }
