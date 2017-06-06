@@ -61,6 +61,15 @@ function chkdelete(id, name){
                 <form name="myForm" class="form-horizontal" role="form" method="POST" action="{{ url('/users') }}{{$user->id ? '/' . $user->id : ''}}">
                     {{ csrf_field() }}
 
+                    @if ($users->links())
+                    <div class='row'>
+                        <div class="col-md-12 col-sm-12 small text-center">
+                            <span class="small">{{$users->links()}}</span>
+                        </div>
+                    </div>
+                    @endif
+
+
                     <div class='row'>
 
                         <div class='col-md-4 col-sm-4 h4'>
@@ -142,15 +151,6 @@ function chkdelete(id, name){
                     </form>
 
                    <hr>
-
-                    @if ($users->links())
-                    <div class='row'>
-                        <div class="col-md-12 col-sm-12 small text-center">
-                            <span class="small">{{$users->links()}}</span>
-                        </div>
-                    </div>
-                    @endif
-
 
                     @php ($i = 1)
                     @foreach ($users as $u)

@@ -54,7 +54,7 @@ use DB;
      {
         $this->middleware('auth');
         $this->middleware('web');
-        $this->middleware('writer:home', ['except' => ['index', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
+        $this->middleware('writer:home', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
     }
 
     
@@ -125,6 +125,20 @@ use DB;
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
         
         return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'currentEtos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect'));
+    }
+
+    public function indexList(){
+        $config = new Config;
+        $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+        $refreshInterval = $config->getConfigValueOf('minutesRefreshInterval') * 60000;
+        $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
+        foreach($protocols as $protocol){
+            if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
+            if($protocol->in_date) $protocol->in_date = Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y');
+            if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
+            if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
+        }
+        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval'));
     }
 
 

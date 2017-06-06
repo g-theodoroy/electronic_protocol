@@ -48,6 +48,14 @@ function chkdelete(id, name){
                 <form name="myForm" class="form-horizontal" role="form" method="POST" action="{{ url('/keep') }}{{$keepvalue->id ? '/' . $keepvalue->id : '' }}">
                     {{ csrf_field() }}
 
+                    @if ($keepvalues->links())
+                    <div class='row'>
+                        <div class="col-md-12 col-sm-12 small text-center">
+                            <span class="small">{{$keepvalues->links()}}</span>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class='row'>
                         <div class='col-md-2 col-sm-2 text-center h4'>
                             <strong>Φ.</strong>
@@ -90,14 +98,6 @@ function chkdelete(id, name){
 
                     </form>
                     <hr>
-
-                    @if ($keepvalues->links())
-                    <div class='row'>
-                        <div class="col-md-12 col-sm-12 small text-center">
-                            <span class="small">{{$keepvalues->links()}}</span>
-                        </div>
-                    </div>
-                    @endif
 
                     @php ($i = 1)
                     @foreach ($keepvalues as $keep)

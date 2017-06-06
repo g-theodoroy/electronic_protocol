@@ -324,7 +324,7 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Συνημμένα</strong> 
                         </div>
-                        <div id='show_arxeia' class="col-md-10 col-sm-10 form-control-static">
+                        <div id='show_arxeia' class="col-md-9 col-sm-9 form-control-static">
                             <ul class='list-inline'>
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
@@ -334,10 +334,11 @@ function periigisi(id){
                                 @endforeach
                             </ul>
                         </div>
-                        <div class="col-md-1 col-sm-1 small text-center form-control-static">
+                        <div class="col-md-2 col-sm-2 small text-right form-control-static">
                             <input id="file_inputs_count" type="hidden" class="form-control" name="file_inputs_count"  value="0"  >
                             <a href="#" onclick="getFileInputs()" class="{{$submitVisible}}" role="button" title="Προσθήκη συνημμένων αρχείων" > <img src="{{ URL::to('/') }}/images/attachment.png" height=25 /></a>
                             <a href="#" onclick='$("#file_inputs_count").val(0);$("#show_protocol_file_inputs").empty();$("#keepdiv").addClass("hidden")' class="{{$submitVisible}}" role="button" title="Καθάρισμα συνημμένων αρχείων" > <img src="{{ URL::to('/') }}/images/clear.ico" height="20" /></a>
+                            <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Λίστα Πρωτοκόλλου" > <img src="{{ URL::to('/') }}/images/protocol.png" height=25 / ></a>
                         </div>
                     </div>
                     <div id="keepdiv" class="row hidden">

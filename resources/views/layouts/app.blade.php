@@ -128,8 +128,9 @@
                                 <ul class="dropdown-menu" role="menu">
                                   
                                     <li class="dropdown-submenu">
-                                        <a class="test" tabindex="-1" href="{{ url('/home') }}">Πρωτόκολλο</a>
+                                        <a class="test" tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
                                         <ul class="dropdown-menu">
+                                            <li><a  tabindex="-1" href="{{ url('/home') }}">Εισαγωγή</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/print') }}">Εκτύπωση</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/keep') }}">Διατήρηση</a></li>

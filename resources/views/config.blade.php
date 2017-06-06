@@ -62,6 +62,14 @@
                                 <input id="showRowsInPage" type="text" class="form-control text-center" name="showRowsInPage" placeholder="showRowsInPage" value="{{$configs['showRowsInPage']}}" title=''>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                Ανανέωση Πρωτοκόλλου κάθε τόσα λεπτά
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="minutesRefreshIntervaldiv">
+                                <input id="minutesRefreshInterval" type="text" class="form-control text-center" name="minutesRefreshInterval" placeholder="minutesRefreshInterval" value="{{$configs['minutesRefreshInterval']}}" title=''>
+                            </div>
+                        </div>
                     </div>
 
                 <div class="panel panel-default col-md-12 col-sm-12  ">

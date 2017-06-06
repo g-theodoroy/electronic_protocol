@@ -52,6 +52,7 @@ class ConfigController extends Controller
             'showRowsInPage' => 'required|integer',
             'protocolArrowStep' => 'required|integer',
             'maxRowsInFindPage' => 'required|integer',
+            'minutesRefreshInterval' => 'required|numeric',
         ]);
 
 

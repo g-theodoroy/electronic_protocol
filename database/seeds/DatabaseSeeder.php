@@ -73,6 +73,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('configs')->insert([
+           'key' => 'minutesRefreshInterval',
+           'value' => 5,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
            'key' => 'ipiresiasName',
            'value' => 'Όνομα Σχολείου',
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
