@@ -154,12 +154,37 @@ use DB;
       $protocolValidate = $config->getConfigValueOf('protocolValidate');
       $etos = request('etos');
       $currentEtos = Carbon::now()->format('Y');
+      $safeNewProtocolNum = $config->getConfigValueOf('safeNewProtocolNum');
 
-      $mustValidate =[
-      'protocolnum' => "required|integer|unique:protocols,protocolnum,NULL,id,etos,$etos",
-      'etos' => 'required|integer|digits:4', 
-      'protocoldate' => 'required', 
-      ];
+      // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
+      $firstProtocolNum = $config->getConfigValueOf('firstProtocolNum');
+      if (Protocol::all()->count()){
+          if ($config->getConfigValueOf('yearInUse')){
+            $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1 ;
+            }else{
+            $newprotocolnum = Protocol::all() -> last() -> protocolnum ? Protocol::all() -> last() -> protocolnum + 1 : 1 ;
+            }  
+        }else{
+            if($firstProtocolNum){
+                $newprotocolnum = $firstProtocolNum;
+            }else{
+                $newprotocolnum = 1;
+            }
+        }
+        // Αν η ρύθμιση λέι ΝΑΙ σε ασφαλή Αρ.Πρωτ δεν ελέγχω το νέο Αρ.Πρ που μόλις έφτιαξα
+      if($safeNewProtocolNum){
+          $mustValidate =[
+          'etos' => 'required|integer|digits:4', 
+          'protocoldate' => 'required', 
+          ];
+      }else{
+        // αλλιώς ελέγχω
+          $mustValidate =[
+          'protocolnum' => "required|integer|unique:protocols,protocolnum,NULL,id,etos,$etos",
+          'etos' => 'required|integer|digits:4', 
+          'protocoldate' => 'required', 
+          ];
+      }
       $this->validate(request(), $mustValidate);
 
       if($protocolValidate){
@@ -215,6 +240,31 @@ use DB;
             ])->validate();
     }
 
+    if($safeNewProtocolNum){ // αν η ρύθμιση Ασφαλής νέος Αρ.Πρ είναι ΝΑΙ
+        // εισαγωγή της εγγραφής με το νέο Αρ.Πρ που μόλις έφτιαξα
+    Protocol::create([
+        'user_id' => Auth::user()->id ,
+        'protocolnum'=> $newprotocolnum,
+        'protocoldate'=> Carbon::createFromFormat('d/m/Y', $data['protocoldate'])->format('Ymd'),
+        'etos' => $data['etos'],
+        'fakelos' => $data['fakelos'],
+        'thema' => $data['thema'],
+        'in_num' => $data['in_num'],
+        'in_date' => $in_date,
+        'in_topos_ekdosis'=>  $data['in_topos_ekdosis'],
+        'in_arxi_ekdosis' => $data['in_arxi_ekdosis'],
+        'in_paraliptis' => $data['in_paraliptis'],
+        'diekperaiosi' => $data['diekperaiosi'],
+        'in_perilipsi' => $data['in_perilipsi'],
+        'out_date' => $out_date,
+        'diekp_date' => $diekp_date,
+        'sxetiko' => $data['sxetiko'],
+        'out_to' => $data['out_to'],
+        'out_perilipsi' => $data['out_perilipsi'],
+        'keywords' => $data['keywords'],
+        'paratiriseis' => $data['paratiriseis']
+        ]);
+    }else{ // αλλιώς εισάγω τον Αρ.Πρ που έστειλε η φόρμα
     Protocol::create([
         'user_id' => Auth::user()->id ,
         'protocolnum'=> $data['protocolnum'],
@@ -237,6 +287,7 @@ use DB;
         'keywords' => $data['keywords'],
         'paratiriseis' => $data['paratiriseis']
         ]);
+    }
 
     $filescount = 3 * $data['file_inputs_count'];
     $protocol_id = Protocol::max('id');

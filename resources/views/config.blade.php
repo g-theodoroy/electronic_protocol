@@ -156,6 +156,22 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
+                                Ασφαλής, όχι διπλότυπος Νέος Αρ.Πρωτοκόλλου  
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="safeNewProtocolNumdiv">
+                                <select id='safeNewProtocolNum' name='safeNewProtocolNum' class="form-control"  title=''>
+                                @if ($configs['safeNewProtocolNum'])
+                                <option value="0"  >ΟΧΙ</option>
+                                <option value="1" selected >ΝΑΙ</option>
+                                @else
+                                <option value="0" selected >ΟΧΙ</option>
+                                <option value="1"  >ΝΑΙ</option>
+                                @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
                                 Έλεύθερη επιλογή χρόνου διατήρησης αρχείων 
                             </div>
                             <div class="col-md-2 col-sm-2  " id="allowUserChangeKeepSelectdiv">

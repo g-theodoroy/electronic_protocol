@@ -66,6 +66,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('configs')->insert([
+           'key' => 'safeNewProtocolNum',
+           'value' => 1,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
            'key' => 'ipiresiasName',
            'value' => 'Όνομα Σχολείου',
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
