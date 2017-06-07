@@ -54,8 +54,8 @@
                               <a href="javascript:chkdeldelete()"  role="button" title="Άδειασμα Κάδου Ανακύκλωσης" > <img src="{{ URL::to('/') }}/images/deldelete.png" height="25" /></a>
                             @endif
                           </div>
-                          <div class="col-md-2 col-sm-2 text-center ">
-                              <a href="{{ URL::to('/home') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
+                          <div class="col-md-2 col-sm-2 text-right ">
+                              <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
                           </div>
                       </div>
 

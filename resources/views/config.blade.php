@@ -219,7 +219,7 @@
                             <a href="#"  onclick="document.forms['configform'].submit();" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height="30" /></a>
                         </div>
                         <div class="col-md-2 col-sm-2 col-md-offset-2 col-sm-offset-2 text-center ">
-                            <a href="{{ URL::to('/home') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
+                            <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
                         </div>
                     </div>
 

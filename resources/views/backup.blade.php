@@ -25,6 +25,9 @@
                             <div class="form-control-static text-center col-md-2 col-sm-2  col-md-offset-5 col-sm-offset-5" >
                             <a href="{{ URL::to('/') }}/backup"  role="button" title="Δημιουργία αντιγράφου ασφαλείας" > <img src="{{ URL::to('/') }}/images/save.ico" height="30" /></a>
                             </div>
+                            <div class="form-control-static text-right col-md-2 col-sm-2  col-md-offset-3 col-sm-offset-3" >
+                            <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
+                            </div>
                      </div>
                 </div>
                 @if($files)
