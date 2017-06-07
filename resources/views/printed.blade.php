@@ -95,6 +95,9 @@
                     @if($protocol->in_topos_ekdosis and $protocol->in_arxi_ekdosis)
                     <br>
                     @endif
+                    @if( ! $protocol->in_topos_ekdosis and ($protocol->in_date and $protocol->in_arxi_ekdosis))
+                    <br>
+                    @endif
                     @if($protocol->in_arxi_ekdosis)
                     &#x2726;{{$protocol->in_arxi_ekdosis}}
                     @endif
@@ -134,7 +137,10 @@
                     @if($protocol->sxetiko and $protocol->paratiriseis)
                     <br>
                     @endif
-                    @if($protocol->paratiriseisparatiriseis)
+                    @if( ! $protocol->sxetiko and ($protocol->fakelos and $protocol->paratiriseis))
+                    <br>
+                    @endif
+                    @if($protocol->paratiriseis)
                     &#x2726;{{$protocol->paratiriseis}}
                     @endif
                     </span>
