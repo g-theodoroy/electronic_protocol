@@ -198,6 +198,28 @@
 
                 <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-info">
+                            <div class="form-control-static h4 text-center">Έλεγχος για ενημερώσεις</div>
+                        </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
+                                Να γίνεται έλεγχος για ενημερώσεις
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="updatesAutoCheckdiv">
+                                <select id='updatesAutoCheck' name='updatesAutoCheck' class="form-control"  title=''>
+                                @if ($configs['updatesAutoCheck'])
+                                <option value="0"  >ΟΧΙ</option>
+                                <option value="1" selected >ΝΑΙ</option>
+                                @else
+                                <option value="0" selected >ΟΧΙ</option>
+                                <option value="1"  >ΝΑΙ</option>
+                                @endif
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="panel panel-default col-md-12 col-sm-12  ">
+                        <div class="row bg-warning">
                             <div class="form-control-static h4 text-center">Ρυθμίσεις αντιγράφων ασφαλείας</div>
                         </div>
                         <div class="row">

@@ -145,6 +145,10 @@
                                             <li><a  tabindex="-1" href="{{ url('/backups') }}">Backup</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/arxeio') }}">Εκκαθάριση</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/config') }}">Ρυθμίσεις</a></li>
+                                            @if(isset($needsUpdate) and $needsUpdate)
+                                            <li class="divider"></li>
+                                            <li><a  tabindex="-1" href="{{ url('/updated') }}" title="Να μην εμφανίζεται το μήνυμα για ενημέρωση του Ηλ.Πρωτοκόλλου.">Ενημερώθηκε</a></li>
+                                            @endif
                                         </ul>
                                     </li>
                                     @endif

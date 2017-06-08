@@ -25,7 +25,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home/list';
+    protected $redirectTo = '/chkForUpdates';
 
     /**
      * Create a new controller instance.

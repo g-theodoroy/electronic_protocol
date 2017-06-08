@@ -54,6 +54,7 @@ Route::post('keep/{keepvalue}', 'KeepvalueController@update');
 Route::get('keep/del/{keepvalue}', 'KeepvalueController@delete');
 
 Route::get('/home','ProtocolController@index');
+Route::get('/chkForUpdates','ProtocolController@chkForUpdates');
 Route::get('/home/list','ProtocolController@indexList');
 Route::get('/home/{protocol}','ProtocolController@index');
 Route::get('getFileInputs/{num}', 'ProtocolController@getFileInputs');
@@ -75,6 +76,8 @@ Route::post('/printed','ProtocolController@printed');
 
 Route::get('/receipt/{protocol}','ProtocolController@receipt');
 Route::get('/about','ProtocolController@about');
+
+Route::get('/updated','ProtocolController@updated');
 
 
 

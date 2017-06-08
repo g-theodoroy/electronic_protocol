@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app',  ['needsUpdate' => $needsUpdate ])
 
 @section('content')
 
@@ -176,11 +176,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class='col-md-1 col-sm-1 small'>
-                            <ul class='list-inline'>
+                        <div class='col-md-1 col-sm-1 small' style='overflow:hidden'>
+                            <ul class='list-unstyled'>
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
-                                        <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank">{{ $attachment->name }}</a>
+                                        <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='{{ $attachment->name }}'>{{ $attachment->name }}</a>
                                     </li>
                                 @endforeach
                             </ul>

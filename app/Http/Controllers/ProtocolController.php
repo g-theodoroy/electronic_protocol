@@ -54,7 +54,7 @@ use DB;
      {
         $this->middleware('auth');
         $this->middleware('web');
-        $this->middleware('writer:home', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
+        $this->middleware('writer:home/list', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
     }
 
     
@@ -127,10 +127,58 @@ use DB;
         return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'currentEtos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect'));
     }
 
+    public function chkForUpdates(){
+        // μόνο όταν γίνεται login
+        // έλεγχος εάν έχουν γίνει αλλαγές στο github
+        // και ενημέρωση του Χρήστη αν η ρύθμιση updatesAutoCheck = 1
+        $config = new Config;
+        $updatesAutoCheck = $config->getConfigValueOf('updatesAutoCheck');
+        if($updatesAutoCheck){
+            if (strpos ( request()->headers->get('referer') , 'login')){
+                $url = 'https://api.github.com/repos/g-theodoroy/electronic_protocol/commits';
+                $curl = curl_init();
+                curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,1); 
+                curl_setopt($curl, CURLOPT_URL, $url);
+                curl_setopt($curl,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'); // Set a user agent
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_HEADER, false);
+                $commits = json_decode(curl_exec($curl));
+                curl_close($curl);
+                
+                if ($commits){
+                    if(Auth::user()->role_description() == "Διαχειριστής"){
+                        $message = 'Έγιναν τροποποιήσεις στον κώδικα του Ηλ.Πρωτοκόλλου. (Github)<br><br>Αν επιθυμείτε ενημερώστε την εγκατάστασή σας.<br><br>Για να μην εμφανίζεται το παρόν μήνυμα καντε κλικ στο menu Διαχείριση->Ενημερώθηκε.';
+                    }else{
+                        $message = 'Έγιναν τροποποιήσεις στον κώδικα του Ηλ.Πρωτοκόλλου. (Github)<br><br>Ενημερώστε το Διαχειριστή.';
+                    }
+                    $file = storage_path('conf/.updateCheck');
+                    if (file_exists($file )){
+                        if ( $commits[0]->sha != file_get_contents($file)){
+                                $notification = array(
+                                    'message' =>  $message, 
+                                    'alert-type' => 'info'
+                                    );
+                                session()->flash('notification',$notification);
+                                $config->setConfigValueOf('needsUpdate', 1);
+                            }
+                    }else{
+                        file_put_contents($file,$commits[0]->sha);
+                    }
+                }
+            }
+        }
+        return redirect('/home/list');
+    }
+
     public function indexList(){
         $config = new Config;
         $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
         $refreshInterval = $config->getConfigValueOf('minutesRefreshInterval') * 60000;
+        $needsUpdate = False;
+        if (strpos ( request()->headers->get('referer') , 'login')){
+            $needsUpdate = $config->getConfigValueOf('needsUpdate');
+        }
+
         $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
         foreach($protocols as $protocol){
             if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
@@ -138,7 +186,7 @@ use DB;
             if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
             if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
         }
-        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval'));
+        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate'));
     }
 
 
@@ -753,6 +801,14 @@ public function receipt(Protocol $protocol){
 
 public function about(){
     return view('about');
+}
+
+public function updated(){
+    $file = storage_path('conf/.updateCheck');
+    unlink($file);
+    $config = new Config;
+    $config->setConfigValueOf('needsUpdate', 0);
+    return redirect("home/list"); 
 }
 
 }
