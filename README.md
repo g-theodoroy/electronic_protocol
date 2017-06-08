@@ -223,6 +223,7 @@ sh install_electronic_protocol_Debian_php5.sh
 Δώστε ένα όνομα στo @ppn@me πχ: protocol
 
 
+
 ### Ρύθμιση Apache του Xampp να ανακατευθύνεται στο Ηλ. Πρωτόκολλο
 
 
@@ -257,6 +258,13 @@ Include "conf/alias/*"
 ```
 
 ### Ρυθμίσεις
+
+
+#### Ρύθμιση php
+
+Ανοίξτε το αρχείο ```C:\xampp\php\php``` και αφαιρέστε το ```;``` μπροστά από το ```;extension=php_curl.dll``` στη γραμμή 878 ώστε να ενεργοποιηθεί η υποστήριξη **php-curl**. 
+Η γραμμή τώρα πρέπει να είναι: ```extension=php_curl.dll``` .
+
 
 Εκκινήστε το Xampp και τους servers apache και mysql 
 
