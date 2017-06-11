@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
         <div class="col-md-12 col-md-offset-0">
             <div class="panel panel-default">
@@ -26,23 +26,24 @@
                     </div>
 
 
+                    <div class='row  bg-primary'>&nbsp;</div>
                     <div class='row bg-primary'>
 
                         <div class='col-md-1 col-sm-1'>
                             <br>
-                            <strong>Αυξ.Αριθ</strong><br>
+                            <strong>Αυξ.Αριθ</strong><hr>
                             <strong>Ημνία</strong>
                         </div>
                         <div class='col-md-5 col-sm-5'>
                             <div class='row'>
                                 <div class='col-md-5 col-sm-5'>
-                                    <strong>Αρ./Ημ.Εισερχ.</strong><br>
-                                    <strong>&#x2727;Τόπος-έκδοσης</strong><br>
-                                    <strong>&#x2726;Αρχή-Έκδοσης</strong>
+                                    <strong>Αρ./Ημ.Εισερχ.</strong><hr>
+                                    <strong>&#x2727;Τόπος Έκδοσης</strong><hr>
+                                    <strong>&#x2726;Αρχή Έκδοσης</strong>
                                 </div>
                                 <div class='col-md-7 col-sm-7'>
-                                    <strong>Θέμα</strong><br>
-                                    <strong>&#x2727;Περ.Εισερχ.</strong><br>
+                                    <strong>Θέμα</strong><hr>
+                                    <strong>&#x2727;Περίλ.Εισερχ.</strong><hr>
                                     <strong>&#x2726;Παραλήπτης</strong>
                                 </div>
                             </div>
@@ -50,129 +51,156 @@
                         <div class='col-md-5 col-sm-5'>
                             <div class='row'>
                                 <div class='col-md-5 col-sm-5'>
-                                    <strong>Ημ.Εξερχ.</strong><br>
-                                    <strong>&#x2727;Απευθύνεται</strong><br>
-                                    <strong>&#x2726;Περ.Εξερχ.</strong>
+                                    <strong>Ημ.Εξερχ.</strong><hr>
+                                    <strong>&#x2727;Απευθύνεται</strong><hr>
+                                    <strong>&#x2726;Περίλ.Εξερχ.</strong>
                                 </div>
                                 <div class='col-md-3 col-sm-3'>
-                                    <strong>Διεκπεραίωση</strong><br>
+                                    <br>
+                                    <strong>Διεκπεραίωση</strong><hr>
                                     <strong>&#x2727;Ημ.Διεκπ.</strong>
                                 </div>
                                 <div class='col-md-4 col-sm-4'>
-                                    <strong>Φάκελος</strong><br>
-                                    <strong>&#x2727;Σχετ.αριθμοί</strong><br>
+                                    <strong>Φάκελος</strong><hr>
+                                    <strong>&#x2727;Σχετ.αριθμοί</strong><hr>
                                     <strong>&#x2726;Παρατηρήσεις</strong>
                                 </div>
                             </div>
                         </div>
                         <div class='col-md-1 col-sm-1'>
+                            <br>
                             <strong>Συνημμένα</strong>
                         </div>
                     </div>
+                    <div class='row  bg-primary'>&nbsp;</div>
 
 
                     @php ($i = 1)
                     @foreach ($protocols as $protocol)
                     @if ($i%2)
+                    <div class='row'>&nbsp;</div>
                     <div class='row'>
                     @else
+                    <div class='row  bg-info'>&nbsp;</div>
                     <div class='row bg-info'>
                     @endif
 
                         <div class='col-md-1 col-sm-1'>
+                            <br>
                             <a href="{{ URL::to('/') }}/home/{{$protocol->id}}" class="" role="button" title="Μετάβαση" > <img src="{{ URL::to('/') }}/images/open.png" height="15" /></a>
-                            <strong>{{$protocol->protocolnum}}</strong><br>
+                            <span title='Αυξων Αριθμός'>
+                            <strong>{{$protocol->protocolnum}}</strong><hr>
+                            </span>
+                            <span title='Ημνία'>
                             {{$protocol->protocoldate}}
+                            </span>
                         </div>
                         <div class='col-md-5 col-sm-5'>
                             <div class='row'>
                                 <div class='col-md-5 col-sm-5 small'>
+                                    <span title='Αριθμός/Ημνία Εισερχομένου'>
                                     @if($protocol->in_num)
                                     {{$protocol->in_num}}/
                                     @endif
-                                    {{$protocol->in_date}}
-                                    @if($protocol->in_date and $protocol->in_topos_ekdosis)
-                                    <br>
-                                    @endif
+                                    {{$protocol->in_date ? $protocol->in_date : '&nbsp;'}}
+                                    </span>
+                                    <hr>
+                                    <span title='Τόπος Έκδοσης'>
                                     @if($protocol->in_topos_ekdosis)
                                     &#x2727;{{$protocol->in_topos_ekdosis}}
+                                    @else
+                                    &nbsp;
                                     @endif
-                                    @if($protocol->in_topos_ekdosis and $protocol->in_arxi_ekdosis)
-                                    <br>
-                                    @endif
-                                    @if( ! $protocol->in_topos_ekdosis and ($protocol->in_date and $protocol->in_arxi_ekdosis))
-                                    <br>
-                                    @endif
+                                    </span>
+                                    <hr>
+                                    <span title='Αρχή Έκδοσης'>
                                     @if($protocol->in_arxi_ekdosis)
                                     &#x2726;{{$protocol->in_arxi_ekdosis}}
+                                    @else
+                                    &nbsp;
                                     @endif
+                                    </span>
                                 </div>
                                 <div class='col-md-7 col-sm-7 small'>
-                                    {{$protocol->thema}}
-                                    @if($protocol->thema and $protocol->in_perilipsi)
-                                    <br>
-                                    @endif
+                                    <span title='Θέμα'><strong>
+                                    {{$protocol->thema ? $protocol->thema : '&nbsp;'}}
+                                    </strong></span>
+                                    <hr>
+                                    <span title='Περίληψη Εισερχομένου'>
                                     @if($protocol->in_perilipsi)
                                     &#x2727;{{$protocol->in_perilipsi}}
+                                    @else
+                                    &nbsp;
                                     @endif
-                                    @if($protocol->in_perilipsi and $protocol->in_paraliptis)
-                                    <br>
-                                    @endif
-                                    @if( ! $protocol->in_perilipsi and ($protocol->thema and $protocol->in_paraliptis))
-                                    <br>
-                                    @endif
+                                    </span>
+                                    <hr>
+                                    <span title='Παραλήπτης'>
                                     @if($protocol->in_paraliptis)
                                     &#x2726;{{$protocol->in_paraliptis}}
+                                    @else
+                                    &nbsp;
                                     @endif
+                                    </span>
                                 </div>
                             </div>
                         </div>
                         <div class='col-md-5 col-sm-5'>
                             <div class='row'>
                                 <div class='col-md-5 col-sm-5 small'>
-                                    {{$protocol->out_date}}
-                                    @if($protocol->out_date and $protocol->out_to)
-                                    <br>
-                                    @endif
+                                    <span title='Ημνία Εξερχομένου'>
+                                    {{$protocol->out_date  ? $protocol->out_date : '&nbsp;'}}
+                                    </span>
+                                    <hr>
+                                    <span title='Απευθύνεται'>
                                     @if($protocol->out_to)
                                     &#x2727;{{$protocol->out_to}}
+                                    @else
+                                    &nbsp;
                                     @endif
-                                    @if($protocol->out_to and $protocol->out_perilipsi)
-                                    <br>
-                                    @endif
-                                    @if( ! $protocol->out_to and ($protocol->out_date and $protocol->out_perilipsi))
-                                    <br>
-                                    @endif
+                                    </span>
+                                    <hr>
+                                    <span title='Περίληψη Εξερχομένου'>
                                     @if($protocol->out_perilipsi)
                                     &#x2726;{{$protocol->out_perilipsi}}
+                                    @else
+                                    &nbsp;
                                     @endif
+                                    </span>
                                 </div>
                                 <div class='col-md-3 col-sm-3 small'>
-                                    {{$protocol->diekperaiosi}}
-                                    @if($protocol->diekperaiosi and $protocol->diekp_date)
                                     <br>
-                                    @endif
+                                    <span title='Διεκπεραίωση'>
+                                    {{$protocol->diekperaiosi ? $protocol->diekperaiosi : '&nbsp;'}}
+                                    </span>
+                                    <hr>
+                                    <span title='Ημνία Διεκπεραίωσης'>
                                     @if($protocol->diekp_date)
                                     &#x2727;{{$protocol->diekp_date}}
+                                    @else
+                                    &nbsp;
                                     @endif
+                                    </span>
                                  </div>
                                 <div class='col-md-4 col-sm-4 small'>
-                                    {{$protocol->fakelos}}
-                                    @if($protocol->fakelos and $protocol->sxetiko)
-                                    <br>
-                                    @endif
+                                    <span title='Φάκελος'>
+                                    {{$protocol->fakelos  ? $protocol->fakelos : '&nbsp;'}}
+                                    </span>
+                                    <hr>
+                                    <span title='Σχετικοί αριθμοί'>
                                     @if($protocol->sxetiko)
                                     &#x2727;{{$protocol->sxetiko}}
+                                    @else
+                                    &nbsp;
                                     @endif
-                                    @if($protocol->sxetiko and $protocol->paratiriseis)
-                                    <br>
-                                    @endif
-                                    @if( ! $protocol->sxetiko and ($protocol->fakelos and $protocol->paratiriseis))
-                                    <br>
-                                    @endif
+                                    </span>
+                                    <hr>
+                                    <span title='Παρατηρήσεις'>
                                     @if($protocol->paratiriseis)
                                     &#x2726;{{$protocol->paratiriseis}}
+                                    @else
+                                    &nbsp;
                                     @endif
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -180,12 +208,17 @@
                             <ul class='list-unstyled'>
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
-                                        <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='{{ $attachment->name }}'>{{ $attachment->name }}</a>
+                                        <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='Λήψη {{ $attachment->name }}'>@if(strlen($attachment->name)> 13){{ substr($attachment->name,0,3) }}...{{ substr($attachment->name,-7,7) }}@else{{$attachment->name}}@endif</a>
                                     </li>
                                 @endforeach
                             </ul>
                         </div>
                     </div>
+                    @if ($i%2)
+                    <div class='row'>&nbsp;</div>
+                    @else
+                    <div class='row  bg-info'>&nbsp;</div>
+                    @endif
                     @php ($i++)
                     @endforeach
 
