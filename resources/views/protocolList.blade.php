@@ -12,16 +12,17 @@
                 <div class="panel panel-default col-md-12 col-sm-12  ">
 
                     <div class='row'>
-                        <div class="col-md-1 col-sm-1 form-control-static">
+                        <div class="col-md-2 col-sm-2 form-control-static">
                         <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=30 / ></a>
                         </div>
                     @if ($protocols->links())
-                        <div class="col-md-10 col-sm-10 small text-center">
+                        <div class="col-md-8 col-sm-8 small text-center">
                             <span class="small">{{$protocols->links()}}</span>
                         </div>
                     @endif
-                        <div class="col-md-1 col-sm-1 form-control-static text-right">
-                        <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
+                        <div class="col-md-2 col-sm-2 form-control-static text-right">
+                        <span id='timer' style='color:#BFBFBF' title='Αυτόματη ανανέωση σε'></span>&nbsp;
+                        <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
                         </div>
                     </div>
 
@@ -240,9 +241,28 @@
 
 @if ($refreshInterval > 0)
 <script type="text/javascript">    
-    setInterval(function() {
-                  window.location.reload()
-                }, {{$refreshInterval}}) 
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10)
+
+        //minutes = minutes < 10 ? "0" + minutes : minutes
+        seconds = seconds < 10 ? "0" + seconds : seconds
+
+        display.textContent = minutes + ":" + seconds
+
+        if (--timer < 0) {
+            window.location.reload()
+        }
+    }, 1000)
+}
+
+window.onload = function () {
+    var duration =  {{$refreshInterval}},
+        display = document.querySelector('#timer')
+    startTimer(duration, display);
+}
 </script>
 @endif
 

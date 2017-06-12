@@ -174,7 +174,7 @@ use DB;
     public function indexList(){
         $config = new Config;
         $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-        $refreshInterval = $config->getConfigValueOf('minutesRefreshInterval') * 60000;
+        $refreshInterval = $config->getConfigValueOf('minutesRefreshInterval') * 60;
         $needsUpdate = False;
         if (strpos ( request()->headers->get('referer') , 'login')){
             $needsUpdate = $config->getConfigValueOf('needsUpdate');
