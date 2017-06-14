@@ -73,6 +73,8 @@ Route::get('/getFindData','ProtocolController@getFindData');
 
 Route::get('/print','ProtocolController@printprotocols');
 Route::post('/printed','ProtocolController@printed');
+Route::get('/printAttachments','ProtocolController@printAttachments');
+Route::post('/printedAttachments','ProtocolController@printedAttachments');
 
 Route::get('/receipt/{protocol}','ProtocolController@receipt');
 Route::get('/about','ProtocolController@about');

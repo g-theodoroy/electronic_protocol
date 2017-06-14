@@ -351,7 +351,6 @@ use DB;
         'paratiriseis' => $data['paratiriseis']
         ]);
     }
-
     $filescount = 3 * $data['file_inputs_count'];
     $protocol_id = Protocol::max('id');
 
@@ -730,27 +729,10 @@ public function getFindData(){
 
 public function printprotocols(){
 
-    $fields = [
-    'fakelos' => 'Φάκελος',
-    'thema' => 'Θέμα',
-    'in_topos_ekdosis' => 'Τόπος έκδοσης',
-    'in_arxi_ekdosis' => 'Αρχή έκδοσης',
-    'in_paraliptis' => 'Παραλήπτης',
-    'diekperaiosi' => 'Διεκπεραίωση',
-    'in_perilipsi' => 'Περιλ. Εισερχ',
-    'out_to' => 'Απευθύνεται',
-    'out_perilipsi' => 'Περιλ. Εξερχ',
-    'keywords' => 'Λέξεις κλειδιά',
-    'paratiriseis' => 'Παρατηρήσεις'
-    ];
-
     $config = new Config;
-    $searchField1 = $config->getConfigValueOf('searchField1');
-    $searchField2 = $config->getConfigValueOf('searchField2');
-    $searchField3 = $config->getConfigValueOf('searchField3');
     $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
 
-    return view('print', compact('fields','searchField1', 'searchField2','searchField3', 'ipiresiasName'));
+    return view('print', compact('ipiresiasName'));
 }
 
 public function printed(){
@@ -810,6 +792,51 @@ public function updated(){
     $config = new Config;
     $config->setConfigValueOf('needsUpdate', 0);
     return redirect("home/list"); 
+}
+
+public function printAttachments(){
+
+    $config = new Config;
+    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+
+    return view('printAttachments', compact('ipiresiasName'));
+}
+
+public function printedAttachments(){
+    $wherevalues = [];
+
+    if(request('aponum')){
+        $wherevalues[] = ['protocolnum', '>',request('aponum')-1 ];
+    }
+    if(request('eosnum')){
+        $wherevalues[] = ['protocolnum', '<',request('eosnum')+1 ];
+    }
+    if(request('etosForMany')){
+        $wherevalues[] = ['etos', request('etosForMany')];
+    }
+    if(request('apoProtocolDate')){
+        $wherevalues[] = ['protocoldate', '>=', Carbon::createFromFormat('d/m/Y', request('apoProtocolDate'))->format('Ymd')];
+    }
+    if(request('eosProtocolDate')){
+        $wherevalues[] = ['protocoldate', '<=', Carbon::createFromFormat('d/m/Y', request('eosProtocolDate'))->format('Ymd')];
+    }
+    $foundProtocolsCount = null;
+    if (! $wherevalues){
+        return back();
+    }else{
+        $foundProtocolsCount = Protocol::where($wherevalues)->count();
+        $protocols = Protocol::where($wherevalues)->orderby('protocolnum','asc')->get();
+    }
+    foreach($protocols as $protocol){
+        if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
+        if($protocol->in_date) $protocol->in_date = Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y');
+        if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
+    }
+    $config = new Config;
+    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $datetime = Carbon::now()->format('d/m/Y H:m:s');
+
+    return view('printedAttachments', compact('protocols', 'ipiresiasName' , 'etos', 'datetime'));
 }
 
 }

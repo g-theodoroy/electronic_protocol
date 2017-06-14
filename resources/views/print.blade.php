@@ -2,14 +2,6 @@
 
 @section('content')
 
-<style>
-.hideoverflow{
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-</style>
-
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-sm-6 col-md-offset-3 col-sm-offset-3">

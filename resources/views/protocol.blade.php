@@ -418,8 +418,8 @@ function getFileInputs() {
 function getKeep4Fakelos(){
     var fak = $("#fakelos").val()
     $.get("{{ URL::to('/') }}/getKeep4Fakelos/" + fak, function(data){
-        $("#keep").val(data).change()
         $("#keep").attr('data-value',data)
+        $("#keep").val(data).change()
     });
 }
 </script>

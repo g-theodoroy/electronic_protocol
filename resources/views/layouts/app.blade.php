@@ -132,7 +132,13 @@
                                         <ul class="dropdown-menu">
                                             <li><a  tabindex="-1" href="{{ url('/home') }}">Εισαγωγή</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
-                                            <li><a  tabindex="-1" href="{{ url('/print') }}">Εκτύπωση</a></li>
+                                            <li class="dropdown-submenu">
+                                            <a class="test" tabindex="-1" href="#">Εκτύπωση</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a  tabindex="-1" href="{{ url('/print') }}">Πρωτόκολλο</a></li>
+                                                    <li><a  tabindex="-1" href="{{ url('/printAttachments') }}">Συνημμένα</a></li>
+                                                </ul>
+                                            </li>
                                             <li><a  tabindex="-1" href="{{ url('/keep') }}">Διατήρηση</a></li>
                                         </ul>
                                     </li>

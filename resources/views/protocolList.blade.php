@@ -69,9 +69,10 @@
                             </div>
                         </div>
                         <div class='col-md-1 col-sm-1'>
-                            <br>
-                            <strong>Συνημμένα</strong>
-                        </div>
+                            <strong>Συνημμένα</strong><hr>
+                             <strong>Διατήρηση</strong><br>
+                            <strong>Διατηρ.έως</strong>
+                       </div>
                     </div>
                     <div class='row  bg-primary'>&nbsp;</div>
 
@@ -209,10 +210,32 @@
                             <ul class='list-unstyled'>
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
-                                        <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='Λήψη {{ $attachment->name }}'>@if(strlen($attachment->name)> 13){{ substr($attachment->name,0,3) }}...{{ substr($attachment->name,-7,7) }}@else{{$attachment->name}}@endif</a>
+                                        <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='Λήψη {{ $attachment->name }}'>@if(strlen($attachment->name)> 13){{ mb_substr($attachment->name,0,3, "utf-8") }}...{{ mb_substr($attachment->name,-7,7, "utf-8") }}@else{{$attachment->name}}@endif</a>
                                     </li>
                                 @endforeach
                             </ul>
+                            <hr>
+                            @foreach ($protocol->attachments()->get() as $attachment)
+                                @if ($loop->first)
+                                    @if(is_numeric($attachment->keep))
+                                    <span title='Διατηρηση: {{$attachment->keep == 1 ? $attachment->keep . " χρόνo" : $attachment->keep . " χρόνια"}}'>
+                                    {{$attachment->keep == 1 ? $attachment->keep . " χρόνo" : $attachment->keep . " χρόνια"}}
+                                    </span>
+                                    @else
+                                    <span title='Διατηρηση: {{$attachment->keep}}'>
+                                   {{$attachment->keep}}
+                                    </span>
+                                    @endif
+                                @endif
+                            @endforeach
+                            <br>
+                            @foreach ($protocol->attachments()->get() as $attachment)
+                                @if ($loop->first and $attachment->expires)
+                                    <span title='Διατήρηση έως {{\Carbon\Carbon::createFromFormat('Ymd', $attachment->expires)->format('d/m/Y')}}'>
+                                    {{\Carbon\Carbon::createFromFormat('Ymd', $attachment->expires)->format('d/m/Y')}}
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                     </div>
                     @if ($i%2)
