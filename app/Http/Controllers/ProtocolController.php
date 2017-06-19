@@ -186,6 +186,7 @@ use DB;
             if($protocol->in_date) $protocol->in_date = Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y');
             if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
             if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
+            if($protocol->fakelos) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
         }
         return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate'));
     }

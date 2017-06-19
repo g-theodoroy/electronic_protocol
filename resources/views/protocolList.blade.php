@@ -184,7 +184,7 @@
                                     </span>
                                  </div>
                                 <div class='col-md-4 col-sm-4 small'>
-                                    <span title='Φάκελος'>
+                                    <span title='{{$protocol->describe  ? "Φάκελος " . $protocol->fakelos . " -> " . $protocol->describe : 'Φάκελος'}}'>
                                     {{$protocol->fakelos  ? $protocol->fakelos : '&nbsp;'}}
                                     </span>
                                     <hr>
