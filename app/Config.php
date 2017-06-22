@@ -9,7 +9,8 @@ class Config extends Model
     protected $fillable = ['key', 'value'];
 
     public function getConfigValueOf($key) {
-    	return Config::whereKey($key)->first()->value;
+        $c = Config::firstOrCreate(['key' => $key]);
+        return $c->value;
     }
 
     public function setConfigValueOf($key, $value) {
