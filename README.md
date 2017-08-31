@@ -42,19 +42,26 @@ ssh {username}@{ip_server}
 Debian, Ubuntu: ``` apt-get -y install wget ``` , Centos: ``` yum -y install wget```
 
 Κατεβάστε ένα από τα ακόλουθα script που ταιριάζει με τη διανομή σας
-- Debian με Php5
+## Debian 9 (stretch)
+- Debian 9 με Php7
+```
+wget -O install_electronic_protocol_Debian_9.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORRHVVeE9PVHRlZU0"
+```
+## Debian 8 (jessie)
+- Debian 8 με Php5
 ```
 wget -O install_electronic_protocol_Debian_php5.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORU3p3ZXl6ekJISW8"
 ```
-- Debian με Php7
+- Debian 8 με Php7
 ```
 wget -O install_electronic_protocol_Debian_php7.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORLVJVazJtbmtUYzg"
 ```
-- Ubuntu
+
+## Ubuntu
 ```
 wget -O install_electronic_protocol_Ubuntu.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORWmFmSVkwN2xqdjg"
 ```
-- Centos
+## Centos
 ```
 wget -O install_electronic_protocol_Centos.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORejZEVU1fQWJRSWc"
 ```
