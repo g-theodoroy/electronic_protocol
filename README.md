@@ -57,14 +57,16 @@ wget -O install_electronic_protocol_Debian_php5.sh "https://drive.google.com/uc?
 wget -O install_electronic_protocol_Debian_php7.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORLVJVazJtbmtUYzg"
 ```
 
-## Ubuntu
+## Ubuntu 16.04 LTS
 ```
 wget -O install_electronic_protocol_Ubuntu.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORWmFmSVkwN2xqdjg"
 ```
-## Centos
+## Centos 7 (1611)
 ```
 wget -O install_electronic_protocol_Centos.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORejZEVU1fQWJRSWc"
 ```
+
+### Τα προτεινόμενα πιο πάνω scripts φτιάχτηκαν και συντηρούνται από μένα με στόχο να απλοποιήσουν την εγκατάσταση.
 
 Αν έχετε άλλη διανομή τροποποιήστε ένα συγγενές script σύμφωνα με τις ανάγκες της διανομής
 
