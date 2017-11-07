@@ -326,8 +326,9 @@ php artisan optimize
 
 ### Εικόνες
 
-<img src="https://cloud.githubusercontent.com/assets/23439035/22380175/283495f8-e4c5-11e6-9190-1f674818a0b2.png" width="99%">
 <img src="https://cloud.githubusercontent.com/assets/23439035/22380174/282f5fa2-e4c5-11e6-9fc7-24fc2da66e06.png" width="99%">
+<img src="https://user-images.githubusercontent.com/23439035/27009310-405d0402-4e93-11e7-9a40-309eb5720168.png" width="99%">
+<img src="https://cloud.githubusercontent.com/assets/23439035/22380175/283495f8-e4c5-11e6-9190-1f674818a0b2.png" width="99%">
 <img src="https://cloud.githubusercontent.com/assets/23439035/26480073/69b32634-41e0-11e7-9c22-d9f02d93acab.png" width="99%">
 <img src="https://cloud.githubusercontent.com/assets/23439035/22380182/28599768-e4c5-11e6-9c98-4ee0b4d7bfb9.png" width="99%">
 <img src="https://cloud.githubusercontent.com/assets/23439035/22380173/282c6144-e4c5-11e6-9011-4b469a3e8104.png" width="99%">
