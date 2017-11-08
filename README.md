@@ -185,13 +185,13 @@ sh install_electronic_protocol_Debian_php5.sh
 ## Εγκατάσταση σε Xampp
 
 
-Εγκαταστήστε το [Xampp] (https://www.apachefriends.org/)
+Εγκαταστήστε το [Xampp](https://www.apachefriends.org/)
 
 
-Εγκαταστήστε τον [Composer] (https://getcomposer.org/download/)
+Εγκαταστήστε τον [Composer](https://getcomposer.org/download/)
 
 
-Κατεβάστε το [Ηλεκτρονικό Πρωτόκολλο] (https://github.com/g-theodoroy/electronic_protocol/archive/master.zip)
+Κατεβάστε το [Ηλεκτρονικό Πρωτόκολλο](https://github.com/g-theodoroy/electronic_protocol/archive/master.zip)
 
 
 ### Ρυθμίσεις
