@@ -199,7 +199,7 @@ sh install_electronic_protocol_Debian_php5.sh
 
 
 Ανοίξτε τον φάκελο (**C:\protocol**) με την Εξερεύνηση των windows και αλλάξτε τις τιμές των παρακάτω μεταβλητών στα ακόλουθα αρχεία:
-- .env
+#### .env
  - γραμμή 10:
    - DB_DATABASE=**d@t@b@se**
  - γραμμή 12:
@@ -208,15 +208,15 @@ sh install_electronic_protocol_Debian_php5.sh
    - MAIL_USERNAME=**gm@ilusern@me**
  - γραμμή 27:
    - MAIL_PASSWORD=**gm@ilp@ss**
-- config/database.php
+#### config/database.php
  - γραμμή 59:      
    - 'database' => env('DB_DATABASE', '**d@t@b@se**'),
  - γραμμή 61:      
    - 'password' => env('DB_PASSWORD', '**p@ssw@rd**'),
-- config/session.php
+#### config/session.php
  - γραμμή 125:      
    - 'cookie' => '**laravel**_session',
-- public/.htaccess 
+#### public/.htaccess 
  - γραμμή 7:      
    - RewriteBase /**@ppn@me**
  
