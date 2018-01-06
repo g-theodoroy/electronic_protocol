@@ -179,6 +179,7 @@ use DB;
         if (strpos ( request()->headers->get('referer') , 'login')){
             $needsUpdate = $config->getConfigValueOf('needsUpdate');
         }
+        $wideListProtocol = $config->getConfigValueOf('wideListProtocol');
 
         $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
         foreach($protocols as $protocol){
@@ -187,8 +188,9 @@ use DB;
             if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
             if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
             if($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
+        
         }
-        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate'));
+        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol'));
     }
 
 

@@ -14,7 +14,8 @@ class Config extends Model
     }
 
     public function setConfigValueOf($key, $value) {
-    	Config::whereKey($key)->update(['value' => $value]);
+        $c = Config::firstOrCreate(['key' => $key]);
+    	$c->update(['value' => $value]);
     	return ;
     }
 

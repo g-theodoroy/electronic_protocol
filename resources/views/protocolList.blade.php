@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="{{$wideListProtocol ? 'container-fluid' : 'container'}}">
     <div class="row">
         <div class="col-md-12 col-md-offset-0">
             <div class="panel panel-default">
