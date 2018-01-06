@@ -113,7 +113,7 @@ use DB;
         $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
 
         $keepval = null;
-        if ($protocol->fakelos){
+        if ($protocol->fakelos  and Keepvalue::whereFakelos($protocol->fakelos)->first()){
             $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep;
             if (! $keepval) $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep_alt;
         }
@@ -179,6 +179,7 @@ use DB;
         if (strpos ( request()->headers->get('referer') , 'login')){
             $needsUpdate = $config->getConfigValueOf('needsUpdate');
         }
+        $wideListProtocol = $config->getConfigValueOf('wideListProtocol');
 
         $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
         foreach($protocols as $protocol){
@@ -186,9 +187,10 @@ use DB;
             if($protocol->in_date) $protocol->in_date = Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y');
             if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
             if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
-            if($protocol->fakelos) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
+            if($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
+        
         }
-        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate'));
+        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol'));
     }
 
 
@@ -262,14 +264,15 @@ use DB;
     'in_date' => 'required_with:in_num,in_topos_ekdosis,in_arxi_ekdosis',
     'in_topos_ekdosis' => 'required_with:in_date,in_arxi_ekdosis|max:255',
     'in_arxi_ekdosis' => 'required_with:in_date,in_topos_ekdosis|max:255',
-    'in_paraliptis' => 'required_with:in_date|max:255',
+        //'in_paraliptis' => 'required_with:in_date|max:255',
     'out_date' => 'required_with:out_to,out_perilipsi',
     'out_to' => 'required_with:out_date,out_perilipsi|max:255',
     ];
 
     if($protocolValidate){
         $validator = Validator::make(request()->all(), [
-            'thema' => 'required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+                //'thema' => 'required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+            'thema' => 'required_with:in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi|max:255',
             ],  [
             'thema.required_with' => "Συμπληρώστε το θέμα.<br>&nbsp;",
             ])->validate();
@@ -418,14 +421,15 @@ public function update(Protocol $protocol){
     'in_date' => 'required_with:in_num,in_topos_ekdosis,in_arxi_ekdosis',
     'in_topos_ekdosis' => 'required_with:in_date,in_arxi_ekdosis|max:255',
     'in_arxi_ekdosis' => 'required_with:in_date,in_topos_ekdosis|max:255',
-    'in_paraliptis' => 'required_with:in_date|max:255',
+        //'in_paraliptis' => 'required_with:in_date|max:255',
     'out_date' => 'required_with:out_to,out_perilipsi',
     'out_to' => 'required_with:out_date,out_perilipsi|max:255',
     ];
 
     if($protocolValidate){
         $validator = Validator::make(request()->all(), [
-            'thema' => 'required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+                //'thema' => 'required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+            'thema' => 'required_with:in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi|max:255',
             ],  [
             'thema.required_with' => "Συμπληρώστε το θέμα.<br>&nbsp;",
             ])->validate();
