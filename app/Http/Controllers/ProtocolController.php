@@ -136,15 +136,10 @@ use DB;
         if($updatesAutoCheck){
             if (strpos ( request()->headers->get('referer') , 'login')){
                 $url = 'https://api.github.com/repos/g-theodoroy/electronic_protocol/commits';
-                $curl = curl_init();
-                curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,1); 
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($curl, CURLOPT_URL, $url);
-                curl_setopt($curl,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'); // Set a user agent
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_HEADER, false);
-                $commits = json_decode(curl_exec($curl));
-                curl_close($curl);
+                $opts = ['http' => ['method' => 'GET', 'header' => ['User-Agent: PHP']]];
+                $context = stream_context_create($opts);
+                $json = file_get_contents($url, false, $context);
+                $commits = json_decode($json, true);
                 
                 if ($commits){
                     if(Auth::user()->role_description() == "Διαχειριστής"){
@@ -154,7 +149,7 @@ use DB;
                     }
                     $file = storage_path('conf/.updateCheck');
                     if (file_exists($file )){
-                        if ( $commits[0]->sha != file_get_contents($file)){
+                        if ( $commits[0]['sha'] != file_get_contents($file)){
                                 $notification = array(
                                     'message' =>  $message, 
                                     'alert-type' => 'info'
@@ -163,7 +158,7 @@ use DB;
                                 $config->setConfigValueOf('needsUpdate', 1);
                             }
                     }else{
-                        file_put_contents($file,$commits[0]->sha);
+                        file_put_contents($file,$commits[0]['sha']);
                     }
                 }
             }
