@@ -57,6 +57,13 @@ use DB;
         $this->middleware('writer:home/list', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
     }
 
+    public function getTitleColorStyle(){
+        $config = new Config;
+        $titleColor = $config->getConfigValueOf('titleColor');
+        $titleColorStyle = '';
+        if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
+        return $titleColorStyle;
+    }
     
     public function index( Protocol $protocol){
 
@@ -64,6 +71,7 @@ use DB;
 
         $config = new Config;
         $newetos = $config->getConfigValueOf('yearInUse')?$config->getConfigValueOf('yearInUse'):Carbon::now()->format('Y');
+        $titleColorStyle = $this->getTitleColorStyle() ;
 
         $firstProtocolNum = $config->getConfigValueOf('firstProtocolNum');
         if (Protocol::all()->count()){
@@ -124,7 +132,7 @@ use DB;
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
         
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'currentEtos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'currentEtos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle'));
     }
 
     public function chkForUpdates(){
@@ -175,6 +183,7 @@ use DB;
             $needsUpdate = $config->getConfigValueOf('needsUpdate');
         }
         $wideListProtocol = $config->getConfigValueOf('wideListProtocol');
+        $titleColorStyle = $this->getTitleColorStyle() ;
 
         $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
         foreach($protocols as $protocol){
@@ -185,7 +194,7 @@ use DB;
             if($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
         
         }
-        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol'));
+        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'titleColorStyle'));
     }
 
 
@@ -641,9 +650,10 @@ public function find(){
     $searchField2 = $config->getConfigValueOf('searchField2');
     $searchField3 = $config->getConfigValueOf('searchField3');
     $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $titleColorStyle = $this->getTitleColorStyle() ;
 
 
-    return view('find', compact('fields','searchField1', 'searchField2','searchField3', 'ipiresiasName'));
+    return view('find', compact('fields','searchField1', 'searchField2','searchField3', 'ipiresiasName', 'titleColorStyle'));
 }
 
 public function getFindData(){
@@ -729,8 +739,9 @@ public function printprotocols(){
 
     $config = new Config;
     $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $titleColorStyle = $this->getTitleColorStyle() ;
 
-    return view('print', compact('ipiresiasName'));
+    return view('print', compact('ipiresiasName', 'titleColorStyle'));
 }
 
 public function printed(){
@@ -796,8 +807,9 @@ public function printAttachments(){
 
     $config = new Config;
     $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $titleColorStyle = $this->getTitleColorStyle() ;
 
-    return view('printAttachments', compact('ipiresiasName'));
+    return view('printAttachments', compact('ipiresiasName', 'titleColorStyle'));
 }
 
 public function printedAttachments(){

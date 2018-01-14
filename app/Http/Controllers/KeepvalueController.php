@@ -23,6 +23,15 @@ class KeepvalueController extends Controller
         $this->middleware('admin:keep', ['except' => ['index']]);
     }
 
+    public function getTitleColorStyle(){
+        $config = new Config;
+        $titleColor = $config->getConfigValueOf('titleColor');
+        $titleColorStyle = '';
+        if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
+        return $titleColorStyle;
+    }
+
+
      /**
      * Show the keepvalue.
      *
@@ -33,11 +42,12 @@ class KeepvalueController extends Controller
         $config = new Config;
         $keepvalues = Keepvalue::orderBy(DB::raw("MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0<>0 DESC, MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0, `fakelos`"))->paginate($config->getConfigValueOf('showRowsInPage'));
         $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+        $titleColorStyle = $this->getTitleColorStyle() ;
 
         $submitVisible = 'hidden';
         if (Auth::user()->role->role == 'Διαχειριστής') $submitVisible = 'active';
         
-        return view('keep', compact('keepvalues', 'keepvalue', 'submitVisible', 'ipiresiasName'));
+        return view('keep', compact('keepvalues', 'keepvalue', 'submitVisible', 'ipiresiasName', 'titleColorStyle'));
     }
 
     /**

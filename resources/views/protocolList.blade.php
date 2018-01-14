@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-md-12 col-md-offset-0">
             <div class="panel panel-default">
-                <div class="panel-heading h1 text-center">Πρωτόκολλο</div>
+                <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>Πρωτόκολλο</div>
 
                 <div class="panel-body">
                 <div class="panel panel-default col-md-12 col-sm-12  ">

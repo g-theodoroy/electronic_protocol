@@ -14,7 +14,7 @@
     <div class="row">
         <div class="col-md-12 col-sm-12 ">
            <div class="panel panel-default">
-                <div class="panel-heading h1 text-center">Αναζήτηση Πρωτοκόλλου</div>
+                <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>Αναζήτηση Πρωτοκόλλου</div>
 
                 <div class="panel-body ">
 
