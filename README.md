@@ -328,6 +328,52 @@ php artisan optimize
 Χρειάζεται ιδιαίτερη προσοχή όταν αλλάζετε τιμές μεταβλητών με αυτό τον τρόπο.
  
 
+#
+# Ενημέρωση του Ηλ. Πρωτοκόλλου
+
+Όταν υπάρξουν αλλαγές στον κώδικα στο github τότε το Ηλ. Πρωτόκολλο εμφανίζει ένα μήνυμα ότι υπάρχουν αλλαγές. Ο Διαχειριστής θα πρέπει να τις κάνει χειροκίνητα. Προσπαθώ όταν ανεβάζω τις αλλαγές να περιγράφω αναλυτικά τί αλλαγή έγινε και σε ποιά αρχεία. Αν δεν επηρεάστηκε ο κώδικας γράφω "Καμία αλλαγή στον κώδικα".
+
+Σας προτείνω μια λύση που απλοποιεί τη δουλειά με το εργαλείο **git**. Στο παράδειγμα υποθέτουμε ότι έχει γίνει εγκατάσταση
+σε **Debian 9 server**
+
+Μπαίνουμε στο server ή συνδεόμαστε μέσω ssh από άλλο pc.
+
+Πηγαίνουμε στον κατάλογο που εγκαταστήσαμε το Ηλ.Πρωτόκολλο πχ: protocol
+```cd /usr/share/protocol```
+
+Με την εγκατάσταση και την πρώτη εγγραφή χρήστη έχουν τροποποιηθεί κάποια αρχεία. Μπορούμε να τα δούμε αν πληκτρολογήσουμε ```git status```. Θα μας δώσει τα παρακάτω:
+```
+On branch master
+Your branch is up-to-date with 'origin/master'.
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   .env
+	modified:   config/database.php
+	modified:   config/session.php
+	modified:   public/.htaccess
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	composer.lock
+	storage/conf/.denyregister
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+Για να μη χάσουμε τις αλλαγές στα αρχεία κατά την ενημέρωση δίνουμε τις παρακάτω εντολές:
+```
+git stash
+git pull
+git stash pop
+```
+Κάντε κλικ στο menu: Διαχείριση->Ενημερώθηκε για να μην εμφανίζεται το μήνυμα που ειδοποιεί για ενημέρωση.
+
+**Έτοιμοι!**
+
+
 # 
 # Ευχαριστίες
 Το Ηλεκτρονικό Πρωτόκολλο χρησιμοποιεί με ευγνωμοσύνη τα:
