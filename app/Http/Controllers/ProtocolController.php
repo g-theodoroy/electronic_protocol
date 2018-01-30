@@ -572,7 +572,9 @@ public function attachDelete (Attachment $attachment){
     $protocol = $attachment->protocol;
     $savedPath = $attachment->savedPath;
     $trashPath = str_replace('arxeio', 'trash', $savedPath);
-    Storage::move($savedPath, $trashPath);
+    if(Storage::exists($attachment->savedPath)){
+        Storage::move($savedPath, $trashPath);
+    }
     $attachment->delete();
     return view('getArxeia', compact('protocol'));
 }
@@ -622,10 +624,19 @@ public function gotonum( $etos, $protocolnum){
 }
 
 public function download(Attachment $attachment){
-    $content = Storage::get($attachment->savedPath);
-    return response($content)
-    ->header('Content-Type', $attachment->mimeType)
-    ->header('Content-Disposition', "filename=" . $attachment->name);
+    if(Storage::exists($attachment->savedPath)){
+        $content = Storage::get($attachment->savedPath);
+        return response($content)
+        ->header('Content-Type', $attachment->mimeType)
+        ->header('Content-Disposition', "filename=" . $attachment->name);
+    }
+    $message = 'Το αρχείο<center>' . $attachment->name . '</center><br>που επιλέξατε δεν υπάρχει!<br>Πιθανόν να έχει διαγραφεί από άλλο εξωτερικό πρόγραμμα!';
+    $notification = array(
+        'message' => $message, 
+        'alert-type' => 'info'
+    );
+    session()->flash('notification',$notification);
+    return back();
 }
 
 
