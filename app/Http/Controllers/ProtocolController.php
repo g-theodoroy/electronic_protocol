@@ -44,6 +44,23 @@ use DB;
 
             class ProtocolController extends Controller
             {
+
+     public  $fields = [
+    'fakelos' => 'Φάκελος',
+    'thema' => 'Θέμα',
+    'in_num' => 'Αριθ. Εισερχ.',
+    'in_topos_ekdosis' => 'Τόπος έκδοσης',
+    'in_arxi_ekdosis' => 'Αρχή έκδοσης',
+    'in_paraliptis' => 'Παραλήπτης',
+    'in_perilipsi' => 'Περιλ. Εισερχ',
+    'diekperaiosi' => 'Διεκπεραίωση',
+    'sxetiko' => 'Σχετικοί Αριθ.',
+    'out_to' => 'Απευθύνεται',
+    'out_perilipsi' => 'Περιλ. Εξερχ',
+    'keywords' => 'Λέξεις κλειδιά',
+    'paratiriseis' => 'Παρατηρήσεις'
+    ];
+
                 
      /**
      * Create a new controller instance.
@@ -642,20 +659,7 @@ public function download(Attachment $attachment){
 
 public function find(){
 
-    $fields = [
-    'fakelos' => 'Φάκελος',
-    'thema' => 'Θέμα',
-    'in_topos_ekdosis' => 'Τόπος έκδοσης',
-    'in_arxi_ekdosis' => 'Αρχή έκδοσης',
-    'in_paraliptis' => 'Παραλήπτης',
-    'diekperaiosi' => 'Διεκπεραίωση',
-    'in_perilipsi' => 'Περιλ. Εισερχ',
-    'out_to' => 'Απευθύνεται',
-    'out_perilipsi' => 'Περιλ. Εξερχ',
-    'keywords' => 'Λέξεις κλειδιά',
-    'paratiriseis' => 'Παρατηρήσεις'
-    ];
-
+    $fields = $this->fields;
     $config = new Config;
     $searchField1 = $config->getConfigValueOf('searchField1');
     $searchField2 = $config->getConfigValueOf('searchField2');
@@ -722,19 +726,7 @@ public function getFindData(){
         if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
     }
 
-    $fields = [
-    'fakelos' => 'Φάκελος',
-    'thema' => 'Θέμα',
-    'in_topos_ekdosis' => 'Τόπος έκδοσης',
-    'in_arxi_ekdosis' => 'Αρχή έκδοσης',
-    'in_paraliptis' => 'Παραλήπτης',
-    'diekperaiosi' => 'Διεκπεραίωση',
-    'in_perilipsi' => 'Περιλ. Εισερχ',
-    'out_to' => 'Απευθύνεται',
-    'out_perilipsi' => 'Περιλ. Εξερχ',
-    'keywords' => 'Λέξεις κλειδιά',
-    'paratiriseis' => 'Παρατηρήσεις'
-    ];
+    $fields = $this->fields;
     $searchField1 = request('searchField1');
     $searchField2 = request('searchField2');
     $searchField3 = request('searchField3');
