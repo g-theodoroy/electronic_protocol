@@ -69,7 +69,11 @@
                 <td class="small middle">
                     <span class='small'>{{$arxeio->protocol->protocoldate}}</span></td>
                 <td class="small middle"><span class='small'>{{$arxeio->expires}}</span></td>
-                <td class="small middle"><span class='small'>{{$arxeio->name}}</span></td>
+                <td class="small middle">
+                  @if ($arxeio->name)<span class='small'>{{$arxeio->name}}</span> @endif
+                  @if ($arxeio->name and $arxeio->ada)<br> @endif
+                  @if ($arxeio->ada)<span class='small'>ΑΔΑ:{{$arxeio->ada}}</span> @endif
+                </td>
                 <td class="small middle"><span class='small'>{{$arxeio->protocol->thema}}</span></td>
                 <td class="small middle">
                     <span class='small'>
@@ -97,9 +101,9 @@
                     &#x2727; {{$arxeio->protocol->out_perilipsi}}</span>
                     @endif
                 </td>
-                </tr> 
+                </tr>
                 @endforeach
-                
+
             </tbody>
              <tfoot>
                  <tr>

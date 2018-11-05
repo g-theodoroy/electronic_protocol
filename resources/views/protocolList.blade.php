@@ -210,7 +210,15 @@
                             <ul class='list-unstyled'>
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
+                                      @if ($attachment->name)
                                         <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='Λήψη {{ $attachment->name }}'>@if(strlen($attachment->name)> 13){{ mb_substr($attachment->name,0,3, "utf-8") }}...{{ mb_substr($attachment->name,-7,7, "utf-8") }}@else{{$attachment->name}}@endif</a>
+                                      @endif
+                                      @if ($attachment->name and $attachment->ada)
+                                      <br>
+                                      @endif
+                                      @if ($attachment->ada)
+                                        <a href='https://diavgeia.gov.gr/doc/{{$attachment->ada}}' target="_blank"  title='Λήψη {{ $attachment->ada }}'>@if(strlen($attachment->ada)> 13){{ mb_substr($attachment->ada,0,3, "utf-8") }}...{{ mb_substr($attachment->ada,-3,3, "utf-8") }}@else{{$attachment->ada}}@endif</a>
+                                      @endif
                                     </li>
                                 @endforeach
                             </ul>
@@ -254,7 +262,7 @@
                     </div>
                     @endif
 
- 
+
                 </div>
                 </div>
             </div>
@@ -263,7 +271,7 @@
 </div>
 
 @if ($refreshInterval > 0)
-<script type="text/javascript">    
+<script type="text/javascript">
 function startTimer(duration, display) {
     var timer = duration, minutes, seconds
     setInterval(function () {

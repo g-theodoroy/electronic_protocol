@@ -161,17 +161,19 @@ class ConfigController extends Controller
         $arxeia = Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->get();
         $arxeiaNumTrash = Attachment::whereNotNull('deleted_at')->count();
         $arxeiaTrash = Attachment::whereNotNull('deleted_at')->get();
+        
         foreach($arxeia as $arxeio){
             $savedPath = $arxeio->savedPath;
             $trashPath = str_replace('arxeio', 'trash', $savedPath);
-
-            Storage::move($savedPath, $trashPath);
+            if(Storage::exists($savedPath)){
+                Storage::move($savedPath, $trashPath);
+            }
             Attachment::where('savedPath',$savedPath)->update(['savedPath' => $trashPath]);
 
         }
 
         Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->delete();
-
+        
         $notification = array(
             'message' => "Διαγράφηκαν $arxeianum αρχεία.", 
             'alert-type' => 'success'

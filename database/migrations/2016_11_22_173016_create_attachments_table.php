@@ -16,9 +16,10 @@ class CreateAttachmentsTable extends Migration
         Schema::create('attachments', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('protocol_id')->unsigned()->required()->index();
-            $table->string('name')->required();
-            $table->string('savedPath')->required();
-            $table->string('mimeType')->required();
+            $table->string('ada')->nullable();
+            $table->string('name')->nullable();
+            $table->string('savedPath')->nullable();
+            $table->string('mimeType')->nullable();
             $table->string('keep')->nullable();
             $table->integer('expires')->unsigned()->nullable();
             $table->timestamps();

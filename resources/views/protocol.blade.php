@@ -17,10 +17,10 @@ input[readonly].asd {
 <script >
 
 function chkdelete(id, name){
- 
+
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή συννημένου ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
-    
+
     toastr.options = {
       "closeButton": true,
       "debug": false,
@@ -49,10 +49,10 @@ function chkdelete(id, name){
 }
 
 function chkprotocoldelete(id, etos, num){
- 
+
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή πρωτοκόλλου με αριθμό ' + num + ' για το έτος ' + etos + '. Είστε σίγουροι;<br>&nbsp;</center>'
-    
+
     toastr.options = {
       "closeButton": true,
       "debug": false,
@@ -108,7 +108,7 @@ function periigisi(id){
             break;
             }
         $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum)
-    
+
 }
 
 </script>
@@ -121,7 +121,7 @@ function periigisi(id){
 
                 <div class="panel-body">
                 <div class="panel panel-default col-md-12 col-sm-12  ">
-                    
+
                     <form name="myProtocolForm" id="myProtocolForm" class="form-horizontal" role="form" method="POST" action="{{ url('/home') }}{{$protocol->id ? '/' . $protocol->id : '' }}" enctype="multipart/form-data" >
                     {{ csrf_field() }}
 
@@ -137,19 +137,19 @@ function periigisi(id){
                         <div class="col-md-7 col-sm-7 ">
                             <div class="row">
                                 <div class="col-md-1 col-sm-1 form-control-static small text-center">
-                                    <strong>Έτος</strong> 
+                                    <strong>Έτος</strong>
                                 </div>
                                 <div class="col-md-3 col-sm-3 middle {{ $errors->has('etos') ? ' has-error' : '' }}">
                                     <input id="etos" type="text" class="form-control input-lg text-center asd" name="etos" placeholder="etos" value="{{ old('etos') ? old('etos') :  $newetos }}" required tabindex=-1 {{$readonly}}  >
                                 </div>
                                 <div class="col-md-1 col-sm-1 small text-center">
-                                    <strong>Αύξων<br>Αριθμός</strong> 
+                                    <strong>Αύξων<br>Αριθμός</strong>
                                 </div>
                                 <div class="col-md-3 col-sm-3 middle {{ $errors->has('protocolnum') ? ' has-error' : '' }}">
                                     <input id="protocolnum" type="text" class="form-control input-lg text-center asd text-bold" name="protocolnum" placeholder="num" value="{{ old('protocolnum') ? old('protocolnum') :  $newprotocolnum }}" title='1. Αύξων αριθμός' required tabindex=-1 {{$readonly}} >
                                 </div>
                                 <div class="col-md-1 col-sm-1 small text-center">
-                                    <strong>Ημ/νια<br>παραλαβής</strong> 
+                                    <strong>Ημ/νια<br>παραλαβής</strong>
                                 </div>
                                 <div class="col-md-3 col-sm-3 middle {{ $errors->has('protocoldate') ? ' has-error' : '' }}">
                                     <input id="protocoldate" type="text" class="form-control input-lg text-center asd" name="protocoldate" placeholder="date" value="{{ old('protocoldate') ? old('protocoldate') : $newprotocoldate  }}" title='2. Ημερομηνία παραλαβής εγγράφου' required tabindex=-1 {{$readonly}}  >
@@ -170,7 +170,7 @@ function periigisi(id){
 
                     <div class="row ">
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
-                            <strong>Φάκελος</strong> 
+                            <strong>Φάκελος</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
                             <select id="fakelos" onchange='getKeep4Fakelos()' class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
@@ -185,7 +185,7 @@ function periigisi(id){
                             </select>
                         </div>
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
-                            <strong>Θέμα</strong> 
+                            <strong>Θέμα</strong>
                         </div>
                         <div class="col-md-7 col-sm-7 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
                             <input id="thema" type="text" class="form-control" name="thema" placeholder="thema" value="{{ old('thema') ? old('thema') : $protocol->thema }}" title='Θέμα'>
@@ -201,20 +201,20 @@ function periigisi(id){
 
                     <div class="row bg-success">
                         <div class="col-md-1 col-sm-1 small text-center">
-                            <strong>Αριθ.<br>Εισερχ.</strong> 
+                            <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
                             <input id="in_chk" type="hidden" name="in_chk"  value="1" >
                             <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ old('in_num') ? old('in_num') : $protocol->in_num }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
-                            <strong>Ημνία<br>Εισερχ.</strong> 
+                            <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
                             <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ old('in_date') ? old('in_date') : $in_date }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
-                            <strong>Τόπος<br>Έκδοσης</strong> 
+                            <strong>Τόπος<br>Έκδοσης</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
                             <input id="in_topos_ekdosis" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
@@ -225,7 +225,7 @@ function periigisi(id){
                         <div class="col-md-6 col-sm-6 ">
                             <div class="row">
                                 <div class="col-md-2 col-sm-2 small text-center">
-                                    <strong>Αρχή<br>Έκδοσης</strong> 
+                                    <strong>Αρχή<br>Έκδοσης</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
                                     <input id="in_arxi_ekdosis" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ old('in_arxi_ekdosis') ? old('in_arxi_ekdosis') : $protocol->in_arxi_ekdosis }}" title='5. Αρχή που το έχει εκδώσει'>
@@ -233,7 +233,7 @@ function periigisi(id){
                                 </div>
                                 <div class="row">
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
-                                    <strong>Παραλήπτης</strong> 
+                                    <strong>Παραλήπτης</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
                                     <input id="in_paraliptis" type="text" class="form-control" name="in_paraliptis" placeholder="in_paraliptis" value="{{ old('in_paraliptis') ? old('in_paraliptis') : $protocol->in_paraliptis }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε'>
@@ -243,7 +243,7 @@ function periigisi(id){
                         <div class="col-md-6 col-sm-6 ">
                             <div class="row">
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
-                                    <strong>Περίληψη</strong> 
+                                    <strong>Περίληψη</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
                                     <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ old('in_perilipsi') ? old('in_perilipsi') : $protocol->in_perilipsi }}</textarea>
@@ -254,19 +254,19 @@ function periigisi(id){
 
                     <div class="row ">
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
-                            <strong>Διεκπεραίωση</strong> 
+                            <strong>Διεκπεραίωση</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
                             <input id="diekperaiosi" type="text" class="form-control" name="diekperaiosi" placeholder="diekperaiosi" value="{{ old('diekperaiosi') ? old('diekperaiosi') : $protocol->diekperaiosi }}" >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
-                            <strong>Ημνία<br>Διεκπεραίωσης</strong> 
+                            <strong>Ημνία<br>Διεκπεραίωσης</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
                             <input id="diekp_date" type="text" class="form-control datepicker text-center" name="diekp_date" placeholder="diekp_date" value="{{ old('diekp_date') ? old('diekp_date') : $diekp_date }}" title='11. Ημερομηνία διεκπεραίωσης'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
-                            <strong>Σχετικοί<br>αριθμοί</strong> 
+                            <strong>Σχετικοί<br>αριθμοί</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('sxetiko') ? ' has-error' : '' }}">
                             <input id="sxetiko" type="text" class="form-control text-center" name="sxetiko" placeholder="sxetiko" value="{{ old('sxetiko') ? old('sxetiko') : $protocol->sxetiko }}" title='12. Σχετικοί αριθμοί'>
@@ -277,7 +277,7 @@ function periigisi(id){
                         <div class="col-md-6 col-sm-6 ">
                             <div class="row">
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
-                                    <strong>Απευθύνεται</strong> 
+                                    <strong>Απευθύνεται</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('out_to') ? ' has-error' : '' }}">
                                     <input id="out_to" type="text" class="form-control" name="out_to" placeholder="out_to" value="{{ old('out_to') ? old('out_to') : $protocol->out_to }}"  title='8. Αρχή στην οποία απευθύνεται'>
@@ -285,7 +285,7 @@ function periigisi(id){
                                 </div>
                                 <div class="row">
                                 <div class="col-md-2 col-sm-2 col-md-offset-3 col-sm-offset-3 small text-center ">
-                                    <strong>Ημνία<br>Εξερχ.</strong> 
+                                    <strong>Ημνία<br>Εξερχ.</strong>
                                 </div>
                                 <div class="col-md-4 col-sm-4 {{ $errors->has('out_date') ? ' has-error' : '' }}">
                                     <input id="out_date" type="text" class="form-control datepicker text-center" name="out_date" placeholder="out_date" value="{{ old('out_date') ? old('out_date') : $out_date }}" title='10. Χρονολογία εξερχομένου εγγράφου'>
@@ -295,7 +295,7 @@ function periigisi(id){
                         <div class="col-md-6 col-sm-6 ">
                             <div class="row">
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
-                                    <strong>Περίληψη</strong> 
+                                    <strong>Περίληψη</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('out_perilipsi') ? ' has-error' : '' }}">
                                     <textarea id="out_perilipsi" type="text" class="form-control" name="out_perilipsi"  placeholder="out_perilipsi" value=""  title='9. Περίληψη εξερχομένου εγγράφου'>{{ old('out_perilipsi') ? old('out_perilipsi') : $protocol->out_perilipsi }}</textarea>
@@ -307,13 +307,13 @@ function periigisi(id){
 
                     <div class="row ">
                         <div class="col-md-1 col-sm-1 small text-center ">
-                            <strong>Λέξεις<br>κλειδιά</strong> 
+                            <strong>Λέξεις<br>κλειδιά</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('keywords') ? ' has-error' : '' }}">
                             <textarea id="keywords" type="text" class="form-control" name="keywords"  placeholder="keywords" >{{ old('keywords') ? old('keywords') : $protocol->keywords }}</textarea>
                             </div>
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
-                            <strong>Παρατηρήσεις</strong> 
+                            <strong>Παρατηρήσεις</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('paratiriseis') ? ' has-error' : '' }}">
                             <textarea id="paratiriseis" type="text" class="form-control" name="paratiriseis"  placeholder="paratiriseis" title='Παρατηρήσεις' >{{ old('paratiriseis') ? old('paratiriseis') : $protocol->paratiriseis }}</textarea>
@@ -322,13 +322,18 @@ function periigisi(id){
 
                     <div class="row ">
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
-                            <strong>Συνημμένα</strong> 
+                            <strong>Συνημμένα</strong>
                         </div>
                         <div id='show_arxeia' class="col-md-9 col-sm-9 form-control-static">
                             <ul class='list-inline'>
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
+                                      @if ($attachment->name)
                                         <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank">{{ $attachment->name }}</a>
+                                      @endif
+                                      @if ($attachment->ada)
+                                        <a href='https://diavgeia.gov.gr/doc/{{$attachment->ada}}' target="_blank" >{{ $attachment->ada }}</a>
+                                      @endif
                                         <a href="javascript:chkdelete('{{ $attachment->id }}','{{$attachment->name}}')" class="{{$submitVisible}}" id='delatt{{ $attachment->id }}' title="Διαγραφή {{ $attachment->name }}" > <img src="{{ URL::to('/') }}/images/delete.ico" alt="delete" height="13"> </a>
                                     </li>
                                 @endforeach
@@ -343,31 +348,31 @@ function periigisi(id){
                     </div>
                     <div id="keepdiv" class="row hidden">
                     <div class="col-md-4 col-sm-4 small form-control-static">
-                        <strong>Επιλογή αρχείων</strong> 
+                        <strong>Επιλέξτε αρχείο ή<br>πληκτρολογείστε ΑΔΑ</strong>
                     </div>
                         @if($allowUserChangeKeepSelect)
                             <div class="col-md-4 col-sm-4 small text-right form-control-static">
-                                <strong>Χρόνος διατήρησης</strong> 
+                                <strong>Χρόνος διατήρησης</strong>
                             </div>
                             <div class="col-md-4 col-sm-4">
                             <select id="keep" class="form-control small selectpicker" name="keep" title='Χρόνος Διατήρησης' >
                         @else
                             <div class="col-md-4 col-sm-4 small text-right form-control-static" title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
-                                <strong>Χρόνος διατήρησης</strong> 
+                                <strong>Χρόνος διατήρησης</strong>
                             </div>
                             <div class="col-md-4 col-sm-4" title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
                             <select id="keep" class="form-control small selectpicker" data-value="{{$keepval}}" onchange="this.value = this.getAttribute('data-value');" name="keep" title='Χρόνος Διατήρησης' >
                         @endif
                             <option value=''></option>
                             @foreach($years as $year)
-                                @if($year->keep == $keepval) 
+                                @if($year->keep == $keepval)
                                     <option value='{{$year->keep}}' title='{{$year->keep}} {{ $year->keep > 1 ? "χρόνια" : "χρόνο" }}' selected >{{$year->keep}} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }} </option>
                                 @else
                                     <option value='{{$year->keep}}' title='{{$year->keep}} {{ $year->keep > 1 ? "χρόνια" : "χρόνο" }}' >{{$year->keep}} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }} </option>
                                 @endif
                                 @endforeach
                             @foreach($words as $word)
-                                @if($word->keep_alt == $keepval) 
+                                @if($word->keep_alt == $keepval)
                                     <option value='{{$word->keep_alt}}' title='{{$word->keep_alt}}' selected >{{$word->keep_alt}}</option>
                                 @else
                                     <option value='{{$word->keep_alt}}' title='{{$word->keep_alt}}' >{{$word->keep_alt}}</option>

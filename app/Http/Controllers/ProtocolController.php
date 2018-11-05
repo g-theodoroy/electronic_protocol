@@ -61,7 +61,7 @@ use DB;
     'paratiriseis' => 'Παρατηρήσεις'
     ];
 
-                
+
      /**
      * Create a new controller instance.
      *
@@ -120,7 +120,7 @@ use DB;
         if($protocol->protocolnum){
             $class = 'bg-success';
             $protocoltitle = 'Επεξεργασία Πρωτοκόλλου';
-        } 
+        }
         $submitVisible = 'active';
         if (Auth::user()->role->role == 'Αναγνώστης') $submitVisible = 'hidden';
 
@@ -142,13 +142,13 @@ use DB;
             $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep;
             if (! $keepval) $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep_alt;
         }
-        
+
         $config = new Config;
         $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
 
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
-        
+
         return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'currentEtos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle'));
     }
 
@@ -165,7 +165,7 @@ use DB;
                 $context = stream_context_create($opts);
                 $json = file_get_contents($url, false, $context);
                 $commits = json_decode($json, true);
-                
+
                 if ($commits){
                     if(Auth::user()->role_description() == "Διαχειριστής"){
                         $message = 'Έγιναν τροποποιήσεις στον κώδικα του Ηλ.Πρωτοκόλλου στο Github.<br><br>Αν επιθυμείτε <a href=\"https://github.com/g-theodoroy/electronic_protocol/commits/master\" target=\"_blank\"><u> εξετάστε τον κώδικα</u></a> και ενημερώστε την εγκατάστασή σας.<br><br>Για να μην εμφανίζεται το παρόν μήνυμα καντε κλικ στο menu Διαχείριση->Ενημερώθηκε.';
@@ -176,7 +176,7 @@ use DB;
                     if (file_exists($file )){
                         if ( $commits[0]['sha'] != file_get_contents($file)){
                                 $notification = array(
-                                    'message' =>  $message, 
+                                    'message' =>  $message,
                                     'alert-type' => 'info'
                                     );
                                 session()->flash('notification',$notification);
@@ -209,7 +209,7 @@ use DB;
             if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
             if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
             if($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
-        
+
         }
         return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'titleColorStyle'));
     }
@@ -250,7 +250,7 @@ use DB;
             $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1 ;
             }else{
             $newprotocolnum = Protocol::all() -> last() -> protocolnum ? Protocol::all() -> last() -> protocolnum + 1 : 1 ;
-            }  
+            }
         }else{
             if($firstProtocolNum){
                 $newprotocolnum = $firstProtocolNum;
@@ -261,15 +261,15 @@ use DB;
         // Αν η ρύθμιση λέι ΝΑΙ σε ασφαλή Αρ.Πρωτ δεν ελέγχω το νέο Αρ.Πρ που μόλις έφτιαξα
       if($safeNewProtocolNum){
           $mustValidate =[
-          'etos' => 'required|integer|digits:4', 
-          'protocoldate' => 'required', 
+          'etos' => 'required|integer|digits:4',
+          'protocoldate' => 'required',
           ];
       }else{
         // αλλιώς ελέγχω
           $mustValidate =[
           'protocolnum' => "required|integer|unique:protocols,protocolnum,NULL,id,etos,$etos",
-          'etos' => 'required|integer|digits:4', 
-          'protocoldate' => 'required', 
+          'etos' => 'required|integer|digits:4',
+          'protocoldate' => 'required',
           ];
       }
       $this->validate(request(), $mustValidate);
@@ -318,7 +318,7 @@ use DB;
     if($data['in_date']) $in_date = Carbon::createFromFormat('d/m/Y', $data['in_date'])->format('Ymd');
     if($data['out_date']) $out_date = Carbon::createFromFormat('d/m/Y', $data['out_date'])->format('Ymd');
     if($data['diekp_date']) $diekp_date = Carbon::createFromFormat('d/m/Y', $data['diekp_date'])->format('Ymd');
-    
+
     $in_chkdata = $data['in_chk'];
     if ($in_chkdata == '1' ){
         $validator = Validator::make(request()->all(), [
@@ -379,35 +379,41 @@ use DB;
     $protocol_id = Protocol::max('id');
 
     for ($i = 1 ; $i < $filescount + 1; $i++){
+      if ($data["ada$i"] or request()->hasFile("att$i")){
+        $filename = NULL;
+        $mimeType = NULL;
+        $savedPath = NULL;
+        $expires = NULL;
         if (request()->hasFile("att$i")){
-            $file = request()->file("att$i");
+          $file = request()->file("att$i");
 
-            $filename = $file->getClientOriginalName();
-            $mimeType = $file->getMimeType();
-            $expires = NULL;
+          $filename = $file->getClientOriginalName();
+          $mimeType = $file->getMimeType();
 
-            $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
-            $dir = '/arxeio/' . request()->fakelos . '/';
-            $savedPath = $file->storeas($dir,$filenameToStore);
-            if ($data['keep'] and is_numeric($data['keep'])){
-             $dt = Carbon::createFromFormat('d/m/Y', request()->protocoldate);
-             $dt->addYears($data['keep']);
-             $expires = $dt->format('Ymd');
-         }
+          $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
+          $dir = '/arxeio/' . request()->fakelos . '/';
+          $savedPath = $file->storeas($dir,$filenameToStore);
+        }
+          if ($data['keep'] and is_numeric($data['keep'])){
+           $dt = Carbon::createFromFormat('d/m/Y', request()->protocoldate);
+           $dt->addYears($data['keep']);
+           $expires = $dt->format('Ymd');
+       }
 
-         Attachment::create([
-            'protocol_id' => $protocol_id,
-            'name' => $filename,
-            'mimeType' => $mimeType,
-            'savedPath' => $savedPath,
-            'keep' => $data['keep'],
-            'expires' => $expires,
-            ]);
+       Attachment::create([
+          'protocol_id' => $id,
+          'ada' => $data["ada$i"],
+          'name' => $filename,
+          'mimeType' => $mimeType,
+          'savedPath' => $savedPath,
+          'keep' => $data['keep'],
+          'expires' => $expires,
+          ]);
      }
  }
 
  $notification = array(
-    'message' => 'Επιτυχημένη καταχώριση.', 
+    'message' => 'Επιτυχημένη καταχώριση.',
     'alert-type' => 'success'
     );
  session()->flash('notification',$notification);
@@ -432,8 +438,8 @@ public function update(Protocol $protocol){
 
     $mustValidate =[
     'protocolnum' => "required|integer|unique:protocols,protocolnum,$id,id,etos,$etos",
-    'etos' => 'required|integer|digits:4', 
-    'protocoldate' => 'required', 
+    'etos' => 'required|integer|digits:4',
+    'protocoldate' => 'required',
     ];
     $this->validate(request(), $mustValidate);
 
@@ -459,7 +465,7 @@ public function update(Protocol $protocol){
     $validator = Validator::make(request()->all(), [
         'protocoldate' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
         'in_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'out_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',  
+        'out_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
         'diekp_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',],  [
         'protocoldate.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         'in_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
@@ -477,7 +483,7 @@ public function update(Protocol $protocol){
 
     $in_chkdata = $data['in_chk'];
     if($data['in_num'] == $oldIn_num and $in_date == $oldIn_date )$in_chkdata = '0';
-    
+
     if ($in_chkdata == '1' ){
         $validator = Validator::make(request()->all(), [
             'in_num' => "unique:protocols,in_num,NULL,id,in_date,$in_date",],  [
@@ -524,16 +530,21 @@ public function update(Protocol $protocol){
     $filescount = 3 * $data['file_inputs_count'];
 
     for ($i = 1 ; $i < $filescount + 1; $i++){
-        if (request()->hasFile("att$i")){
+        if ($data["ada$i"] or request()->hasFile("att$i")){
+          $filename = NULL;
+          $mimeType = NULL;
+          $savedPath = NULL;
+          $expires = NULL;
+          if (request()->hasFile("att$i")){
             $file = request()->file("att$i");
 
             $filename = $file->getClientOriginalName();
             $mimeType = $file->getMimeType();
-            $expires = NULL;
-            
+
             $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
             $dir = '/arxeio/' . request()->fakelos . '/';
             $savedPath = $file->storeas($dir,$filenameToStore);
+          }
             if ($data['keep'] and is_numeric($data['keep'])){
              $dt = Carbon::createFromFormat('d/m/Y', request()->protocoldate);
              $dt->addYears($data['keep']);
@@ -542,6 +553,7 @@ public function update(Protocol $protocol){
 
          Attachment::create([
             'protocol_id' => $id,
+            'ada' => $data["ada$i"],
             'name' => $filename,
             'mimeType' => $mimeType,
             'savedPath' => $savedPath,
@@ -552,7 +564,7 @@ public function update(Protocol $protocol){
  }
 
  $notification = array(
-    'message' => 'Επιτυχημένη ενημέρωση.', 
+    'message' => 'Επιτυχημένη ενημέρωση.',
     'alert-type' => 'success'
     );
  session()->flash('notification',$notification);
@@ -566,7 +578,7 @@ public function delprotocol(Protocol $protocol){
     $etos = $protocol->etos;
     if ($protocol->attachments->count()){
         $notification = array(
-            'message' => 'Δεν μπορώ να διαγράψω πρωτόκολλο με συνημμένα.', 
+            'message' => 'Δεν μπορώ να διαγράψω πρωτόκολλο με συνημμένα.',
             'alert-type' => 'error'
             );
         session()->flash('notification',$notification);
@@ -576,12 +588,12 @@ public function delprotocol(Protocol $protocol){
     Protocol::destroy($protocol->id);
 
     $notification = array(
-        'message' => "Διαγράφηκε το Πρωτόκολλο με αριθμό $protocolnum για το έτος $etos", 
+        'message' => "Διαγράφηκε το Πρωτόκολλο με αριθμό $protocolnum για το έτος $etos",
         'alert-type' => 'success'
         );
     session()->flash('notification',$notification);
 
-    return redirect("home");    
+    return redirect("home");
 }
 
 
@@ -632,7 +644,7 @@ public function gotonum( $etos, $protocolnum){
     }
 
     $notification = array(
-        'message' => "Δεν βρέθηκε Πρωτόκολλο με Αριθμό $protocolnum για το έτος $etos.", 
+        'message' => "Δεν βρέθηκε Πρωτόκολλο με Αριθμό $protocolnum για το έτος $etos.",
         'alert-type' => 'warning'
         );
     session()->flash('notification',$notification);
@@ -649,7 +661,7 @@ public function download(Attachment $attachment){
     }
     $message = 'Το αρχείο<center>' . $attachment->name . '</center><br>που επιλέξατε δεν υπάρχει!<br>Πιθανόν να έχει διαγραφεί από άλλο εξωτερικό πρόγραμμα!';
     $notification = array(
-        'message' => $message, 
+        'message' => $message,
         'alert-type' => 'info'
     );
     session()->flash('notification',$notification);
@@ -803,7 +815,7 @@ public function updated(){
     unlink($file);
     $config = new Config;
     $config->setConfigValueOf('needsUpdate', 0);
-    return redirect("home/list"); 
+    return redirect("home/list");
 }
 
 public function printAttachments(){

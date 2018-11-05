@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property integer $id
  * @property integer $protocol_id
+ * @property string $ada
  * @property string $name
  * @property string $url
  * @property string $keep
@@ -39,7 +40,8 @@ class Attachment extends Model
     protected $fillable = [
         'protocol_id',
         'protocolnum',
-        'name', 
+        'ada',
+        'name',
         'savedPath',
         'mimeType',
         'keep',
