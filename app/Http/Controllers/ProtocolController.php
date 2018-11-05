@@ -401,7 +401,7 @@ use DB;
        }
 
        Attachment::create([
-          'protocol_id' => $id,
+          'protocol_id' => $protocol_id,
           'ada' => $data["ada$i"],
           'name' => $filename,
           'mimeType' => $mimeType,
