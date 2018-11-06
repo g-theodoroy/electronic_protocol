@@ -81,7 +81,7 @@ use DB;
         if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
         return $titleColorStyle;
     }
-    
+
     public function index( Protocol $protocol){
 
         $fakeloi= Keepvalue::orderBy(DB::raw("MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0<>0 DESC, MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0, `fakelos`"))->select('fakelos', 'describe')->get();
@@ -200,6 +200,7 @@ use DB;
             $needsUpdate = $config->getConfigValueOf('needsUpdate');
         }
         $wideListProtocol = $config->getConfigValueOf('wideListProtocol');
+        $diavgeiaUrl = $config->getConfigValueOf('diavgeiaUrl');
         $titleColorStyle = $this->getTitleColorStyle() ;
 
         $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
@@ -211,7 +212,7 @@ use DB;
             if($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
 
         }
-        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'titleColorStyle'));
+        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'titleColorStyle', 'diavgeiaUrl' ));
     }
 
 
@@ -329,9 +330,14 @@ use DB;
 
     if($safeNewProtocolNum){ // αν η ρύθμιση Ασφαλής νέος Αρ.Πρ είναι ΝΑΙ
         // εισαγωγή της εγγραφής με το νέο Αρ.Πρ που μόλις έφτιαξα
+        $protocolNewNum = $newprotocolnum;
+      }else{
+        $protocolNewNum = $data['protocolnum'];
+      }
+
     Protocol::create([
         'user_id' => Auth::user()->id ,
-        'protocolnum'=> $newprotocolnum,
+        'protocolnum'=> $protocolNewNum,
         'protocoldate'=> Carbon::createFromFormat('d/m/Y', $data['protocoldate'])->format('Ymd'),
         'etos' => $data['etos'],
         'fakelos' => $data['fakelos'],
@@ -351,32 +357,9 @@ use DB;
         'keywords' => $data['keywords'],
         'paratiriseis' => $data['paratiriseis']
         ]);
-    }else{ // αλλιώς εισάγω τον Αρ.Πρ που έστειλε η φόρμα
-    Protocol::create([
-        'user_id' => Auth::user()->id ,
-        'protocolnum'=> $data['protocolnum'],
-        'protocoldate'=> Carbon::createFromFormat('d/m/Y', $data['protocoldate'])->format('Ymd'),
-        'etos' => $data['etos'],
-        'fakelos' => $data['fakelos'],
-        'thema' => $data['thema'],
-        'in_num' => $data['in_num'],
-        'in_date' => $in_date,
-        'in_topos_ekdosis'=>  $data['in_topos_ekdosis'],
-        'in_arxi_ekdosis' => $data['in_arxi_ekdosis'],
-        'in_paraliptis' => $data['in_paraliptis'],
-        'diekperaiosi' => $data['diekperaiosi'],
-        'in_perilipsi' => $data['in_perilipsi'],
-        'out_date' => $out_date,
-        'diekp_date' => $diekp_date,
-        'sxetiko' => $data['sxetiko'],
-        'out_to' => $data['out_to'],
-        'out_perilipsi' => $data['out_perilipsi'],
-        'keywords' => $data['keywords'],
-        'paratiriseis' => $data['paratiriseis']
-        ]);
-    }
+
     $filescount = 3 * $data['file_inputs_count'];
-    $protocol_id = Protocol::max('id');
+    $protocol_id = Protocol::where("etos",$data['etos'])->where('protocolnum', $protocolNewNum)->first()->id ;
 
     for ($i = 1 ; $i < $filescount + 1; $i++){
       if ($data["ada$i"] or request()->hasFile("att$i")){

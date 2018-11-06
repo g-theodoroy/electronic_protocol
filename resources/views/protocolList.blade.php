@@ -217,7 +217,7 @@
                                       <br>
                                       @endif
                                       @if ($attachment->ada)
-                                        <a href='https://diavgeia.gov.gr/doc/{{$attachment->ada}}' target="_blank"  title='Λήψη {{ $attachment->ada }}'>@if(strlen($attachment->ada)> 13){{ mb_substr($attachment->ada,0,3, "utf-8") }}...{{ mb_substr($attachment->ada,-3,3, "utf-8") }}@else{{$attachment->ada}}@endif</a>
+                                        <a href='{{$diavgeiaUrl}}{{$attachment->ada}}' target="_blank"  title='Λήψη {{ $attachment->ada }}'>@if(strlen($attachment->ada)> 13){{ mb_substr($attachment->ada,0,3, "utf-8") }}...{{ mb_substr($attachment->ada,-3,3, "utf-8") }}@else{{$attachment->ada}}@endif</a>
                                       @endif
                                     </li>
                                 @endforeach

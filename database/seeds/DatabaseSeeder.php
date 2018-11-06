@@ -135,6 +135,13 @@ class DatabaseSeeder extends Seeder
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
+        DB::table('configs')->insert([
+           'key' => 'diavgeiaUrl',
+           'value' => 'http://static.diavgeia.gov.gr/doc/',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
         if ('\\' === DIRECTORY_SEPARATOR) {
           DB::table('configs')->insert([
              'key' => 'mysqldumpPath',
@@ -153,6 +160,6 @@ class DatabaseSeeder extends Seeder
 
 
         //$this->call(KeepvaluesTableSeeder::class);
-    
+
     }
 }
