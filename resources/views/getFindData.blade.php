@@ -25,9 +25,43 @@
     @endif
         <div class="col-md-1 col-sm-1 text-center " >{{$protocol->protocolnum}}</div>
         <div class="col-md-1 col-sm-1 text-center " >{{$protocol->protocoldate}}</div>
-        <div class="col-md-4 col-sm-4 " >{!! str_ireplace($searchData1, "<mark><strong>$searchData1</strong></mark>", $protocol->$searchField1) !!}</div>
-        <div class="col-md-3 col-sm-3 " >{!! str_ireplace($searchData2, "<mark><strong>$searchData2</strong></mark>", $protocol->$searchField2) !!}</div>
-        <div class="col-md-2 col-sm-2 " >{!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $protocol->$searchField3) !!}</div>
+        @if (array_key_exists($searchField1,$attachmentfields))
+            <div class="col-md-4 col-sm-4 " >
+              <ul class='list-inline'>
+              @foreach ($protocol->attachments()->get() as $attachment)
+              <li>
+              {!! str_ireplace($searchData1, "<mark><strong>$searchData1</strong></mark>", $attachment->$searchField1) !!}
+            </li>
+              @endforeach
+            </ul>
+            </div>
+        @else
+            <div class="col-md-4 col-sm-4 " >{!! str_ireplace($searchData1, "<mark><strong>$searchData1</strong></mark>", $protocol->$searchField1) !!}</div>
+        @endif
+        @if (array_key_exists($searchField2,$attachmentfields))
+              <div class="col-md-3 col-sm-3 " >
+                <ul class='list-inline'>
+                @foreach ($protocol->attachments()->get() as $attachment)
+                <li>
+                  {!! str_ireplace($searchData2, "<mark><strong>$searchData2</strong></mark>", $attachment->$searchField2) !!}
+                </li>
+                @endforeach
+                </div>
+        @else
+          <div class="col-md-3 col-sm-3 " >{!! str_ireplace($searchData2, "<mark><strong>$searchData2</strong></mark>", $protocol->$searchField2) !!}</div>
+        @endif
+        @if (array_key_exists($searchField3,$attachmentfields))
+        <div class="col-md-2 col-sm-2 " >
+          <ul class='list-inline'>
+          @foreach ($protocol->attachments()->get() as $attachment)
+          <li>
+            {!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $attachment->$searchField3) !!}
+          </li>
+          @endforeach
+          </div>
+        @else
+          <div class="col-md-2 col-sm-2 " >{!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $protocol->$searchField3) !!}</div>
+        @endif
         <div class="col-md-1 col-sm-1 text-center" ><a href="{{ URL::to('/') }}/home/{{$protocol->id}}" class="" role="button" title="Μετάβαση" > <img src="{{ URL::to('/') }}/images/open.png" height="20" /></a></div>
     </div>
     @php($i++)

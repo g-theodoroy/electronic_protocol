@@ -45,7 +45,7 @@ use DB;
             class ProtocolController extends Controller
             {
 
-     public  $fields = [
+     protected  $protocolfields = [
     'fakelos' => 'Φάκελος',
     'thema' => 'Θέμα',
     'in_num' => 'Αριθ. Εισερχ.',
@@ -59,6 +59,10 @@ use DB;
     'out_perilipsi' => 'Περιλ. Εξερχ',
     'keywords' => 'Λέξεις κλειδιά',
     'paratiriseis' => 'Παρατηρήσεις'
+    ];
+    protected  $attachmentfields = [
+    'name' => 'Όνομα συνημμένου',
+    'ada' => 'ΑΔΑ'
     ];
 
 
@@ -654,7 +658,7 @@ public function download(Attachment $attachment){
 
 public function find(){
 
-    $fields = $this->fields;
+    $fields = array_merge($this->protocolfields,$this->attachmentfields);
     $config = new Config;
     $searchField1 = $config->getConfigValueOf('searchField1');
     $searchField2 = $config->getConfigValueOf('searchField2');
@@ -671,7 +675,11 @@ public function getFindData(){
     $config = new Config;
     $maxRowsInFindPage = $config->getConfigValueOf('maxRowsInFindPage');
 
+    $fields = array_merge($this->protocolfields,$this->attachmentfields);
+    $attachmentfields = $this->attachmentfields;
+
     $wherevalues = [];
+    $whereAttachmentvalues = [];
 
     if(request('aponum')){
         $wherevalues[] = ['protocolnum', '>',request('aponum')-1 ];
@@ -702,26 +710,49 @@ public function getFindData(){
         $wherevalues[] = ['out_date', '<=', Carbon::createFromFormat('d/m/Y', request('eosExerxDate'))->format('Ymd')];
     }
     if(request('searchData1')){
+      if( array_key_exists(request('searchField1'), $attachmentfields)){
+        $whereAttachmentvalues[] = [request('searchField1'),'LIKE', '%' . request('searchData1') . '%' ];
+      }else{
         $wherevalues[] = [request('searchField1'),'LIKE', '%' . request('searchData1') . '%' ];
+      }
     }
     if(request('searchData2')){
+      if( array_key_exists(request('searchField2'),$attachmentfields)){
+        $whereAttachmentvalues[] = [request('searchField2'),'LIKE', '%' . request('searchData2') . '%' ];
+      }else{
         $wherevalues[] = [request('searchField2'),'LIKE', '%' . request('searchData2')  . '%' ];
+      }
     }
     if(request('searchData3')){
+      if( array_key_exists(request('searchField3'),$attachmentfields)){
+        $whereAttachmentvalues[] =  [request('searchField3'),'LIKE', '%' . request('searchData3')  . '%' ];
+      }else{
         $wherevalues[] = [request('searchField3'),'LIKE', '%' . request('searchData3') . '%'  ];
+      }
     }
-    $foundProtocolsCount = null;
-    if (! $wherevalues){
+    if (! $wherevalues and ! $whereAttachmentvalues){
         return;
-    }else{
-        $foundProtocolsCount = Protocol::where($wherevalues)->count();
-        $protocols = Protocol::where($wherevalues)->orderby('protocoldate','desc')->orderby('protocolnum','desc')->take($maxRowsInFindPage)->get();
     }
+
+    $foundProtocolsCount = Null;
+
+    $protocols = Protocol::with('attachments');
+    if ($wherevalues){
+      $protocols = $protocols->where($wherevalues);
+    }
+    if ($whereAttachmentvalues){
+      $protocols = $protocols->whereHas('attachments', function ($query)  use ($whereAttachmentvalues){
+           $query->where($whereAttachmentvalues );
+     });
+   }
+    $protocols = $protocols->orderby('protocoldate','desc')->orderby('protocolnum','desc')->take($maxRowsInFindPage);
+    $protocols = $protocols->get();
+    $foundProtocolsCount = $protocols->count();
+
     foreach($protocols as $protocol){
         if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
     }
 
-    $fields = $this->fields;
     $searchField1 = request('searchField1');
     $searchField2 = request('searchField2');
     $searchField3 = request('searchField3');
@@ -729,8 +760,7 @@ public function getFindData(){
     $searchData2 = request('searchData2');
     $searchData3 = request('searchData3');
 
-    return view('getFindData', compact('protocols', 'foundProtocolsCount' , 'maxRowsInFindPage', 'fields', 'searchField1', 'searchField2', 'searchField3', 'searchData1', 'searchData2', 'searchData3' ));
-
+    return view('getFindData', compact('protocols', 'foundProtocolsCount' , 'maxRowsInFindPage', 'fields', 'attachmentfields', 'searchField1', 'searchField2', 'searchField3', 'searchData1', 'searchData2', 'searchData3' ));
 }
 
 public function printprotocols(){
