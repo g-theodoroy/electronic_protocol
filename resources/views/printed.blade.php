@@ -147,6 +147,11 @@
                 </td>
                 </tr> 
                 @endforeach
+                @if(! count($protocols))
+                 <tr>
+                     <td class="small" colspan=12 >Δεν υπάρχουν Πρωτόκολλα τα οποία ικανοποιούν τα κριτήρια που θέσατε.</td>
+                 </tr>
+                @endif
             </tbody>
              <tfoot>
                  <tr>

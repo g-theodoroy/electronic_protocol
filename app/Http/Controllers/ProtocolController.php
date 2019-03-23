@@ -872,6 +872,7 @@ public function printedAttachments(){
     }
     $config = new Config;
     $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $etos = $config->getConfigValueOf('yearInUse');
     $datetime = Carbon::now()->format('d/m/Y H:m:s');
 
     return view('printedAttachments', compact('protocols', 'ipiresiasName' , 'etos', 'datetime'));

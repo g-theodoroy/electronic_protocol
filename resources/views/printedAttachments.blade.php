@@ -63,14 +63,16 @@
                     <th  class="small middle"><span class='small'>Θέμα<br>&#x2727;Περίληψη Εισερχομένου</span></th>
                     <th  class="small middle"><span class='small'>Ημνια Εξερχ.<br>&#x2727;Απευθύνεται</span></th>
                     <th  class="small middle"><span class='small'>Περίληψη<br>Εξερχόμενου</span></th>
-                    <th class="small middle"><center><span class='small'>Όνομα αρχείου</center></th>
+                    <th class="small middle"><center><span class='small'>Όνομα αρχείου<br>ή<br>ΑΔΑ</center></th>
                     <th class="small middle"><center><span class='small'>Διατήρηση</center></th>
                     <th class="small middle"><center><span class='small'>Έως</center></th>
                 </tr>
             </thead>
             <tbody>
+                @php($foundattacments = false)
                 @foreach($protocols as $protocol)
                 @if($protocol->attachments()->get()->count())
+                @php($foundattacments = true)
                 <tr>
                 <td class="small middle">
                     <strong>{{$protocol->protocolnum}}</strong><br>
@@ -119,9 +121,16 @@
                 <td class="small middle"><span class='small'>
                     <ul class='list-unstyled'>
                         @foreach ($protocol->attachments()->get() as $attachment)
+			@if($attachment->name)
                             <li>
                                 {{$attachment->name}}
                             </li>
+			@endif
+			@if($attachment->ada)
+                           <li>
+                                {{$attachment->ada}}
+                            </li>
+			@endif
                         @endforeach
                     </ul>
                     </span>
@@ -149,6 +158,11 @@
                 </tr> 
                 @endif
                 @endforeach
+                @if(! $foundattacments)
+                 <tr>
+                     <td class="small" colspan=12 >Δεν υπάρχουν Πρωτόκολλα με συνημμένα αρχεία τα οποία ικανοποιούν τα κριτήρια που θέσατε.</td>
+                 </tr>
+                @endif
             </tbody>
              <tfoot>
                  <tr>
