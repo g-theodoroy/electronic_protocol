@@ -14,6 +14,7 @@ use Auth;
 use Illuminate\Validation\Rule;
 use Validator;
 use DB;
+use Active;
 
 /*
 
@@ -42,7 +43,7 @@ use DB;
 
 */
 
-            class ProtocolController extends Controller
+class ProtocolController extends Controller
             {
 
      protected  $protocolfields = [
@@ -88,7 +89,7 @@ use DB;
 
     public function index( Protocol $protocol){
 
-        $fakeloi= Keepvalue::orderBy(DB::raw("MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0<>0 DESC, MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0, `fakelos`"))->select('fakelos', 'describe')->get();
+        $fakeloi= Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-3)+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->select('fakelos', 'describe')->get();
 
         $config = new Config;
         $newetos = $config->getConfigValueOf('yearInUse')?$config->getConfigValueOf('yearInUse'):Carbon::now()->format('Y');
@@ -108,6 +109,19 @@ use DB;
                 $newprotocolnum = 1;
             }
         }
+        // βρίσκω τους όλους ενεργούς χρήστες
+        $activeusers = Active::users()->mostRecent()->get();
+        $activeusers2show = [];
+        foreach($activeusers as $actuser){
+          $activeusers2show[] = $actuser['user']['name'];
+        }
+        // μετράω μόνο τους Διαχειριστές και Συγγραφείς που έχουν δικαίωμα να γράψουν
+        $activeuserscount = Active::users()->whereHas('user', function($q) {
+              $q->where('role_id', 1)->orWhere('role_id', 2) ;
+            })->count();
+          // αν είναι πάνω από ένας δεν εμφανίζω τον επόμενο Αρ.Πρωτ.
+        if ($activeuserscount > 1) $newprotocolnum = '';
+
         $newprotocoldate = Carbon::now()->format('d/m/Y');
         $class = 'bg-info';
         $protocoltitle = 'Νέο Πρωτόκολλο';
@@ -153,7 +167,7 @@ use DB;
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle', 'activeusers2show'));
     }
 
     public function chkForUpdates(){
@@ -773,6 +787,11 @@ public function printprotocols(){
 }
 
 public function printed(){
+    $config = new Config;
+    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $etos = $config->getConfigValueOf('yearInUse');
+    $datetime = Carbon::now()->format('d/m/Y H:m:s');
+
     $wherevalues = [];
 
     if(request('aponum')){
@@ -783,6 +802,7 @@ public function printed(){
     }
     if(request('etosForMany')){
         $wherevalues[] = ['etos', request('etosForMany')];
+        $etos = request('etosForMany');
     }
     if(request('apoProtocolDate')){
         $wherevalues[] = ['protocoldate', '>=', Carbon::createFromFormat('d/m/Y', request('apoProtocolDate'))->format('Ymd')];
@@ -803,10 +823,6 @@ public function printed(){
         if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
         if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
     }
-    $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-    $etos = $config->getConfigValueOf('yearInUse');
-    $datetime = Carbon::now()->format('d/m/Y H:m:s');
 
     return view('printed', compact('protocols', 'ipiresiasName' , 'etos', 'datetime'));
 }
@@ -841,6 +857,11 @@ public function printAttachments(){
 }
 
 public function printedAttachments(){
+    $config = new Config;
+    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+    $etos = $config->getConfigValueOf('yearInUse');
+    $datetime = Carbon::now()->format('d/m/Y H:m:s');
+
     $wherevalues = [];
 
     if(request('aponum')){
@@ -851,29 +872,26 @@ public function printedAttachments(){
     }
     if(request('etosForMany')){
         $wherevalues[] = ['etos', request('etosForMany')];
-    }
+        $etos = request('etosForMany');
+}
     if(request('apoProtocolDate')){
         $wherevalues[] = ['protocoldate', '>=', Carbon::createFromFormat('d/m/Y', request('apoProtocolDate'))->format('Ymd')];
     }
     if(request('eosProtocolDate')){
         $wherevalues[] = ['protocoldate', '<=', Carbon::createFromFormat('d/m/Y', request('eosProtocolDate'))->format('Ymd')];
     }
+
     $foundProtocolsCount = null;
     if (! $wherevalues){
         return back();
     }else{
-        $foundProtocolsCount = Protocol::where($wherevalues)->count();
-        $protocols = Protocol::where($wherevalues)->orderby('protocolnum','asc')->get();
+        $protocols = Protocol::has('attachments')->where($wherevalues)->orderby('protocolnum','asc')->get();
     }
     foreach($protocols as $protocol){
         if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         if($protocol->in_date) $protocol->in_date = Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y');
         if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
     }
-    $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-    $etos = $config->getConfigValueOf('yearInUse');
-    $datetime = Carbon::now()->format('d/m/Y H:m:s');
 
     return view('printedAttachments', compact('protocols', 'ipiresiasName' , 'etos', 'datetime'));
 }

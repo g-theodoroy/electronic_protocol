@@ -40,7 +40,7 @@ class KeepvalueController extends Controller
     public function index(Keepvalue $keepvalue)
     {
         $config = new Config;
-        $keepvalues = Keepvalue::orderBy(DB::raw("MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0<>0 DESC, MID(`fakelos`,LOCATE('.',`fakelos`)+1,LENGTH(`fakelos`)-(LOCATE('.',`fakelos`)+1))+0, `fakelos`"))->paginate($config->getConfigValueOf('showRowsInPage'));
+        $keepvalues = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->paginate($config->getConfigValueOf('showRowsInPage'));
         $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
         $titleColorStyle = $this->getTitleColorStyle() ;
 
@@ -85,13 +85,13 @@ class KeepvalueController extends Controller
         ]);
 
         $notification = array(
-            'message' => 'Επιτυχημένη καταχώριση.', 
+            'message' => 'Επιτυχημένη καταχώριση.',
             'alert-type' => 'success'
         );
         session()->flash('notification',$notification);
 
     return back();
-    
+
     }
 
     public function update($id)
@@ -105,7 +105,7 @@ class KeepvalueController extends Controller
         $validatevalues =[
         'fakelos' => "required|max:255|unique:keepvalues,fakelos,$id,id",
         'keep' => 'nullable|integer',
-        ]; // 'describe' => 'required', 
+        ]; // 'describe' => 'required',
             // 'keep' => 'nullable|integer|required_without:keep_alt',
             // 'keep_alt' => 'nullable|max:255|required_without:keep',
 
@@ -126,13 +126,13 @@ class KeepvalueController extends Controller
         Keepvalue::whereId($id)->update($updatevalues);
 
         $notification = array(
-            'message' => 'Επιτυχημένη ενημέρωση.', 
+            'message' => 'Επιτυχημένη ενημέρωση.',
             'alert-type' => 'success'
         );
         session()->flash('notification',$notification);
-      
+
     return back();
-    
+
     }
 
 

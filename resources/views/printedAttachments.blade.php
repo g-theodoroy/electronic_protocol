@@ -47,7 +47,7 @@
                 <tr>
                     <th colspan=9>
                         <div class="col-md-3">{{$ipiresiasName}}</div>
-                        <div class="col-md-6 text-center">Εκτύπωση Πρωτοκόλλων με Συνημμένα Αρχεία</div>
+                        <div class="col-md-6 text-center">Εκτύπωση Πρωτοκόλλων με Συνημμένα Αρχεία έτους {{$etos}}</div>
                     </th>
                 </tr>
                 <tr >
@@ -69,10 +69,7 @@
                 </tr>
             </thead>
             <tbody>
-                @php($foundattacments = false)
                 @foreach($protocols as $protocol)
-                @if($protocol->attachments()->get()->count())
-                @php($foundattacments = true)
                 <tr>
                 <td class="small middle">
                     <strong>{{$protocol->protocolnum}}</strong><br>
@@ -121,16 +118,12 @@
                 <td class="small middle"><span class='small'>
                     <ul class='list-unstyled'>
                         @foreach ($protocol->attachments()->get() as $attachment)
-			@if($attachment->name)
-                            <li>
-                                {{$attachment->name}}
-                            </li>
-			@endif
-			@if($attachment->ada)
-                           <li>
-                                {{$attachment->ada}}
-                            </li>
-			@endif
+			                     @if($attachment->name)
+                            <li>{{$attachment->name}}</li>
+			                     @endif
+			                     @if($attachment->ada)
+                           <li>{{$attachment->ada}}</li>
+			                     @endif
                         @endforeach
                     </ul>
                     </span>
@@ -155,10 +148,9 @@
                         @endforeach
                     </span>
                 </td>
-                </tr> 
-                @endif
+                </tr>
                 @endforeach
-                @if(! $foundattacments)
+                @if(! count($protocols))
                  <tr>
                      <td class="small" colspan=12 >Δεν υπάρχουν Πρωτόκολλα με συνημμένα αρχεία τα οποία ικανοποιούν τα κριτήρια που θέσατε.</td>
                  </tr>

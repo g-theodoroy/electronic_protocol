@@ -389,6 +389,14 @@ function periigisi(id){
                     </div>
                     </form>
                 </div>
+                @if(count($activeusers2show)>1)
+                <div class="col-md-2 col-sm-2 small text-right">Ενεργοί χρήστες: {{count($activeusers2show)}}</div>
+                <div class="col-md-10 col-sm-10 small text-left">
+                  @foreach($activeusers2show as $user2show)
+                  {{$user2show}}@if(! $loop->last), @endif
+                  @endforeach
+                </div>
+                @endif
                 </div>
             </div>
         </div>

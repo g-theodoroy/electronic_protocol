@@ -13,7 +13,8 @@
 
                     <div class='row'>
                         <div class="col-md-2 col-sm-2 form-control-static">
-                        <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=30 / ></a>
+                          <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
+                          &nbsp;<span id='timer' style='color:#BFBFBF' title='Αυτόματη ανανέωση σε'></span>
                         </div>
                     @if ($protocols->links())
                         <div class="col-md-8 col-sm-8 small text-center">
@@ -21,8 +22,7 @@
                         </div>
                     @endif
                         <div class="col-md-2 col-sm-2 form-control-static text-right">
-                        <span id='timer' style='color:#BFBFBF' title='Αυτόματη ανανέωση σε'></span>&nbsp;
-                        <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
+                          <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=30 / ></a>
                         </div>
                     </div>
 
@@ -104,7 +104,7 @@
                                     @if($protocol->in_num)
                                     {{$protocol->in_num}}/
                                     @endif
-                                    {{$protocol->in_date ? $protocol->in_date : '&nbsp;'}}
+                                    {{$protocol->in_date ? $protocol->in_date : ''}}
                                     </span>
                                     <hr>
                                     <span title='Τόπος Έκδοσης'>
@@ -125,7 +125,7 @@
                                 </div>
                                 <div class='col-md-7 col-sm-7 small'>
                                     <span title='Θέμα'><strong>
-                                    {{$protocol->thema ? $protocol->thema : '&nbsp;'}}
+                                    {{$protocol->thema ? $protocol->thema : ''}}
                                     </strong></span>
                                     <hr>
                                     <span title='Περίληψη Εισερχομένου'>
@@ -150,7 +150,7 @@
                             <div class='row'>
                                 <div class='col-md-5 col-sm-5 small'>
                                     <span title='Ημνία Εξερχομένου'>
-                                    {{$protocol->out_date  ? $protocol->out_date : '&nbsp;'}}
+                                    {{$protocol->out_date  ? $protocol->out_date : ''}}
                                     </span>
                                     <hr>
                                     <span title='Απευθύνεται'>
@@ -172,7 +172,7 @@
                                 <div class='col-md-3 col-sm-3 small'>
                                     <br>
                                     <span title='Διεκπεραίωση'>
-                                    {{$protocol->diekperaiosi ? $protocol->diekperaiosi : '&nbsp;'}}
+                                    {{$protocol->diekperaiosi ? $protocol->diekperaiosi : ''}}
                                     </span>
                                     <hr>
                                     <span title='Ημνία Διεκπεραίωσης'>
@@ -185,7 +185,7 @@
                                  </div>
                                 <div class='col-md-4 col-sm-4 small'>
                                     <span title='{{$protocol->describe  ? "Φάκελος " . $protocol->fakelos . " -> " . $protocol->describe : 'Φάκελος'}}'>
-                                    {{$protocol->fakelos  ? $protocol->fakelos : '&nbsp;'}}
+                                    {{$protocol->fakelos  ? $protocol->fakelos : ''}}
                                     </span>
                                     <hr>
                                     <span title='Σχετικοί αριθμοί'>

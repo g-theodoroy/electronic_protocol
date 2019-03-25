@@ -218,7 +218,8 @@
                         </div>
                     </div>
 
-                <div class="panel panel-default col-md-12 col-sm-12  ">
+		@if (env('DB_CONNECTION') !== 'sqlite')
+               <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-warning">
                             <div class="form-control-static h4 text-center">Ρυθμίσεις αντιγράφων ασφαλείας</div>
                         </div>
@@ -231,7 +232,7 @@
                             </div>
                         </div>
                     </div>
-
+		@endif
 
                     <div class="row">
                         <div class="col-md-2 col-sm-2 col-md-offset-4 col-sm-offset-4 text-center">
