@@ -21,6 +21,9 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 #
 # Εγκατάσταση
 
+Τετάρτη 27/3/2019
+Το Ηλ. Πρωτόκολλο χρησιμοποιεί στην παρούσα στιγνή την έκδοση laravel 5.8 και php 7
+
 #
 # Προτεινόμενη μέθοδος
 
