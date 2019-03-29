@@ -167,10 +167,9 @@ class ProtocolController extends Controller
               // αν η μεταβλητή είναι 1 δηλαδή επιτρέπεται μόνο στον Συγγραφέα που καταχώρισε το Πρ.
               }elseif($allowWriterUpdateProtocol == 1){
                 // αν ο Συγγραφέας ΔΕΝ είναι ο ίδιος
-                if ($protocol->user_id !== Auth::user()->id ){
+                if ($protocol->user_id <> Auth::user()->id ){
                     $submitVisible = 'hidden';
                 }else{
-                  //return Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp() - $protocol->updated_at->getTimestamp() ;
                   // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
                   if ($allowWriterUpdateProtocolTimeInMinutes){
                     if ($protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()){
