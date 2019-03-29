@@ -117,6 +117,14 @@ function periigisi(id){
     <div class="row">
         <div class="col-md-12 ">
             <div class="panel panel-default">
+              @if(count($activeusers2show)>1)
+              <div class="col-md-2 col-sm-2 small text-center">Ενεργοί χρήστες: <strong>{{count($activeusers2show)}}</strong></div>
+              <div class="col-md-10 col-sm-10 small text-left">
+                @foreach($activeusers2show as $user2show)
+                {{$user2show}}@if(! $loop->last), @endif
+                @endforeach
+              </div>
+              @endif
                 <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
 
                 <div class="panel-body">
@@ -146,7 +154,7 @@ function periigisi(id){
                                     <strong>Αύξων<br>Αριθμός</strong>
                                 </div>
                                 <div class="col-md-3 col-sm-3 middle {{ $errors->has('protocolnum') ? ' has-error' : '' }}">
-                                    <input id="protocolnum" type="text" class="form-control input-lg text-center asd text-bold" name="protocolnum" placeholder="num" value="{{ old('protocolnum') ? old('protocolnum') :  $newprotocolnum }}" title='1. Αύξων αριθμός' required tabindex=-1 {{$readonly}} >
+                                    <input id="protocolnum" type="text" class="form-control input-lg text-center asd text-bold {{$newprotocolnumvisible}}" name="protocolnum" placeholder="num" value="{{ old('protocolnum') ? old('protocolnum') :  $newprotocolnum }}" title='1. Αύξων αριθμός' required tabindex=-1 {{$readonly}} >
                                 </div>
                                 <div class="col-md-1 col-sm-1 small text-center">
                                     <strong>Ημ/νια<br>παραλαβής</strong>
@@ -326,9 +334,6 @@ function periigisi(id){
                         </div>
                         <div id='show_arxeia' class="col-md-9 col-sm-9 form-control-static">
                             <ul class='list-inline'>
-                              @php
-                                 $diavgeiaUrl = \App\Config::where('key', 'diavgeiaUrl')->first()->value;
-                              @endphp
                                 @foreach ($protocol->attachments()->get() as $attachment)
                                     <li>
                                       @if ($attachment->name)
@@ -389,14 +394,31 @@ function periigisi(id){
                     </div>
                     </form>
                 </div>
-                @if(count($activeusers2show)>1)
-                <div class="col-md-2 col-sm-2 small text-right">Ενεργοί χρήστες: {{count($activeusers2show)}}</div>
-                <div class="col-md-10 col-sm-10 small text-left">
-                  @foreach($activeusers2show as $user2show)
-                  {{$user2show}}@if(! $loop->last), @endif
-                  @endforeach
-                </div>
-                @endif
+                  @if($showUserInfo == 1)
+                    <div class="col-md-12 col-sm-12 small text-left">
+                    @if($protocol->id)
+                      @if($protocol->created_at == $protocol->updated_at)
+                        Καταχωρίστηκε {{$protocol->updated_at}}
+                        @if($protocolUser) από {{$protocolUser->username}} @endif
+                      @else
+                        Ενημερώθηκε {{$protocol->updated_at}}
+                        @if($protocolUser) από {{$protocolUser->username}} @endif
+                      @endif
+                    @endif
+                  </div>
+                  @elseif($showUserInfo == 2)
+                  <div class="col-md-12 col-sm-12 small text-left">
+                    @if($protocol->id)
+                      @if($protocol->created_at == $protocol->updated_at)
+                        Καταχωρίστηκε {{$protocol->updated_at}}
+                        @if($protocolUser) από {{$protocolUser->name}} @endif
+                      @else
+                        Ενημερώθηκε {{$protocol->updated_at}}
+                        @if($protocolUser) από {{$protocolUser->name}} @endif
+                      @endif
+                    </div>
+                    @endif
+                  @endif
                 </div>
             </div>
         </div>

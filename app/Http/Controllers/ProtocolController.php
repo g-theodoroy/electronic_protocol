@@ -7,6 +7,7 @@ use App\Keepvalue;
 use App\Config;
 use App\Protocol;
 use App\Attachment;
+use App\User;
 use Storage;
 use Carbon\Carbon;
 use URL;
@@ -94,6 +95,7 @@ class ProtocolController extends Controller
         $config = new Config;
         $newetos = $config->getConfigValueOf('yearInUse')?$config->getConfigValueOf('yearInUse'):Carbon::now()->format('Y');
         $titleColorStyle = $this->getTitleColorStyle() ;
+        $showUserInfo = $config->getConfigValueOf('showUserInfo');
 
         $firstProtocolNum = $config->getConfigValueOf('firstProtocolNum');
         if (Protocol::all()->count()){
@@ -109,22 +111,29 @@ class ProtocolController extends Controller
                 $newprotocolnum = 1;
             }
         }
+
         // βρίσκω τους όλους ενεργούς χρήστες
         $activeusers = Active::users()->mostRecent()->get();
         $activeusers2show = [];
         foreach($activeusers as $actuser){
-          $activeusers2show[] = $actuser['user']['name'];
+          if ($showUserInfo == 1){
+            $activeusers2show[] = $actuser['user']['username'];
+          }elseif($showUserInfo == 2){
+            $activeusers2show[] = $actuser['user']['name'];
+          }
         }
         // μετράω μόνο τους Διαχειριστές και Συγγραφείς που έχουν δικαίωμα να γράψουν
         $activeuserscount = Active::users()->whereHas('user', function($q) {
               $q->where('role_id', 1)->orWhere('role_id', 2) ;
             })->count();
           // αν είναι πάνω από ένας δεν εμφανίζω τον επόμενο Αρ.Πρωτ.
-        if ($activeuserscount > 1) $newprotocolnum = '';
+        $newprotocolnumvisible = 'active';
+        if ($activeuserscount > 1 and ! $protocol->id) $newprotocolnumvisible = 'hidden';
 
         $newprotocoldate = Carbon::now()->format('d/m/Y');
         $class = 'bg-info';
         $protocoltitle = 'Νέο Πρωτόκολλο';
+        $protocolUser = '';
         $protocolArrowStep = $config->getConfigValueOf('protocolArrowStep');
         if($protocol->etos) $newetos = $protocol->etos;
         if($protocol->protocolnum) $newprotocolnum = $protocol->protocolnum;
@@ -138,9 +147,48 @@ class ProtocolController extends Controller
         if($protocol->protocolnum){
             $class = 'bg-success';
             $protocoltitle = 'Επεξεργασία Πρωτοκόλλου';
+            $protocolUser = User::whereId($protocol->user_id)->first();
         }
+
+        $allowWriterUpdateProtocol = $config->getConfigValueOf('allowWriterUpdateProtocol');
+        $allowWriterUpdateProtocolTimeInMinutes = $config->getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes');
+
         $submitVisible = 'active';
+        // ΑΠΟΚΡΥΨΗ ΤΟΥ ΚΟΥΜΠΙΟΥ ΑΠΟΘΗΚΕΥΣΗ
+        // 1 αν ο χρήστης είναι Αναγνώστης
         if (Auth::user()->role->role == 'Αναγνώστης') $submitVisible = 'hidden';
+        // 2 αν ο χρήστης είναι Συγγραφέας
+        if (Auth::user()->role->role == 'Συγγραφέας') {
+            // αν είναι παλιό πρωτόκολλο (έχει id) ΕΠΕΞΕΡΓΑΣΙΑ ΠΡΩΤΟΚΟΛΛΟΥ
+            if($protocol->id){
+              // αν η μεταβλητή είναι 0 ή null δηλαδή δεν επιτρέπεται τροποποίηση από Συγγραφείς
+              if ( ! $allowWriterUpdateProtocol){
+                $submitVisible = 'hidden';
+              // αν η μεταβλητή είναι 1 δηλαδή επιτρέπεται μόνο στον Συγγραφέα που καταχώρισε το Πρ.
+              }elseif($allowWriterUpdateProtocol == 1){
+                // αν ο Συγγραφέας ΔΕΝ είναι ο ίδιος
+                if ($protocol->user_id !== Auth::user()->id ){
+                    $submitVisible = 'hidden';
+                }else{
+                  //return Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp() - $protocol->updated_at->getTimestamp() ;
+                  // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
+                  if ($allowWriterUpdateProtocolTimeInMinutes){
+                    if ($protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()){
+                    $submitVisible = 'hidden';
+                  }
+                }
+              }
+              // αν η μεταβλητή είναι 2 δηλαδή επιτρέπεται σε κάθε Συγγραφέα να τροποποιήσει
+              }else{
+                // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
+                if ($allowWriterUpdateProtocolTimeInMinutes and $protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()){
+                  $submitVisible = 'hidden';
+                }
+              }
+              // Αν το πρωτόκολλο δεν έχει θέμα (είναι δηλαδή κενό) ακυρώνονται όλα τα παραπάνω
+              if (! $protocol->thema)$submitVisible = 'active';
+            }
+        }
 
         $readonly = 'readonly';
         $delVisible = 'hidden';
@@ -154,6 +202,7 @@ class ProtocolController extends Controller
         }
 
         $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+        $diavgeiaUrl = $config->getConfigValueOf('diavgeiaUrl');
 
         $keepval = null;
         if ($protocol->fakelos  and Keepvalue::whereFakelos($protocol->fakelos)->first()){
@@ -161,13 +210,12 @@ class ProtocolController extends Controller
             if (! $keepval) $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep_alt;
         }
 
-        $config = new Config;
         $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
 
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle', 'activeusers2show'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser'));
     }
 
     public function chkForUpdates(){

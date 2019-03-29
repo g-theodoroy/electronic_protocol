@@ -158,6 +158,40 @@ class DatabaseSeeder extends Seeder
           ]);
         }
 
+        DB::table('configs')->insert([
+           'key' => 'wideListProtocol',
+           'value' => 0,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
+           'key' => 'titleColor',
+           'value' => Null,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
+           'key' => 'allowWriterUpdateProtocol',
+           'value' => 1,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
+           'key' => 'allowWriterUpdateProtocolTimeInMinutes',
+           'value' => 10,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
+           'key' => 'showUserInfo',
+           'value' => 2,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
 
         //$this->call(KeepvaluesTableSeeder::class);
 

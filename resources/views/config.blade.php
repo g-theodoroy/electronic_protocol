@@ -18,7 +18,7 @@
 
                 <div class="panel-body ">
                     <!-- ________________________________form______________________________________________________ -->
-                    <form id='configform' name="configform" class="form-horizontal" role="form" method="POST" action="{{ url('/config') }}" > 
+                    <form id='configform' name="configform" class="form-horizontal" role="form" method="POST" action="{{ url('/config') }}" >
                         {{ csrf_field() }}
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-info">
@@ -68,6 +68,52 @@
                             </div>
                             <div class="col-md-2 col-sm-2  " id="minutesRefreshIntervaldiv">
                                 <input id="minutesRefreshInterval" type="text" class="form-control text-center" name="minutesRefreshInterval" placeholder="minutesRefreshInterval" value="{{$configs['minutesRefreshInterval']}}" title=''>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                Χρώμα επικεφαλίδας
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="titleColordiv">
+                                <input id="titleColor" type="text" class="form-control text-center" name="titleColor" placeholder="titleColor" value="{{$configs['titleColor']}}" title=''>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1 ">
+                                Η  Λίστα Πρωτοκόλλου απλώνεται σε όλο τον διαθέσιμο χώρο
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="wideListProtocoldiv">
+                                <select id='wideListProtocol' name='wideListProtocol' class="form-control"  title=''>
+                                @if ($configs['wideListProtocol'] )
+                                <option value="0"  >ΟΧΙ</option>
+                                <option value="1" selected >ΝΑΙ</option>
+                                @else
+                                <option value="0" selected >ΟΧΙ</option>
+                                <option value="1"  >ΝΑΙ</option>
+                                @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1 ">
+                                Εμφάνιση πληροφοριών Χρηστών
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="showUserInfodiv">
+                                <select id='showUserInfo' name='showUserInfo' class="form-control"  title=''>
+                                @if ( ! $configs['showUserInfo'] )
+                                <option value="0" selected >ΟΧΙ</option>
+                                <option value="1" >username</option>
+                                <option value="2" >Όνομα</option>
+                                @elseif($configs['showUserInfo'] == 1)
+                                <option value="0" >ΟΧΙ</option>
+                                <option value="1" selected >username</option>
+                                <option value="2" >Όνομα</option>
+                                @else
+                                <option value="0" >ΟΧΙ</option>
+                                <option value="1" >username</option>
+                                <option value="2" selected >Όνομα</option>
+                                @endif
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -126,7 +172,7 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1  " >
-                                Βήμα μετακίνησης με το κλικ των κουμπιών <img src="{{ URL::to('/') }}/images/arrow-left-double.png" height=20 / > και <img src="{{ URL::to('/') }}/images/arrow-right-double.png" height=20 / > 
+                                Βήμα μετακίνησης με το κλικ των κουμπιών <img src="{{ URL::to('/') }}/images/arrow-left-double.png" height=20 / > και <img src="{{ URL::to('/') }}/images/arrow-right-double.png" height=20 / >
                             </div>
                             <div class="col-md-2 col-sm-2  " id="protocolArrowStepdiv">
                                 <input id="protocolArrowStep" type="text" class="form-control text-center" name="protocolArrowStep" placeholder="protocolArrowStep" value="{{$configs['protocolArrowStep']}}" title=''>
@@ -164,7 +210,7 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
-                                Ασφαλής, όχι διπλότυπος Νέος Αρ.Πρωτοκόλλου  
+                                Ασφαλής, όχι διπλότυπος Νέος Αρ.Πρωτοκόλλου
                             </div>
                             <div class="col-md-2 col-sm-2  " id="safeNewProtocolNumdiv">
                                 <select id='safeNewProtocolNum' name='safeNewProtocolNum' class="form-control"  title=''>
@@ -180,7 +226,7 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
-                                Έλεύθερη επιλογή χρόνου διατήρησης αρχείων 
+                                Έλεύθερη επιλογή χρόνου διατήρησης αρχείων
                             </div>
                             <div class="col-md-2 col-sm-2  " id="allowUserChangeKeepSelectdiv">
                                 <select id='allowUserChangeKeepSelect' name='allowUserChangeKeepSelect' class="form-control"  title=''>
@@ -194,6 +240,36 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
+                                Δυνατότητα Επεξεργασίας Πρωτοκόλλου από Συγγραφέα
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="allowWriterUpdateProtocoldiv">
+                                <select id='allowWriterUpdateProtocol' name='allowWriterUpdateProtocol' class="form-control"  title=''>
+                                @if( ! $configs['allowWriterUpdateProtocol'])
+                                <option value="0" selected >ΚΑΝΕΙΣ</option>
+                                <option value="1" >ΕΝΑΣ</option>
+                                <option value="2" >ΟΛΟΙ</option>
+                                @elseif ($configs['allowWriterUpdateProtocol'] == 1)
+                                <option value="0" >ΚΑΝΕΙΣ</option>
+                                <option value="1" selected >ΕΝΑΣ</option>
+                                <option value="2" >ΟΛΟΙ</option>
+                                @else
+                                <option value="0" >ΚΑΝΕΙΣ</option>
+                                <option value="1" >ΕΝΑΣ</option>
+                                <option value="2" selected >ΟΛΟΙ</option>
+                                @endif
+                                </select>
+                            </div>
+                          </div>
+                          <div class="row">
+                                <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1  " >
+                                    Χρόνος σε λεπτά δυνατότητας επεξεργασίας Πρωτ. από Συγγραφέα
+                                </div>
+                                <div class="col-md-2 col-sm-2  " id="allowWriterUpdateProtocolTimeInMinutesdiv">
+                                    <input id="allowWriterUpdateProtocolTimeInMinutes" type="text" class="form-control text-center" name="allowWriterUpdateProtocolTimeInMinutes" placeholder="allowWriterUpdateProtocolTimeInMinutes" value="{{$configs['allowWriterUpdateProtocolTimeInMinutes']}}" title=''>
+                                </div>
+                          </div>
                     </div>
 
                 <div class="panel panel-default col-md-12 col-sm-12  ">
@@ -218,9 +294,23 @@
                         </div>
                     </div>
 
+                    <div class="panel panel-default col-md-12 col-sm-12  ">
+                             <div class="row bg-warning">
+                                 <div class="form-control-static h4 text-center">Ρυθμίσεις συνημμένων αρχείων</div>
+                             </div>
+                             <div class="row">
+                                 <div class="form-control-static col-md-7 col-sm-7  col-md-offset-1 col-sm-offset-1" >
+                                     URL Διαύγειας
+                                 </div>
+                                 <div class="col-md-4 col-sm-4  " id="diavgeiaUrldiv">
+                                     <input id="diavgeiaUrl" type="text" class="form-control text-center" name="diavgeiaUrl" placeholder="diavgeiaUrl" value="{{$configs['diavgeiaUrl']}}" title=''>
+                                 </div>
+                             </div>
+                         </div>
+
 		@if (env('DB_CONNECTION') !== 'sqlite')
                <div class="panel panel-default col-md-12 col-sm-12  ">
-                        <div class="row bg-warning">
+                        <div class="row bg-success">
                             <div class="form-control-static h4 text-center">Ρυθμίσεις αντιγράφων ασφαλείας</div>
                         </div>
                         <div class="row">
@@ -250,7 +340,7 @@
                 </form> <!-- ________________________________end form______________________________________________________ -->
 
                     <div id='showFindData' ></div>
-                    
+
                 </div>
             </div>
         </div>
@@ -380,7 +470,7 @@ function getPrintData() {
     $("#printform").submit()
     return true
 }
-   
+
 
 </script>
 
