@@ -152,11 +152,15 @@ class ProtocolController extends Controller
 
         $allowWriterUpdateProtocol = $config->getConfigValueOf('allowWriterUpdateProtocol');
         $allowWriterUpdateProtocolTimeInMinutes = $config->getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes');
-
+        $time2update = 0;
         $submitVisible = 'active';
         // ΑΠΟΚΡΥΨΗ ΤΟΥ ΚΟΥΜΠΙΟΥ ΑΠΟΘΗΚΕΥΣΗ
         // 1 αν ο χρήστης είναι Αναγνώστης
-        if (Auth::user()->role->role == 'Αναγνώστης') $submitVisible = 'hidden';
+        if (Auth::user()->role->role == 'Αναγνώστης'){
+          $submitVisible = 'hidden';
+          $class = 'bg-warning';
+          $protocoltitle = 'Πρωτόκολλο';
+        }
         // 2 αν ο χρήστης είναι Συγγραφέας
         if (Auth::user()->role->role == 'Συγγραφέας') {
             // αν είναι παλιό πρωτόκολλο (έχει id) ΕΠΕΞΕΡΓΑΣΙΑ ΠΡΩΤΟΚΟΛΛΟΥ
@@ -184,8 +188,18 @@ class ProtocolController extends Controller
                   $submitVisible = 'hidden';
                 }
               }
+              if($submitVisible == 'active'){
+                $time2update = $allowWriterUpdateProtocolTimeInMinutes * 60 - (Carbon::now()->getTimestamp() - $protocol->updated_at->getTimestamp());
+                $class = 'bg-success';
+              }else{
+                $class = 'bg-warning';
+                $protocoltitle = 'Πρωτόκολλο';
+              }
               // Αν το πρωτόκολλο δεν έχει θέμα (είναι δηλαδή κενό) ακυρώνονται όλα τα παραπάνω
-              if (! $protocol->thema)$submitVisible = 'active';
+              if (! $protocol->thema){
+                $submitVisible = 'active';
+                $class = 'bg-success';
+              }
             }
         }
 
@@ -214,7 +228,7 @@ class ProtocolController extends Controller
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser', 'time2update'));
     }
 
     public function chkForUpdates(){

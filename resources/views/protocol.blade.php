@@ -394,8 +394,8 @@ function periigisi(id){
                     </div>
                     </form>
                 </div>
+                <div class="col-md-11 col-sm-11 small text-left">
                   @if($showUserInfo == 1)
-                    <div class="col-md-12 col-sm-12 small text-left">
                     @if($protocol->id)
                       @if($protocol->created_at == $protocol->updated_at)
                         Καταχωρίστηκε {{$protocol->updated_at}}
@@ -405,9 +405,7 @@ function periigisi(id){
                         @if($protocolUser) από {{$protocolUser->username}} @endif
                       @endif
                     @endif
-                  </div>
                   @elseif($showUserInfo == 2)
-                  <div class="col-md-12 col-sm-12 small text-left">
                     @if($protocol->id)
                       @if($protocol->created_at == $protocol->updated_at)
                         Καταχωρίστηκε {{$protocol->updated_at}}
@@ -416,9 +414,10 @@ function periigisi(id){
                         Ενημερώθηκε {{$protocol->updated_at}}
                         @if($protocolUser) από {{$protocolUser->name}} @endif
                       @endif
-                    </div>
                     @endif
                   @endif
+                </div>
+                <div id='timer' class="col-md-1 col-sm-1 small text-right" style='color:#BFBFBF' title='Λήξη δυνατότητας επεξεργασίας σε'>
                 </div>
             </div>
         </div>
@@ -461,5 +460,32 @@ function getKeep4Fakelos(){
     });
 }
 </script>
+
+@if ($time2update > 0)
+<script type="text/javascript">
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds
+    interval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10)
+
+        //minutes = minutes < 10 ? "0" + minutes : minutes
+        seconds = seconds < 10 ? "0" + seconds : seconds
+
+        display.textContent = minutes + ":" + seconds
+
+        if (--timer < 0) {
+            window.location.reload()
+        }
+    }, 1000)
+}
+
+window.onload = function () {
+    var duration =  {{$time2update}},
+        display = document.querySelector('#timer')
+    startTimer(duration, display);
+}
+</script>
+@endif
 
 @endsection
