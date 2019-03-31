@@ -157,7 +157,7 @@ function periigisi(id){
                                     <input id="protocolnum" type="text" class="form-control input-lg text-center asd text-bold {{$newprotocolnumvisible}}" name="protocolnum" placeholder="num" value="{{ old('protocolnum') ? old('protocolnum') :  $newprotocolnum }}" title='1. Αύξων αριθμός' required tabindex=-1 {{$readonly}} >
                                 </div>
                                 <div class="col-md-1 col-sm-1 small text-center">
-                                    <strong>Ημ/νια<br>παραλαβής</strong>
+                                    <strong>Ημνια<br>παραλαβής</strong>
                                 </div>
                                 <div class="col-md-3 col-sm-3 middle {{ $errors->has('protocoldate') ? ' has-error' : '' }}">
                                     <input id="protocoldate" type="text" class="form-control input-lg text-center asd" name="protocoldate" placeholder="date" value="{{ old('protocoldate') ? old('protocoldate') : $newprotocoldate  }}" title='2. Ημερομηνία παραλαβής εγγράφου' required tabindex=-1 {{$readonly}}  >
@@ -394,7 +394,7 @@ function periigisi(id){
                     </div>
                     </form>
                 </div>
-                <div class="col-md-11 col-sm-11 small text-left">
+                <div class="col-md-6 col-sm-6 small text-left">
                   @if($showUserInfo == 1)
                     @if($protocol->id)
                       @if($protocol->created_at == $protocol->updated_at)
@@ -417,7 +417,7 @@ function periigisi(id){
                     @endif
                   @endif
                 </div>
-                <div id='timer' class="col-md-1 col-sm-1 small text-right" style='color:#BFBFBF' title='Λήξη δυνατότητας επεξεργασίας σε'>
+                <div id='timer' class="col-md-6 col-sm-6 small text-right" title=''>
                 </div>
             </div>
         </div>
@@ -472,7 +472,7 @@ function startTimer(duration, display) {
         //minutes = minutes < 10 ? "0" + minutes : minutes
         seconds = seconds < 10 ? "0" + seconds : seconds
 
-        display.textContent = minutes + ":" + seconds
+        display.textContent = 'Δυνατότητα επεξεργασίας: ' + minutes + ":" + seconds + ' λεπτά'
 
         if (--timer < 0) {
             window.location.reload()

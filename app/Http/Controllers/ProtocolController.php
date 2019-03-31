@@ -199,6 +199,7 @@ class ProtocolController extends Controller
               if (! $protocol->thema){
                 $submitVisible = 'active';
                 $class = 'bg-success';
+                $time2update = 0;
               }
             }
         }
