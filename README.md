@@ -21,6 +21,11 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 #
 # Εγκατάσταση
 
+# Σάββατο 6 Απριλίου 2019
+# Οι οδηγίες εγκατάστασης είναι ΠΑΛΙΕΣ. Σύντομα ΘΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ
+#
+
+
 Τετάρτη 27/3/2019
 
 Το Ηλ. Πρωτόκολλο χρησιμοποιεί στην παρούσα στιγμή την έκδοση laravel 5.8 και php 7
@@ -51,15 +56,6 @@ Debian, Ubuntu: ``` apt-get -y install wget ``` , Centos: ``` yum -y install wge
 - Debian 9 με Php7
 ```
 wget -O install_electronic_protocol_Debian_9.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORRHVVeE9PVHRlZU0"
-```
-## Debian 8 (jessie)
-- Debian 8 με Php5
-```
-wget -O install_electronic_protocol_Debian_php5.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORU3p3ZXl6ekJISW8"
-```
-- Debian 8 με Php7
-```
-wget -O install_electronic_protocol_Debian_php7.sh "https://drive.google.com/uc?export=download&id=0B2ACFOVDi2ORLVJVazJtbmtUYzg"
 ```
 
 ## Ubuntu 16.04 LTS
@@ -208,6 +204,21 @@ sh install_electronic_protocol_Debian_php5.sh
 
 
 Ανοίξτε τον φάκελο (**C:\protocol**) με την Εξερεύνηση των windows και αλλάξτε τις τιμές των παρακάτω μεταβλητών στα ακόλουθα αρχεία:
+
+## Αν χρησιμοποιείτε sqlite
+
+#### .env
+
+- γραμμή 12:
+   - DB_PASSWORD=**p@ssw@rd**
+ - γραμμή 26:
+   - MAIL_USERNAME=**gm@ilusern@me**
+ - γραμμή 27:
+   - MAIL_PASSWORD=**gm@ilp@ss**
+
+
+## Αν χρησιμοποιείτε mysql
+
 #### .env
  - γραμμή 10:
    - DB_DATABASE=**d@t@b@se**
@@ -225,9 +236,6 @@ sh install_electronic_protocol_Debian_php5.sh
 #### config/session.php
  - γραμμή 125:      
    - 'cookie' => '**laravel**_session',
-#### public/.htaccess 
- - γραμμή 7:      
-   - RewriteBase /**@ppn@me**
  
  
 Αν δεν αλλάξατε κάτι η mysql στο Xampp έχει εξορισμού:
@@ -280,9 +288,6 @@ Include "conf/alias/*"
 
 #### Ρύθμιση php
 
-Ανοίξτε το αρχείο ```C:\xampp\php\php``` και αφαιρέστε το ```;``` μπροστά από το ```;extension=php_curl.dll``` στη γραμμή 878 ώστε να ενεργοποιηθεί η υποστήριξη **php-curl**. 
-Η γραμμή τώρα πρέπει να είναι: ```extension=php_curl.dll``` .
-
 
 Εκκινήστε το Xampp και τους servers apache και mysql 
 
@@ -297,11 +302,16 @@ Eκτελέστε τις παρακάτω εντολές για να εγκατ�
 ```
 composer install
 
-php artisan migrate:refresh --seed
-php artisan db:seed --class=KeepvaluesTableSeeder
 php artisan key:generate
 php artisan optimize
 ```
+## με mysql
+```
+php artisan migrate:refresh --seed
+php artisan db:seed --class=KeepvaluesTableSeeder
+```
+## με sqlite
+Η βάση είναι ήδη έτοιμη
 
 Κατευθύνετε τον φυλομετρητή σας στη σελίδα http://localhost/protocol
 
