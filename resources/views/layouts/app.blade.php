@@ -41,9 +41,9 @@
 
             .dropdown-submenu>a:after {
 
-                position: absolute; 
-                left: 7px; 
-                top: 3px;  
+                position: absolute;
+                left: 7px;
+                top: 3px;
 
                 display: block;
                 content: " ";
@@ -98,7 +98,7 @@
                         </button>
 
                         <!-- Branding Image -->
-                        <a class="navbar-brand" href="{{ url('/') }}">
+                        <a class="navbar-brand" href="{{ url('/home/list') }}">
                             {{ config('app.name', 'Ηλ. Πρωτόκολλο') }}&nbsp;&nbsp;&nbsp;{{isset($ipiresiasName)?$ipiresiasName:''}}
                         </a>
                     </div>
@@ -126,20 +126,54 @@
                                 </a>
 
                                 <ul class="dropdown-menu" role="menu">
-                                  
+
                                     <li class="dropdown-submenu">
                                         <a class="test" tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
                                         <ul class="dropdown-menu">
-                                            <li><a  tabindex="-1" href="{{ url('/home') }}">Εισαγωγή</a></li>
+                                            <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
+                                            <li class="divider"></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
                                             <li class="dropdown-submenu">
                                             <a class="test" tabindex="-1" href="#">Εκτύπωση</a>
                                                 <ul class="dropdown-menu">
                                                     <li><a  tabindex="-1" href="{{ url('/print') }}">Πρωτόκολλο</a></li>
-                                                    <li><a  tabindex="-1" href="{{ url('/printAttachments') }}">Συνημμένα</a></li>
+                                                    <li><a  tabindex="-1" href="{{ url('/printAttachments') }}">με Συνημμένα</a></li>
                                                 </ul>
                                             </li>
                                             <li><a  tabindex="-1" href="{{ url('/keep') }}">Διατήρηση</a></li>
+                                            @if(in_array ( Auth::user()->role_description(), [ "Διαχειριστής",  "Αναθέτων"]))
+                                              <li class="divider"></li>
+                                              <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
+                                                <ul class="dropdown-menu">
+                                                  @foreach($myActiveUsers as $myAU)
+                                                    <li><a  tabindex="-1" href="{{ url('/home/list/a/') }}/{{$myAU->id}}">{{$myAU->name}}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                              </li>
+                                              <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list/d') }}">προς Διεκπ/ση</a>
+                                                <ul class="dropdown-menu">
+                                                  <li><a  tabindex="-1" href="{{ url('/home/list/d/a') }}">Όλοι οι χρήστες</a></li>
+                                                  <li class="divider"></li>
+                                                  @foreach($myActiveUsers as $myAU)
+                                                    <li><a  tabindex="-1" href="{{ url('/home/list/d/') }}/{{$myAU->id}}">{{$myAU->name}}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                              </li>
+                                              <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list/f') }}">Διεκπεραιώθηκε</a>
+                                              <ul class="dropdown-menu">
+                                                <li><a  tabindex="-1" href="{{ url('/home/list/f/a') }}">Όλοι οι χρήστες</a></li>
+                                                <li class="divider"></li>
+                                                  @foreach($myActiveUsers as $myAU)
+                                                    <li><a  tabindex="-1" href="{{ url('/home/list/f/') }}/{{$myAU->id}}">{{$myAU->name}}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                              </li>
+                                            @elseif (Auth::user()->role_description() == "Συγγραφέας")
+                                              <li class="divider"></li>
+                                              <li><a  tabindex="-1" href="{{ url('/home/list/d') }}"> προς Διεκπ/ση</a></li>
+                                              <li><a  tabindex="-1" href="{{ url('/home/list/f') }}">Διεκπεραιώθηκε</a></li>
+                                            @endif
+
                                         </ul>
                                     </li>
 
@@ -178,7 +212,7 @@
                                             {{ csrf_field() }}
                                         </form>
                                     </li>
-                                    
+
                                 </ul>
                             </li>
                             @endif
@@ -191,8 +225,8 @@
         </div>
 
         <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}"></script> 
-        <script src="{{ asset('js/npm.js') }}"></script> 
+        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{ asset('js/npm.js') }}"></script>
         <script src="{{ asset('js/fileinput.js') }}"></script>
         <script src="{{ asset('js/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
@@ -200,15 +234,15 @@
         <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
 
 
-        <script>  
+        <script>
 
-        $('.datepicker').datepicker({  
+        $('.datepicker').datepicker({
 
-           format: 'dd/mm/yyyy'  
+           format: 'dd/mm/yyyy'
 
-         });  
+         });
 
-       </script>  
+       </script>
 
         <script>
 
@@ -255,7 +289,7 @@
             @if($errors->has('in_num'))
             var html = "<center><button type='button' id='confirmRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
             var msg = '{!! $errors->first() !!}'
-            
+
             toastr.options = {
               "closeButton": true,
               "debug": false,

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['ipiresiasName' => $ipiresiasName])
+@extends('layouts.app')
 
 @section('content')
 <style>
@@ -265,7 +265,12 @@ function periigisi(id){
                             <strong>Διεκπεραίωση</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                            <input id="diekperaiosi" type="text" class="form-control" name="diekperaiosi" placeholder="diekperaiosi" value="{{ old('diekperaiosi') ? old('diekperaiosi') : $protocol->diekperaiosi }}" >
+                          <select id="diekperaiosi" class="form-control small selectpicker" name="diekperaiosi" title='Διεκπεραίωση' @if($forbidenChangeDiekperaiosiSelect) data-value="{{$protocol->diekperaiosi}}" onchange="this.value = this.getAttribute('data-value');" @endif>
+                          <option value=''></option>
+                          @foreach($writers_admins as $writer_admin)
+                                  <option value='{{$writer_admin->id}}' @if($writer_admin->id == $protocol->diekperaiosi) selected @endif>{{$writer_admin->name}}</option>
+                              @endforeach
+                            </select>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Διεκπεραίωσης</strong>

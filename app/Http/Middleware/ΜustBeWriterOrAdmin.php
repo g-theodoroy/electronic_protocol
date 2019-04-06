@@ -17,7 +17,7 @@ class ΜustBeWriterOrAdmin
     {
         $user = $request->user();
 
-        if ( $user->role->role == 'Διαχειριστής' or $user->role->role == 'Συγγραφέας'){
+        if ( in_array ( $user->role->role, ['Διαχειριστής', 'Αναθέτων', 'Συγγραφέας'])){
         return $next($request);
         }
         return redirect($url);

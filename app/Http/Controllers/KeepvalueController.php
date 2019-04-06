@@ -23,13 +23,6 @@ class KeepvalueController extends Controller
         $this->middleware('admin:keep', ['except' => ['index']]);
     }
 
-    public function getTitleColorStyle(){
-        $config = new Config;
-        $titleColor = $config->getConfigValueOf('titleColor');
-        $titleColorStyle = '';
-        if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
-        return $titleColorStyle;
-    }
 
 
      /**
@@ -41,13 +34,11 @@ class KeepvalueController extends Controller
     {
         $config = new Config;
         $keepvalues = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->paginate($config->getConfigValueOf('showRowsInPage'));
-        $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-        $titleColorStyle = $this->getTitleColorStyle() ;
 
         $submitVisible = 'hidden';
         if (Auth::user()->role->role == 'Διαχειριστής') $submitVisible = 'active';
-        
-        return view('keep', compact('keepvalues', 'keepvalue', 'submitVisible', 'ipiresiasName', 'titleColorStyle'));
+
+        return view('keep', compact('keepvalues', 'keepvalue', 'submitVisible'));
     }
 
     /**
@@ -61,7 +52,7 @@ class KeepvalueController extends Controller
         $this->validate(request(), [
             'fakelos' => 'required|max:255|unique:keepvalues',
             'keep' => 'nullable|integer',
-        ]); // 'describe' => 'required', 
+        ]); // 'describe' => 'required',
             // 'keep' => 'nullable|integer|required_without:keep_alt',
             // 'keep_alt' => 'nullable|max:255|required_without:keep',
 

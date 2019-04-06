@@ -32,9 +32,8 @@ namespace App;
 
 
 use Illuminate\Notifications\Notifiable;
+//use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Role;
-use App\Notifications\ResetPasswordGreek;
 
 class User extends Authenticatable
 {
@@ -46,7 +45,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'username', 'email', 'role_id', 'password',
+        'name', 'username', 'email', 'role_id', 'password', 'active',
     ];
 
     /**
@@ -67,6 +66,13 @@ class User extends Authenticatable
         return User::role()->first()->role;
     }
 
+    public static function my_active_users(){
+        return User::where('role_id', '!=',   Role::whereRole('Αναγνώστης')->first()->id)->wherenotNull('active')->orderby('name')->get();
+    }
+
+    public static function my_users(){
+        return User::where('role_id', '!=',   Role::whereRole('Αναγνώστης')->first()->id)->orderby('name')->get();
+    }
 
     /**
      * Βρίσκω τον αριθμό των διαχειριστών
@@ -74,15 +80,20 @@ class User extends Authenticatable
      * @var array
      */
     public function get_num_of_admins(){
-        return User::whereRoleId(Role::whereRole('Διαχειριστής')->first()->id)->count();
+        return User::whereRoleId(Role::whereRole('Διαχειριστής')->first()->id)->wherenotNull('active')->count();
+    }
+
+    public static function get_writers_and_admins(){
+      return User::where('role_id', '!=',   Role::whereRole('Αναγνώστης')->first()->id)->wherenotNull('active')->orderby('name')->get();
     }
 
     /**
-     * Send a password reset email to the user
+     * The attributes that should be cast to native types.
+     *
+     * @var array
      */
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new ResetPasswordGreek($token));
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
 }

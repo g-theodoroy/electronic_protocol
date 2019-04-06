@@ -17,10 +17,10 @@
 
 <script >
 function chkdelete(id, name){
- 
+
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή χρήστη ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
-    
+
     toastr.options = {
       "closeButton": true,
       "debug": false,
@@ -91,6 +91,9 @@ function chkdelete(id, name){
                         <div class='col-md-1 col-sm-1  h4'>
                             <strong>Ρόλος</strong>
                         </div>
+                        <div class='col-md-1 col-sm-1  h4'>
+                            <strong>Ενεργός</strong>
+                        </div>
                     </div>
 
                     <div class='row'>
@@ -120,7 +123,7 @@ function chkdelete(id, name){
 
                         <div class="col-md-3 col-sm-3 ">
                         <div class='row'>
-                        <div class="col-md-6 col-sm-6 {{ $errors->has('name') ? ' has-error' : '' }}">
+                        <div class="col-md-5 col-sm-5 {{ $errors->has('name') ? ' has-error' : '' }}">
                             <select id="role_id" class="form-control" name="role_id" required>
                                 <option value="" selected placeholder="role_id"></option>
                                 @foreach($roles as $role)
@@ -140,7 +143,11 @@ function chkdelete(id, name){
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6 col-sm-6 text-center">
+                        <div class="col-md-2 col-sm-2 text-center">
+                          <input type="hidden" id="active" name="active" value="0">
+                          <input type="checkbox" class="form-control" id="active" name="active"  @if( $user->active) checked @endif @if(! $user->id) checked @endif >
+                        </div>
+                          <div class="col-md-5 col-sm-5 text-center">
                             <a href="javascript:document.forms['myForm'].submit();" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height="30" /></a>
                             <a href="{{ URL::to('/') }}/users" class="active" role="button" title="Καθάρισμα" > <img src="{{ URL::to('/') }}/images/clear.ico" height="20" /></a>
                         </div>
@@ -182,10 +189,13 @@ function chkdelete(id, name){
                         <div class="col-md-3 col-sm-3 ">
                             <div class='row'>
 
-                        <div class="col-md-6 col-sm-6 form-control-static">
+                        <div class="col-md-5 col-sm-5 form-control-static">
                             {{$u->role}}
                         </div>
-                        <div class="col-md-6 col-sm-6 form-control-static  text-center">
+                        <div class="col-md-2 col-sm-2 form-control-static  text-center">
+                          @if($u->active)&#10004;@endif
+                        </div>
+                          <div class="col-md-5 col-sm-5 form-control-static  text-center">
                             <a href="{{ URL::to('/') }}/users/{{ $u->id }}" class="{{$submitVisible}}" title="Επεξεργασία {{ $u->name }}"> <img src="{{ URL::to('/') }}/images/edit.ico" alt="edit" height="15" > </a>
                             <a href="#" id='deluser{{ $u->id }}' class="{{$submitVisible}}" title="Διαγραφή {{ $u->name }}" onclick="chkdelete('{{ $u->id }}','{{$u->name}}')"> <img src="{{ URL::to('/') }}/images/delete.ico" alt="delete" height="15"> </a>
                         </div>
@@ -203,7 +213,7 @@ function chkdelete(id, name){
                     </div>
                     @endif
 
- 
+
                 </div>
                 </div>
             </div>

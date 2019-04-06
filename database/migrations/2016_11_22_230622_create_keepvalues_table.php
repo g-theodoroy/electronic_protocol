@@ -18,7 +18,7 @@ class CreateKeepvaluesTable extends Migration
             $table->string('fakelos')->required()->unique();
             $table->integer('keep')->unsigned()->nullable();
             $table->string('keep_alt')->nullable();
-            $table->string('describe')->nullable()->index();
+            $table->string('describe', 400)->nullable()->index();
             $table->string('remarks')->nullable();
             $table->timestamps();
         });

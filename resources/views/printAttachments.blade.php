@@ -1,4 +1,4 @@
-@extends('layouts.app', ['ipiresiasName' => $ipiresiasName])
+@extends('layouts.app')
 
 @section('content')
 
@@ -18,7 +18,7 @@
 
                 <div class="panel-body ">
                     <!-- ________________________________form______________________________________________________ -->
-                    <form id='printform' name="printform" class="form-horizontal" role="form" method="POST" action="{{ url('/printedAttachments') }}" target='_blank'> 
+                    <form id='printform' name="printform" class="form-horizontal" role="form" method="POST" action="{{ url('/printedAttachments') }}" target='_blank'>
                         {{ csrf_field() }}
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-info">
@@ -66,7 +66,7 @@
                 </form> <!-- ________________________________end form______________________________________________________ -->
 
                     <div id='showFindData' ></div>
-                    
+
                 </div>
             </div>
         </div>
@@ -200,7 +200,7 @@ function getPrintData() {
     $("#printform").submit()
     return true
 }
-   
+
 
 </script>
 

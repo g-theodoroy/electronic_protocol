@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('roles')->insert([
+            'role' => 'Αναθέτων',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('roles')->insert([
             'role' => 'Συγγραφέας',
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
@@ -109,14 +115,14 @@ class DatabaseSeeder extends Seeder
 
         DB::table('configs')->insert([
            'key' => 'searchField2',
-           'value' => 'in_paraliptis',
+           'value' => 'in_arxi_ekdosis',
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
         DB::table('configs')->insert([
            'key' => 'searchField3',
-           'value' => 'in_arxi_ekdosis',
+           'value' => 'ada',
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);

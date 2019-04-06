@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
-use Validator;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
@@ -23,7 +24,7 @@ class RegisterController extends Controller
     use RegistersUsers;
 
     /**
-     * Where to redirect users after login / registration.
+     * Where to redirect users after registration.
      *
      * @var string
      */
@@ -48,10 +49,10 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'required|max:255',
-            'username' => 'required|max:255|unique:users',
-            'email' => 'required|email|max:255',
-            'password' => 'required|min:6|confirmed',
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
@@ -59,7 +60,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return User
+     * @return \App\User
      */
     protected function create(array $data)
     {
@@ -67,7 +68,7 @@ class RegisterController extends Controller
         file_put_contents($file,"Η ύπαρξη του αρχείου .denyregister ελέγχει
 τη δυνατότητα να γίνεται register νέων χρηστών.
 
-Με την εγγραφή του πρώτου Διαχειριστή δημιουργείται το αρχείο από τον 
+Με την εγγραφή του πρώτου Διαχειριστή δημιουργείται το αρχείο από τον
 app/Http/Controllers/Auth/RegisterController.php.
 
 Αν διαγραφούν όλοι οι Διαχειριστές το παρόν αρχείο διαγράφεται και
@@ -78,7 +79,8 @@ app/Http/Controllers/Auth/RegisterController.php.
             'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'password' => Hash::make($data['password']),
+            'active' => 1
         ]);
     }
 

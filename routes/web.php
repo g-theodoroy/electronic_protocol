@@ -56,6 +56,7 @@ Route::get('keep/del/{keepvalue}', 'KeepvalueController@delete');
 Route::get('/home','ProtocolController@index');
 Route::get('/chkForUpdates','ProtocolController@chkForUpdates');
 Route::get('/home/list','ProtocolController@indexList');
+Route::get('/home/list/{filter?}/{userId?}','ProtocolController@indexList');
 Route::get('/home/{protocol}','ProtocolController@index');
 Route::get('getFileInputs/{num}', 'ProtocolController@getFileInputs');
 Route::get('getKeep4Fakelos/{fakelos}', 'ProtocolController@getKeep4Fakelos');
@@ -95,4 +96,3 @@ Route::get('/arxeio','ConfigController@arxeio');
 Route::get('/expired','ConfigController@expired');
 Route::get('/delExpired','ConfigController@delExpired');
 Route::get('/delDeleted','ConfigController@delDeleted');
-

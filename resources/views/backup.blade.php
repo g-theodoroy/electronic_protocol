@@ -22,12 +22,26 @@
                             <div class="form-control-static h4 text-center">Δημιουργία νέου αντιγράφου ασφαλείας</div>
                         </div>
                         <div class="row">
+                              @if( env('DB_CONNECTION') == 'sqlite')
+                              <div class="form-control-static text-left col-md-10 col-sm-10  col-md-offset-1 col-sm-offset-1" >
+                              {{--<a href="{{ URL::to('/') }}/backup"  role="button" title="Δημιουργία αντιγράφου ασφαλείας" > <img src="{{ URL::to('/') }}/images/save.ico" height="30" /></a>--}}
+  				                        Το Ηλεkτρονικό Πρωτόκολλο χρησιμοποιεί την <strong>sqlite</strong> σαν βάση δεδομένων. Αν θέλετε να κρατήσετε αντίγραφα ασφαλείας μπορείτε:
+  				                            <ul>
+  				                               <li>Να αντιγράψετε όλο τον φάκελο του Ηλ. Πρωτοκόλλου:<br> <strong>"{{base_path()}}"</strong></li>
+  				                               <li>Να αντιγράψετε τη βάση δεδομένων και τα συνημμένα αρχεία που περιέχονται στον φάκελο:<br><strong>"{{storage_path()}}/app/arxeio"</strong></li>
+  				                           </ul>
+                              </div>
+                            <div class="form-control-static text-right col-md-12 col-sm-12  " >
+                            <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
+                            </div>
+                             @else
                             <div class="form-control-static text-center col-md-2 col-sm-2  col-md-offset-5 col-sm-offset-5" >
-                            <a href="{{ URL::to('/') }}/backup"  role="button" title="Δημιουργία αντιγράφου ασφαλείας" > <img src="{{ URL::to('/') }}/images/save.ico" height="30" /></a>
+                              <a href="{{ URL::to('/') }}/backup"  role="button" title="Δημιουργία αντιγράφου ασφαλείας" > <img src="{{ URL::to('/') }}/images/save.ico" height="30" /></a>
                             </div>
                             <div class="form-control-static text-right col-md-2 col-sm-2  col-md-offset-3 col-sm-offset-3" >
                             <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
                             </div>
+                            @endif
                      </div>
                 </div>
                 @if($files)
@@ -58,10 +72,10 @@
 <script>
 
 function chkdelete(name){
- 
+
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή αρχείου ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
-    
+
     toastr.options = {
       "closeButton": true,
       "debug": false,

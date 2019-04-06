@@ -120,7 +120,11 @@
                 <td class="small middle"><span class='small'>{{$protocol->out_perilipsi}}</span></td>
                 <td class="small middle"><span class='small'>
                     @if($protocol->diekperaiosi)
+                    @if($myUsers->where('id', '==', $protocol->diekperaiosi)->count())
+                    {{$myUsers->where('id', '==', $protocol->diekperaiosi)->first()->name}}
+                    @else
                     {{$protocol->diekperaiosi}}
+                    @endif
                     @endif
                     @if($protocol->diekp_date)
                     <br>&#x2727;{{$protocol->diekp_date}}
@@ -145,7 +149,7 @@
                     @endif
                     </span>
                 </td>
-                </tr> 
+                </tr>
                 @endforeach
                 @if(! count($protocols))
                  <tr>

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['ipiresiasName' => $ipiresiasName])
+@extends('layouts.app')
 
 @section('content')
 

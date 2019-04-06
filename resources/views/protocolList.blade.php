@@ -6,26 +6,36 @@
     <div class="row">
         <div class="col-md-12 col-md-offset-0">
             <div class="panel panel-default">
-                <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>Πρωτόκολλο</div>
+              @if(count($activeusers2show)>1)
+              <div class="col-md-2 col-sm-2 small text-center">Ενεργοί χρήστες: <strong>{{count($activeusers2show)}}</strong></div>
+              <div class="col-md-10 col-sm-10 small text-left">
+                @foreach($activeusers2show as $user2show)
+                {{$user2show}}@if(! $loop->last), @endif
+                @endforeach
+              </div>
+              @endif
+                <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
 
                 <div class="panel-body">
                 <div class="panel panel-default col-md-12 col-sm-12  ">
 
                     <div class='row'>
-                        <div class="col-md-2 col-sm-2 form-control-static">
+                        <div class="col-md-3 col-sm-3 form-control-static">
                           <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
                           &nbsp;<span id='timer' style='color:#BFBFBF' title='Αυτόματη ανανέωση σε'></span>
                         </div>
                     @if ($protocols->links())
-                        <div class="col-md-8 col-sm-8 small text-center">
-                            <span class="small">{{$protocols->links()}}</span>
+                        <div class="col-md-6 col-sm-6 small text-center">
+                            <span class="small" >{{$protocols->links()}}</span>
                         </div>
                     @endif
-                        <div class="col-md-2 col-sm-2 form-control-static text-right">
+                        <div class="col-md-3 col-sm-3 form-control-static text-right">
                           <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=30 / ></a>
+                          <a href="{{ URL::to('/') }}/home/list/d" class="active" role="button" title="προς Διεκπεραίωση" > <img src="{{ URL::to('/') }}/images/todo.png" height=30 / ></a>
+                          <a href="{{ URL::to('/') }}/home/list/f" class="active" role="button" title="Διεκπεραιώθηκε" > <img src="{{ URL::to('/') }}/images/done.png" height=30 / ></a>
+                          <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height=30 / ></a>
                         </div>
                     </div>
-
 
                     <div class='row  bg-primary'>&nbsp;</div>
                     <div class='row bg-primary'>
@@ -171,9 +181,15 @@
                                 </div>
                                 <div class='col-md-3 col-sm-3 small'>
                                     <br>
+                                    @if($myUsers->where('id', '==', $protocol->diekperaiosi)->count())
                                     <span title='Διεκπεραίωση'>
-                                    {{$protocol->diekperaiosi ? $protocol->diekperaiosi : ''}}
+                                    {{$protocol->diekperaiosi ? $myUsers->where('id', '==', $protocol->diekperaiosi)->first()->name : ''}}
                                     </span>
+                                    @else
+                                    <span title='Ανύπαρκτος χρήστης ή διεγραμμένος'>
+                                    {{$protocol->diekperaiosi}}
+                                    </span>
+                                    @endif
                                     <hr>
                                     <span title='Ημνία Διεκπεραίωσης'>
                                     @if($protocol->diekp_date)

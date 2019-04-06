@@ -12,6 +12,26 @@ use Storage;
 class ConfigController extends Controller
 {
 
+			protected  $protocolfields = [
+		 'fakelos' => 'Φάκελος',
+		 'thema' => 'Θέμα',
+		 'in_num' => 'Αριθ. Εισερχ.',
+		 'in_topos_ekdosis' => 'Τόπος έκδοσης',
+		 'in_arxi_ekdosis' => 'Αρχή έκδοσης',
+		 'in_paraliptis' => 'Παραλήπτης',
+		 'in_perilipsi' => 'Περιλ. Εισερχ',
+		 'diekperaiosi' => 'Διεκπεραίωση',
+		 'sxetiko' => 'Σχετικοί Αριθ.',
+		 'out_to' => 'Απευθύνεται',
+		 'out_perilipsi' => 'Περιλ. Εξερχ',
+		 'keywords' => 'Λέξεις κλειδιά',
+		 'paratiriseis' => 'Παρατηρήσεις'
+		 ];
+		 protected  $attachmentfields = [
+		 'name' => 'Όνομα συνημμένου',
+		 'ada' => 'ΑΔΑ'
+		 ];
+
 	    public function __construct()
     {
         $this->middleware('auth');
@@ -22,20 +42,7 @@ class ConfigController extends Controller
     public function index(){
         $c =  new Config;
         $configs = $c->getConfigValues();
-	    $fields = [
-	        'fakelos' => 'Φάκελος',
-	        'thema' => 'Θέμα',
-	        'in_topos_ekdosis' => 'Τόπος έκδοσης',
-	        'in_arxi_ekdosis' => 'Αρχή έκδοσης',
-	        'in_paraliptis' => 'Παραλήπτης',
-	        'diekperaiosi' => 'Διεκπεραίωση',
-	        'in_perilipsi' => 'Περιλ. Εισερχ',
-	        'out_to' => 'Απευθύνεται',
-	        'out_perilipsi' => 'Περιλ. Εξερχ',
-	        'keywords' => 'Λέξεις κλειδιά',
-	        'paratiriseis' => 'Παρατηρήσεις'
-	    ];
-
+	$fields = array_merge($this->protocolfields,$this->attachmentfields);
 
         return view('config', compact('configs','fields'));
     }
@@ -60,10 +67,10 @@ class ConfigController extends Controller
         foreach($data as $key => $value){
             $config->setConfigValueOf($key,$value);
             if ($key == 'updatesAutoCheck' and $value == 0)$config->setConfigValueOf('needsUpdate',0);
-        } 
+        }
 
         $notification = array(
-            'message' => 'Επιτυχημένη καταχώριση.', 
+            'message' => 'Επιτυχημένη καταχώριση.',
             'alert-type' => 'success'
         );
         session()->flash('notification',$notification);
@@ -99,12 +106,12 @@ class ConfigController extends Controller
 
         if($ret == 0){
             $notification = array(
-                'message' => "Επιτυχημένη δημιουργία αρχείου backup.", 
+                'message' => "Επιτυχημένη δημιουργία αρχείου backup.",
                 'alert-type' => 'success'
             );
         }else{
             $notification = array(
-                'message' => "Πρόβλημα στη δημιουργία αρχείου backup.", 
+                'message' => "Πρόβλημα στη δημιουργία αρχείου backup.",
                 'alert-type' => 'error'
             );
         }
@@ -151,9 +158,8 @@ class ConfigController extends Controller
         );
 
         $config = new Config;
-        $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
         $datetime = Carbon::now()->format('d/m/Y H:m:s');
-        return view('expired', compact('arxeia','ipiresiasName', 'datetime'));
+        return view('expired', compact('arxeia', 'datetime'));
     }
 
     public function delExpired(){
@@ -161,7 +167,7 @@ class ConfigController extends Controller
         $arxeia = Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->get();
         $arxeiaNumTrash = Attachment::whereNotNull('deleted_at')->count();
         $arxeiaTrash = Attachment::whereNotNull('deleted_at')->get();
-        
+
         foreach($arxeia as $arxeio){
             $savedPath = $arxeio->savedPath;
             $trashPath = str_replace('arxeio', 'trash', $savedPath);
@@ -173,9 +179,9 @@ class ConfigController extends Controller
         }
 
         Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->delete();
-        
+
         $notification = array(
-            'message' => "Διαγράφηκαν $arxeianum αρχεία.", 
+            'message' => "Διαγράφηκαν $arxeianum αρχεία.",
             'alert-type' => 'success'
         );
         session()->flash('notification',$notification);

@@ -67,6 +67,7 @@ class UserController extends Controller
 
 
         $data = request()->all();
+        $active = $data['active'] == "on" ? 1 : null;
 
         User::create([
             'name' => $data['name'],
@@ -74,6 +75,7 @@ class UserController extends Controller
             'email' => $data['email'],
             'role_id' => $data['role_id'],
             'password' => bcrypt($data['password']),
+            'active' => $active
             ]);
 
         $notification = array(
@@ -89,6 +91,7 @@ class UserController extends Controller
     public function update($id)
     {
         $data = request()->all();
+        $active = $data['active'] == "on" ? 1 : null;
 
         $validatevalues =[
         'name' => 'required|max:255',
@@ -99,7 +102,8 @@ class UserController extends Controller
         $updatevalues=[
         'name' => $data['name'],
         'username' => $data['username'],
-        'email' => $data['email']
+        'email' => $data['email'],
+        'active' => $active
         ];
 
         if (request()->password ){
@@ -129,9 +133,9 @@ class UserController extends Controller
             $updatevalues['role_id'] = $data['role_id'];
         }
 
-        if ($admin_count == 1 and $old_role_id == $admin_id and $data['role_id'] != $admin_id) {
+        if ($admin_count == 1 and $old_role_id == $admin_id and ($data['role_id'] != $admin_id or !$active)) {
             $notification = array(
-                'message' => 'Πρέπει να υπάρχει τουλάχιστον ένας χρήστης με το Ρόλο <b>\"Διαχειριστής\"</b>',
+                'message' => 'Πρέπει να υπάρχει τουλάχιστον ένας ενεργός χρήστης με το Ρόλο <b>\"Διαχειριστής\"</b>',
                 'alert-type' => 'error'
                 );
             session()->flash('notification',$notification);

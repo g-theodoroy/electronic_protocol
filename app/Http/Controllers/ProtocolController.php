@@ -8,6 +8,7 @@ use App\Config;
 use App\Protocol;
 use App\Attachment;
 use App\User;
+use App\Role;
 use Storage;
 use Carbon\Carbon;
 use URL;
@@ -80,24 +81,23 @@ class ProtocolController extends Controller
         $this->middleware('writer:home/list', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
     }
 
-    public function getTitleColorStyle(){
-        $config = new Config;
-        $titleColor = $config->getConfigValueOf('titleColor');
-        $titleColorStyle = '';
-        if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
-        return $titleColorStyle;
-    }
 
     public function index( Protocol $protocol){
-
-        $fakeloi= Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-3)+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->select('fakelos', 'describe')->get();
-
+        $writers_admins = User::get_writers_and_admins();
+        $fakeloi = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-3)+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->select('fakelos', 'describe')->get();
+        // διαβάζω τις ρυθμίσεις
         $config = new Config;
         $newetos = $config->getConfigValueOf('yearInUse')?$config->getConfigValueOf('yearInUse'):Carbon::now()->format('Y');
-        $titleColorStyle = $this->getTitleColorStyle() ;
         $showUserInfo = $config->getConfigValueOf('showUserInfo');
-
         $firstProtocolNum = $config->getConfigValueOf('firstProtocolNum');
+        $protocolArrowStep = $config->getConfigValueOf('protocolArrowStep');
+        $allowWriterUpdateProtocol = $config->getConfigValueOf('allowWriterUpdateProtocol');
+        $allowWriterUpdateProtocolTimeInMinutes = $config->getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes');
+        $protocolValidate = $config->getConfigValueOf('protocolValidate');
+        $diavgeiaUrl = $config->getConfigValueOf('diavgeiaUrl');
+        $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
+
+        // βρίσκω το νέο αριθμό πρωτοκόλλου
         if (Protocol::all()->count()){
             if ($config->getConfigValueOf('yearInUse')){
                 $newprotocolnum = Protocol::whereEtos($newetos)->max('protocolnum') ? Protocol::whereEtos($newetos)->max('protocolnum') + 1 : 1 ;
@@ -124,17 +124,17 @@ class ProtocolController extends Controller
         }
         // μετράω μόνο τους Διαχειριστές και Συγγραφείς που έχουν δικαίωμα να γράψουν
         $activeuserscount = Active::users()->whereHas('user', function($q) {
-              $q->where('role_id', 1)->orWhere('role_id', 2) ;
+              $q->where('role_id', '!=',   Role::whereRole('Αναγνώστης')->first()->id) ;
             })->count();
           // αν είναι πάνω από ένας δεν εμφανίζω τον επόμενο Αρ.Πρωτ.
         $newprotocolnumvisible = 'active';
         if ($activeuserscount > 1 and ! $protocol->id) $newprotocolnumvisible = 'hidden';
 
+        // συμπληρώνω τα σποιχεία αν πρόκειται για επεξεργασία
         $newprotocoldate = Carbon::now()->format('d/m/Y');
         $class = 'bg-info';
         $protocoltitle = 'Νέο Πρωτόκολλο';
         $protocolUser = '';
-        $protocolArrowStep = $config->getConfigValueOf('protocolArrowStep');
         if($protocol->etos) $newetos = $protocol->etos;
         if($protocol->protocolnum) $newprotocolnum = $protocol->protocolnum;
         if($protocol->protocoldate) $newprotocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
@@ -150,10 +150,10 @@ class ProtocolController extends Controller
             $protocolUser = User::whereId($protocol->user_id)->first();
         }
 
-        $allowWriterUpdateProtocol = $config->getConfigValueOf('allowWriterUpdateProtocol');
-        $allowWriterUpdateProtocolTimeInMinutes = $config->getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes');
         $time2update = 0;
         $submitVisible = 'active';
+
+        // ΔΙΑΚΑΙΩΜΑΤΑ ΑΠΟΘΗΚΕΥΣΗΣ
         // ΑΠΟΚΡΥΨΗ ΤΟΥ ΚΟΥΜΠΙΟΥ ΑΠΟΘΗΚΕΥΣΗ
         // 1 αν ο χρήστης είναι Αναγνώστης
         if (Auth::user()->role->role == 'Αναγνώστης'){
@@ -161,8 +161,8 @@ class ProtocolController extends Controller
           $class = 'bg-warning';
           $protocoltitle = 'Πρωτόκολλο';
         }
-        // 2 αν ο χρήστης είναι Συγγραφέας
-        if (Auth::user()->role->role == 'Συγγραφέας') {
+        // 2 αν ο χρήστης είναι Συγγραφέας ή Αναθέτων
+        if(in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναθέτων"])) {
             // αν είναι παλιό πρωτόκολλο (έχει id) ΕΠΕΞΕΡΓΑΣΙΑ ΠΡΩΤΟΚΟΛΛΟΥ
             if($protocol->id){
               // αν η μεταβλητή είναι 0 ή null δηλαδή δεν επιτρέπεται τροποποίηση από Συγγραφείς
@@ -188,6 +188,7 @@ class ProtocolController extends Controller
                   $submitVisible = 'hidden';
                 }
               }
+              // Αν περνώντας τα παραπάνω τεστ μπορεί να τροποιήσει αρχίζω αντίστροφη μέτρηση
               if($submitVisible == 'active'){
                 $time2update = $allowWriterUpdateProtocolTimeInMinutes * 60 - (Carbon::now()->getTimestamp() - $protocol->updated_at->getTimestamp());
                 $class = 'bg-success';
@@ -201,12 +202,32 @@ class ProtocolController extends Controller
                 $class = 'bg-success';
                 $time2update = 0;
               }
-            }
+              // Αν είναι προς διεκπεραίωση από το χρήστη => επιτρέπεται η επεξεργασία
+              if ($protocol->diekperaiosi == Auth::user()->id and ! $protocol->diekp_date){
+                $class = 'bg-success';
+                $submitVisible = 'active';
+              }elseif($protocol->diekperaiosi == Auth::user()->id and $protocol->diekp_date){
+                // Αν έχει διεκπεραιωθεί αρχίζω αντίστροφη μέτρηση
+                // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
+                if ($allowWriterUpdateProtocolTimeInMinutes and $protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()){
+                  $submitVisible = 'hidden';
+                }
+              }
+              // Αν ο χρήστης είναι Αναθέτων και το Πρωτόκολλο δεν έχει ανάτεθεί σε διεκπεραιωτή επιτρέπω τροποποίηση
+              if(Auth::user()->role_description() ==  "Αναθέτων") {
+                if( ! $protocol->diekperaiosi ){
+                  $class = 'bg-success';
+                  $submitVisible = 'active';
+                }
+              }
+
+          }
         }
 
+        // Αν ο χρήστης είναι Διαχειριστής και οι έλεγχοι καταχώρισης είναι ΟΧΙ
+        // ανοίγω και πεδία που κανονικά είναι κλειδωμενα (Αρ.Πρωτ, Ημνια , Έτος, ...)
         $readonly = 'readonly';
         $delVisible = 'hidden';
-        $protocolValidate = $config->getConfigValueOf('protocolValidate');
         if(! $protocolValidate){
             if ( Auth::user()->role->role == 'Διαχειριστής'){
                 $readonly ='';
@@ -215,21 +236,22 @@ class ProtocolController extends Controller
             }
         }
 
-        $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-        $diavgeiaUrl = $config->getConfigValueOf('diavgeiaUrl');
+        // Μόνο Διαχειριστής και Αναθέτων μπορούν να αναθέσουν Διεκπεραίωση σε χρήστη
+        $forbidenChangeDiekperaiosiSelect = 1;
+        if(in_array ( Auth::user()->role_description(), [ "Διαχειριστής",  "Αναθέτων"])) $forbidenChangeDiekperaiosiSelect = null;
 
+        // βρίσκω την τιμή διατήρησης ανάλογα τον φάκελο Φ.
         $keepval = null;
         if ($protocol->fakelos  and Keepvalue::whereFakelos($protocol->fakelos)->first()){
             $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep;
             if (! $keepval) $keepval = Keepvalue::whereFakelos($protocol->fakelos)->first()->keep_alt;
         }
 
-        $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
-
+        // γεμίζω τη λίστα με τη διατήρηση αρχείων
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'ipiresiasName', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'titleColorStyle', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser', 'time2update'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect'));
     }
 
     public function chkForUpdates(){
@@ -271,9 +293,9 @@ class ProtocolController extends Controller
         return redirect('/home/list');
     }
 
-    public function indexList(){
+    public function indexList($filter = null, $userId = null){
+        $writers_admins = User::get_writers_and_admins();
         $config = new Config;
-        $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
         $refreshInterval = $config->getConfigValueOf('minutesRefreshInterval') * 60;
         $needsUpdate = False;
         if (strpos ( request()->headers->get('referer') , 'login')){
@@ -281,9 +303,55 @@ class ProtocolController extends Controller
         }
         $wideListProtocol = $config->getConfigValueOf('wideListProtocol');
         $diavgeiaUrl = $config->getConfigValueOf('diavgeiaUrl');
-        $titleColorStyle = $this->getTitleColorStyle() ;
+        $showUserInfo = $config->getConfigValueOf('showUserInfo');
 
-        $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc')->paginate($config->getConfigValueOf('showRowsInPage'));
+        // βρίσκω τους όλους ενεργούς χρήστες
+        $activeusers = Active::users()->mostRecent()->get();
+        $activeusers2show = [];
+        foreach($activeusers as $actuser){
+          if ($showUserInfo == 1){
+            $activeusers2show[] = $actuser['user']['username'];
+          }elseif($showUserInfo == 2){
+            $activeusers2show[] = $actuser['user']['name'];
+          }
+        }
+        $protocoltitle = 'Πρωτόκολλο';
+        $user2show = '';
+        $protocols = Protocol::orderby('etos','desc')->orderby('protocolnum','desc');
+        if(! $userId ){
+          if($filter == 'd'){
+            $protocols = $protocols->where('diekperaiosi', Auth::user()->id)->whereNull('diekp_date');
+            $protocoltitle = 'Πρωτόκολλο προς Διεκπεραίωση';
+          }elseif($filter == 'f'){
+            $protocols = $protocols->where('diekperaiosi', Auth::user()->id)->wherenotNull('diekp_date');
+            $protocoltitle = 'Πρωτόκολλο Διεκπεραιώθηκε';
+          }
+        }elseif(User::whereId($userId)->count() and $filter){
+            if ($showUserInfo == 1){
+              $user2show = User::whereId($userId)->first('username')->username;
+            }elseif($showUserInfo == 2){
+              $user2show = User::whereId($userId)->first('name')->name;
+            }
+            if($filter == 'd'){
+              $protocols = $protocols->where('diekperaiosi', $userId)->whereNull('diekp_date');
+              $protocoltitle = "$user2show, προς Διεκπεραίωση";
+            }elseif($filter == 'f'){
+              $protocols = $protocols->where('diekperaiosi', $userId)->wherenotNull('diekp_date');
+              $protocoltitle = "$user2show, Διεκπεραιώθηκε";
+            }else{
+              $protocols = $protocols->where('user_id', $userId);
+              $protocoltitle = "$user2show, Πρωτόκολλο";
+            }
+          }else{
+          if($filter == 'd'){
+            $protocols = $protocols->where('diekperaiosi', '!=', '')->whereNull('diekp_date');
+            $protocoltitle = "Όλοι οι χρήστες, προς Διεκπεραίωση";
+          }elseif($filter == 'f'){
+            $protocols = $protocols->where('diekperaiosi', '!=', '')->wherenotNull('diekp_date');
+            $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
+          }
+        }
+        $protocols = $protocols->paginate($config->getConfigValueOf('showRowsInPage'));
         foreach($protocols as $protocol){
             if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
             if($protocol->in_date) $protocol->in_date = Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y');
@@ -292,7 +360,7 @@ class ProtocolController extends Controller
             if($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
 
         }
-        return view('protocolList', compact('protocols', 'ipiresiasName', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'titleColorStyle', 'diavgeiaUrl' ));
+        return view('protocolList', compact('protocols', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'diavgeiaUrl', 'activeusers2show', 'writers_admins', 'protocoltitle'));
     }
 
 
@@ -314,7 +382,6 @@ class ProtocolController extends Controller
 
 
     public function store(){
-
       $data = request()->all();
 
       $config = new Config;
@@ -373,7 +440,7 @@ class ProtocolController extends Controller
 
     if($protocolValidate){
         $validator = Validator::make(request()->all(), [
-            'thema' => 'required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+            'thema' => 'nullable|required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
             ],  [
             'thema.required_with' => "Συμπληρώστε το θέμα.<br>&nbsp;",
             ])->validate();
@@ -384,9 +451,9 @@ class ProtocolController extends Controller
 
     $validator = Validator::make(request()->all(), [
         'protocoldate' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'in_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'out_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'diekp_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',],  [
+        'in_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
+        'out_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
+        'diekp_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',],  [
         'protocoldate.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         'in_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         'out_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
@@ -510,14 +577,14 @@ public function update(Protocol $protocol){
     'in_date' => 'required_with:in_num,in_topos_ekdosis,in_arxi_ekdosis',
     'in_topos_ekdosis' => 'required_with:in_date,in_arxi_ekdosis|max:255',
     'in_arxi_ekdosis' => 'required_with:in_date,in_topos_ekdosis|max:255',
-    'in_paraliptis' => 'required_with:in_date|max:255',
+    //'in_paraliptis' => 'required_with:in_date|max:255',
     'out_date' => 'required_with:out_to,out_perilipsi',
     'out_to' => 'required_with:out_date,out_perilipsi|max:255',
     ];
 
     if($protocolValidate){
         $validator = Validator::make(request()->all(), [
-            'thema' => 'required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+          'thema' => 'nullable|required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
             ],  [
             'thema.required_with' => "Συμπληρώστε το θέμα.<br>&nbsp;",
             ])->validate();
@@ -527,9 +594,9 @@ public function update(Protocol $protocol){
 
     $validator = Validator::make(request()->all(), [
         'protocoldate' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'in_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'out_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
-        'diekp_date' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',],  [
+        'in_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
+        'out_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
+        'diekp_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',],  [
         'protocoldate.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         'in_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         'out_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
@@ -739,11 +806,8 @@ public function find(){
     $searchField1 = $config->getConfigValueOf('searchField1');
     $searchField2 = $config->getConfigValueOf('searchField2');
     $searchField3 = $config->getConfigValueOf('searchField3');
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-    $titleColorStyle = $this->getTitleColorStyle() ;
 
-
-    return view('find', compact('fields','searchField1', 'searchField2','searchField3', 'ipiresiasName', 'titleColorStyle'));
+    return view('find', compact('fields','searchField1', 'searchField2','searchField3'));
 }
 
 public function getFindData(){
@@ -841,16 +905,11 @@ public function getFindData(){
 
 public function printprotocols(){
 
-    $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-    $titleColorStyle = $this->getTitleColorStyle() ;
-
-    return view('print', compact('ipiresiasName', 'titleColorStyle'));
+    return view('print');
 }
 
 public function printed(){
     $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
     $etos = $config->getConfigValueOf('yearInUse');
     $datetime = Carbon::now()->format('d/m/Y H:m:s');
 
@@ -886,15 +945,14 @@ public function printed(){
         if($protocol->diekp_date) $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
     }
 
-    return view('printed', compact('protocols', 'ipiresiasName' , 'etos', 'datetime'));
+    return view('printed', compact('protocols', 'etos', 'datetime'));
 }
 
 public function receipt(Protocol $protocol){
     if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
     $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
     $datetime = Carbon::now()->format('d/m/Y H:m:s');
-    return view('receipt', compact('protocol', 'ipiresiasName', 'datetime'));
+    return view('receipt', compact('protocol', 'datetime'));
 }
 
 public function about(){
@@ -910,17 +968,11 @@ public function updated(){
 }
 
 public function printAttachments(){
-
-    $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-    $titleColorStyle = $this->getTitleColorStyle() ;
-
-    return view('printAttachments', compact('ipiresiasName', 'titleColorStyle'));
+    return view('printAttachments');
 }
 
 public function printedAttachments(){
     $config = new Config;
-    $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
     $etos = $config->getConfigValueOf('yearInUse');
     $datetime = Carbon::now()->format('d/m/Y H:m:s');
 
@@ -955,7 +1007,7 @@ public function printedAttachments(){
         if($protocol->out_date) $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
     }
 
-    return view('printedAttachments', compact('protocols', 'ipiresiasName' , 'etos', 'datetime'));
+    return view('printedAttachments', compact('protocols', 'etos', 'datetime'));
 }
 
 }

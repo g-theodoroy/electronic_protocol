@@ -20,7 +20,7 @@ class CreateProtocolsTable extends Migration
             $table->integer('protocoldate')->required()->unsigned();
             $table->integer('etos')->unsigned()->required();
             $table->string('fakelos')->nullable();
-            $table->string('thema')->required();
+            $table->string('thema')->nullable();
             $table->string('in_num')->nullable();
             $table->integer('in_date')->unsigned()->nullable();
             $table->string('in_topos_ekdosis')->nullable();
@@ -35,7 +35,6 @@ class CreateProtocolsTable extends Migration
             $table->string('out_perilipsi')->nullable();
             $table->string('keywords')->nullable();
             $table->string('paratiriseis')->nullable();
-            $table->string('flags')->nullable();
             $table->timestamps();
             $table->unique(array('protocolnum', 'etos'));
         });
