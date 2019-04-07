@@ -92,7 +92,7 @@ Alias /protocol "/opt/protocol/public"
 
 #### Ρύθμιση του apache να διαβάσει το αρχείο protocol.conf
 ```
-sudo gedit /etc/apache2/httpd.conf
+sudo gedit /etc/apache2/apache2.conf
 ```
 Προσθήκη στο τέλος
 ```
