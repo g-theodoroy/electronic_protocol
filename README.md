@@ -24,57 +24,61 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 ## Εγκατάσταση σε Ubuntu 18.04
 
 Ακολουθείται εν μέρει ο οδηγός στην ιστοσελίδα:
+
 https://websiteforstudents.com/install-laravel-php-framework-on-ubuntu-16-04-17-10-18-04-with-apache2-and-php-7-2-support/
 
 
-### Ενημέρωση του συστήματος
+#### Ενημέρωση του συστήματος
 ```
 sudo apt update
 sudo apt upgrade
 ```
 
-### Εγκατάσταση apache, php kai sqlite3
+#### Εγκατάσταση apache, php kai sqlite3
 ```
 sudo apt install apache2 sqlite3
 
 sudo apt install php7.2 libapache2-mod-php7.2 php7.2-mbstring php7.2-xmlrpc php7.2-soap php7.2-gd php7.2-xml php7.2-cli php7.2-zip php7.2-sqlite3
 ```
 
-### Ρύθμιση της php (php.ini) για το laravel
+#### Ρύθμιση της php (php.ini) για το laravel
 ```
 sudo gedit /etc/php/7.2/apache2/php.ini
 ```
-#### αλλάζουμε τις τιμές των παρακάτω παραμέτρων ως εξής:
+αλλάζουμε τις τιμές των παρακάτω παραμέτρων ως εξής:
+
 memory_limit = 256M
+
 upload_max_filesize = 64M
+
 cgi.fix_pathinfo=0
 
 
-### Εγκατάσταση composer
+#### Εγκατάσταση composer
 ```
 sudo apt install curl git
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 ```
 
-### Δημιουργία φακέλου ```/opt/protocol``` και κατέβασμα του Ηλ. Πρωτοκόλλου από το github 
+#### Δημιουργία φακέλου ```/opt/protocol``` και κατέβασμα του Ηλ. Πρωτοκόλλου από το github 
 ```
 sudo mkdir /opt/protocol
 cd /opt/protocol
 sudo git clone https://github.com/g-theodoroy/electronic_protocol.git .
 ```
 
-### Ρύθμιση δικαιωμάτων του φακέλου ```/opt/protocol``` στον χρήστη www-data
+#### Ρύθμιση δικαιωμάτων του φακέλου ```/opt/protocol``` στον χρήστη www-data
 ```
 sudo chown -R www-data:www-data opt/protocol/
 sudo chmod -R 755 opt/protocol/
 ```
 
-### Δημιουργία του αρχείου με τη ρύθμιση alias
+#### Δημιουργία του αρχείου με τη ρύθμιση alias
 ```
 sudo mkdir /etc/apache2/alias
 sudo gedit /etc/apache2/alias/protocol.conf
 ```
-#### Γράφουμε στο αρχείο ```protocol.conf``` τα παρακάτω:
+Γράφουμε στο αρχείο ```protocol.conf``` τα παρακάτω:
 ```
 Alias /protocol "/opt/protocol/public"
 
@@ -86,22 +90,22 @@ Alias /protocol "/opt/protocol/public"
 </Directory>
 ```
 
-### Ρύθμιση του apache να διαβάσει το αρχείο protocol.conf
+#### Ρύθμιση του apache να διαβάσει το αρχείο protocol.conf
 ```
 sudo gedit /etc/apache2/httpd.conf
 ```
-#### Προσθήκη στο τέλος
+Προσθήκη στο τέλος
 ```
 Include "alias/*"
 ```
 
-### Ρύθμιση και επανεκκίνηση apache
+#### Ρύθμιση και επανεκκίνηση apache
 ```
 sudo a2enmod rewrite
 sudo systemctl restart apache2.service
 ```
 
-### Το Ηλ. Πρωτόκολλο είναι προσβάσιμο στον υπερσύνδεσμο
+#### Το Ηλ. Πρωτόκολλο είναι προσβάσιμο στον υπερσύνδεσμο
 http://localhost/protocol
 
 
