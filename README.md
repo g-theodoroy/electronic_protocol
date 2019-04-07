@@ -69,8 +69,8 @@ sudo git clone https://github.com/g-theodoroy/electronic_protocol.git .
 
 #### Ρύθμιση δικαιωμάτων του φακέλου ```/opt/protocol``` στον χρήστη www-data
 ```
-sudo chown -R www-data:www-data opt/protocol/
-sudo chmod -R 755 opt/protocol/
+sudo chown -R www-data:www-data /opt/protocol/
+sudo chmod -R 755 /opt/protocol/
 ```
 
 #### Δημιουργία του αρχείου με τη ρύθμιση alias
