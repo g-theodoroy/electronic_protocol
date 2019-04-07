@@ -65,6 +65,7 @@ curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/loca
 sudo mkdir /opt/protocol
 cd /opt/protocol
 sudo git clone https://github.com/g-theodoroy/electronic_protocol.git .
+sudo composer install
 ```
 
 #### Ρύθμιση δικαιωμάτων του φακέλου ```/opt/protocol``` στον χρήστη www-data
