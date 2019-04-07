@@ -23,6 +23,8 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 
 ## Εγκατάσταση σε Ubuntu 18.04
 
+Ενημερώθηκε 7 Απρ 2019.
+
 Ακολουθείται εν μέρει ο οδηγός στην ιστοσελίδα:
 
 https://websiteforstudents.com/install-laravel-php-framework-on-ubuntu-16-04-17-10-18-04-with-apache2-and-php-7-2-support/
@@ -109,7 +111,17 @@ sudo systemctl restart apache2.service
 #### Το Ηλ. Πρωτόκολλο είναι προσβάσιμο στον υπερσύνδεσμο
 http://localhost/protocol
 
+#### Για να ρυθμίσετε την αποστολή email συμπληρώστε ανάλογα τα στοιχεία στο αρχείο ```.env```.
 
+γραμμές 26 έως 31:
+```
+MAIL_DRIVER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=gm@ilusern@me
+MAIL_PASSWORD=gm@ilp@ss
+MAIL_ENCRYPTION=tls
+```
 
 
 
@@ -301,8 +313,6 @@ sh install_electronic_protocol_Debian_php5.sh
 
 #### .env
 
-- γραμμή 12:
-   - DB_PASSWORD=**p@ssw@rd**
  - γραμμή 26:
    - MAIL_USERNAME=**gm@ilusern@me**
  - γραμμή 27:
