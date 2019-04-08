@@ -23,7 +23,7 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 
 ## Εγκατάσταση σε Ubuntu 18.04
 
-Ενημερώθηκε 7 Απρ 2019.
+Ενημερώθηκε 7 Απρ 2019. Μπορέιτε να δείτε σχετικό βίντεο: https://www.youtube.com/watch?v=7x3zE0tEaLI
 
 Ακολουθείται εν μέρει ο οδηγός στην ιστοσελίδα:
 
@@ -123,6 +123,15 @@ MAIL_PASSWORD=gm@ilp@ss
 MAIL_ENCRYPTION=tls
 ```
 
+## Εγκατάσταση σε Windows 7 και νεότερα
+
+Χάρη στη εξαιρετική δουλειά του cztomczak με το phpdesktop μπορεί στα windows να τρέξει η php σαν desktop εφαρμογή χρησιμοποιώντας τον chrome. https://github.com/cztomczak/phpdesktop
+
+Το Ηλεκτρονικό Πρωτόκολλο προσαρμόστηκε και ρυθμίστηκε. Κατεβάστε το συμπιεσμένο αρχείο 7z από τον παρακάτω σύνδεσμο:
+
+https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
+
+Τρέξτε το αρχείο electronic_protocol.exe
 
 
 #
