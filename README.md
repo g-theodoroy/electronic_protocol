@@ -125,13 +125,15 @@ MAIL_ENCRYPTION=tls
 
 ## Εγκατάσταση σε Windows 7 και νεότερα
 
+Σχετικό βίντεο: https://youtu.be/e79OPKagz9A
+
 Χάρη στη εξαιρετική δουλειά του cztomczak με το phpdesktop μπορεί στα windows να τρέξει η php σαν desktop εφαρμογή χρησιμοποιώντας τον chrome. https://github.com/cztomczak/phpdesktop
 
 Το Ηλεκτρονικό Πρωτόκολλο προσαρμόστηκε και ρυθμίστηκε. Κατεβάστε το συμπιεσμένο αρχείο 7z από τον παρακάτω σύνδεσμο:
 
 https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 
-Τρέξτε το αρχείο electronic_protocol.exe
+Τρέξτε το αρχείο **electronic_protocol.exe**
 
 
 #
