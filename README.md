@@ -40,12 +40,13 @@ sudo apt upgrade
 ```
 sudo apt install apache2 sqlite3
 
-sudo apt install php7.2 libapache2-mod-php7.2 php7.2-mbstring php7.2-xmlrpc php7.2-soap php7.2-gd php7.2-xml php7.2-cli php7.2-zip php7.2-sqlite3
+sudo apt install php libapache2-mod-php php-mbstring php-xmlrpc php-soap php-gd php-xml php-cli php-zip php-sqlite3
 ```
 
 #### Ρύθμιση της php (php.ini) για το laravel
+αντικαταστείστε την [έκδοση της php] με τον αντίστοιχο αριθμό **7.2** σήμερα τις 7 Απρ 2019
 ```
-sudo gedit /etc/php/7.2/apache2/php.ini
+sudo gedit /etc/php/[έκδοση της php]/apache2/php.ini
 ```
 αλλάζουμε τις τιμές των παρακάτω παραμέτρων ως εξής:
 
