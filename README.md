@@ -46,7 +46,7 @@ sudo apt install php libapache2-mod-php php-mbstring php-xmlrpc php-soap php-gd 
 #### Ρύθμιση της php (php.ini) για το laravel
 αντικαταστείστε τις αγκύλες [έκδοση της php] με τον αντίστοιχο αριθμό (**7.2** σήμερα, 7 Απρ 2019)
 ```
-sudo gedit /etc/php/**[έκδοση της php]**/apache2/php.ini
+sudo gedit /etc/php/[έκδοση της php]/apache2/php.ini
 ```
 αλλάζουμε τις τιμές των παρακάτω παραμέτρων ως εξής:
 
