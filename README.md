@@ -21,14 +21,57 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 #
 # Εγκατάσταση
 
-## Εγκατάσταση σε Ubuntu 18.04
+Για την εγκατάσταση του framework laravel υπάρχουν διαθέσιμοι αρκετοί οδηγοί στο υπερκείμενο:
 
-Ενημερώθηκε 7 Απρ 2019. Μπορέιτε να δείτε σχετικό βίντεο: https://www.youtube.com/watch?v=7x3zE0tEaLI
+#### Για Debian 9:
 
-Ακολουθείται εν μέρει ο οδηγός στην ιστοσελίδα:
+https://tecadmin.net/install-laravel-on-debian-9-stretch/
+
+#### Για Centos 7:
+
+https://tecadmin.net/install-laravel-framework-on-centos/
+
+#### Για Ubuntu:
 
 https://websiteforstudents.com/install-laravel-php-framework-on-ubuntu-16-04-17-10-18-04-with-apache2-and-php-7-2-support/
 
+#### Χρήση xampp
+
+Αν θέλετε να χρησιμοποιήσετε xampp σε linux ή Windows ρίξτε μια ματιά στους επόμενους υπερσυνδέσμους:
+
+https://www.5balloons.info/how-to-install-laravel-5-5-with-xampp-on-linux/
+
+https://www.5balloons.info/install-laravel-5-7-xampp-windows/
+
+#### Παρατηρήσεις
+
+Σε όλους τους οδηγούς είναι σημαντικό να προσέξουμε και να **εγκαταστήσουμε τις απαραίτητες εξαρτήσεις**.
+
+Όταν φτάσουμε στην εγκατάσταση του laravel
+
+```git clone https://github.com/laravel/laravel.git```
+
+ή
+
+```sudo composer create-project laravel/laravel MyProject --prefer-dist```
+
+**αντικαθιστούμε** με την παρακάτω εντολή:
+
+```sudo git clone https://github.com/g-theodoroy/electronic_protocol.git .```
+
+Οι οδηγοί αναφέρονται στη **mysql (mariaDB)** σαν Βάση Δεδομένων. Μπορείτε να επιλέξετε και τη **sqlite** (η πρότασή μου για ευκολία)
+
+Για να ανακατευθύνουν τον **apache** server χρησιμοποιούν τη ντιρεκτίβα **VirtualHost**.
+
+Προσωπικά Θεωρώ πιο εύκολο να ρυθμιστεί με τη χρήση της ντιρεκτίβας **Alias**
+
+
+### Ενδεικτικά σας παρουσιάζω αναλυτικά τις ενέργειες που πρέπει να γίνουν για εγκατάσταση σε Ubuntu 18.04
+
+
+## Εγκατάσταση σε Ubuntu 18.04
+
+Ενημερώθηκε 7 Απρ 2019. Μπορέιτε να δείτε σχετικό βίντεο: https://www.youtube.com/watch?v=7x3zE0tEaLI
 
 #### Ενημέρωση του συστήματος
 ```
