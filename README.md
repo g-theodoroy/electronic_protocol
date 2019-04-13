@@ -244,11 +244,6 @@ https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 
 Δώστε ένα όνομα στη d@t@b@se πχ: protocol
 
-Αντικαταστήστε τη λέξη laravel με κάτι άλλο (πχ: protocol). Χρήσιμο αν τρέξουμε δύο πρωτόκολλα
-
-Δώστε ένα όνομα στo @ppn@me πχ: protocol
-
-
 
 ### Ρύθμιση Apache του Xampp να ανακατευθύνεται στο Ηλ. Πρωτόκολλο
 
