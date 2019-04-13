@@ -214,6 +214,8 @@ https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 
 #### .env
 
+ - γραμμή 9:
+   - DB_CONNECTION=sqlite
  - γραμμή 29:
    - MAIL_USERNAME=**gm@ilusern@me**
  - γραμμή 30:
@@ -223,6 +225,9 @@ https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 ## Αν χρησιμοποιείτε mysql
 
 #### .env
+
+- γραμμή 9:
+   - DB_CONNECTION=**mysql**
  - γραμμή 12:
    - DB_DATABASE=**d@t@b@se**
  - γραμμή 14:
