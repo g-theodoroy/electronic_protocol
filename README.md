@@ -168,7 +168,8 @@ MAIL_PASSWORD=gm@ilp@ss
 MAIL_ENCRYPTION=tls
 ```
 
-## Εγκατάσταση σε Windows 7 και νεότερα
+
+## Εγκατάσταση σε Windows 7 και νεότερα με το phpdesktop
 
 Σχετικό βίντεο: https://youtu.be/e79OPKagz9A
 
@@ -179,6 +180,21 @@ MAIL_ENCRYPTION=tls
 https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 
 Τρέξτε το αρχείο **electronic_protocol.exe**
+
+
+## Εγκατάσταση σε linux με το phpdesktop
+
+Χάρη στη εξαιρετική δουλειά του cztomczak με το phpdesktop μπορεί στα linux να τρέξει η php σαν desktop εφαρμογή χρησιμοποιώντας τον chrome. https://github.com/cztomczak/phpdesktop/releases/tag/linux-v72.0
+
+Κατεβάστε και χρησιμοποιείστε το Ηλ. Πρωτόκολλο σαν εφαρμογή desktop σε linux.
+
+https://drive.google.com/uc?export=download&id=1Y1xqmA1llK1JAmswGS0m92S6XOJFpVCR
+
+Τρέξτε το αρχείο **electronic-protocol*
+
+**ΠΡΟΣΟΧΗ:**
+
+Φροντίστε ο φάκελος storage να είναι προσβάσιμος και εγγράψιμος από όλους.
 
 
 #
