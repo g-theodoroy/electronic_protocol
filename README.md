@@ -190,7 +190,7 @@ https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 
 https://drive.google.com/uc?export=download&id=1Y1xqmA1llK1JAmswGS0m92S6XOJFpVCR
 
-Τρέξτε το αρχείο **electronic-protocol*
+Τρέξτε το αρχείο **electronic-protocol**
 
 **ΠΡΟΣΟΧΗ:**
 
