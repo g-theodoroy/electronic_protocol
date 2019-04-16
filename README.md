@@ -196,6 +196,8 @@ https://drive.google.com/uc?export=download&id=1Y1xqmA1llK1JAmswGS0m92S6XOJFpVCR
 
 Φροντίστε ο φάκελος storage να είναι προσβάσιμος και εγγράψιμος από όλους.
 
+Κάντε το αρχείο ```php-cgi``` εκτελέσιμο με την εντολή ```chmod +x php-cgi```.
+
 
 #
 # Εναλλακτικές λύσεις
