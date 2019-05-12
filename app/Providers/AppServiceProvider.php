@@ -26,18 +26,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-      View::share('myActiveUsers', User::my_active_users());
-      View::share('myUsers', User::my_users());
-      View::share('myUsers', User::my_users());
+        try{
+            View::share('myActiveUsers', User::my_active_users());
+            View::share('myUsers', User::my_users());
+            View::share('myUsers', User::my_users());
 
-      $config = new Config;
-      $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
-      View::share('ipiresiasName', $ipiresiasName);
+            $config = new Config;
+            $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+            View::share('ipiresiasName', $ipiresiasName);
 
-      $titleColor = $config->getConfigValueOf('titleColor');
-      $titleColorStyle = '';
-      if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
-      View::share('titleColorStyle', $titleColorStyle);
+            $titleColor = $config->getConfigValueOf('titleColor');
+            $titleColorStyle = '';
+            if($titleColor) $titleColorStyle = "style='background:" . $titleColor . "'" ;
+            View::share('titleColorStyle', $titleColorStyle);
+        } catch (\Exception $e) {
+            // καμία ενέργεια απλά πιάνει το λάθος
+            // γιατί χτύπαγε στη δημιουργία των πινάκων με php artisan:migrate
+        }
 
     }
 }
