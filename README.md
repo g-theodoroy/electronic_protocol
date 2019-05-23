@@ -13,6 +13,7 @@
 - **Backup** βάσης δεδομένων, εύκολο κατέβασμα για φύλαξη αυτών
 - **Διαχείριση Χρηστών** με ρόλους "Διαχειριστής", "Αναθέτων", "Συγγραφέας", "Αναγνώστης" και ανάλογη πρόσβαση
 - **Σύστημα αναθέσεων**: Ο "Διαχειριστής" και "Αναθέτων" μπορούν να αναθέτουν προς Διεκπεραίωση Πρωτόκολλα σε "Συγγραφείς"...
+- **Πρωτοκόλληση email**: Σύνδεση με λογαριασμό email. Επισκόπηση εισερχομένων μηνυμάτων και των συνημμένων αρχείων και Πρωτοκόλληση με αποθήκευση των επιλεγμένων
 
 #
 # Οδηγίες Χρήσης
@@ -65,6 +66,61 @@ https://www.5balloons.info/install-laravel-5-7-xampp-windows/
 Για να ανακατευθύνουν τον **apache** server χρησιμοποιούν τη ντιρεκτίβα **VirtualHost**.
 
 Προσωπικά Θεωρώ πιο εύκολο να ρυθμιστεί με τη χρήση της ντιρεκτίβας **Alias**
+
+
+#### Ρυθμίσεις php
+
+Θα πρέπει να ενεργοποιηθούν στο ```php.ini``` οι ακόλουθες extentions:
+
+```
+extension=fileinfo
+extension=imap
+extension=mbstring
+extension=exif
+extension=openssl
+extension=pdo_sqlite
+```
+
+Για χρήση με mysql ή mariaDB και οι παρακάτω:
+
+```
+extension=mysqli
+extension=pdo_mysql
+
+```
+
+#### Ρύθμίση email
+
+Για να ρυθμίσετε το email συμπληρώστε ανάλογα τα στοιχεία στο αρχείο ```.env```.
+
+γραμμές 26 έως 40:
+```
+MAIL_DRIVER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=gm@ilusern@me
+MAIL_PASSWORD=gm@ilp@ss
+MAIL_ENCRYPTION=tls
+
+IMAP_HOST=imap.gmail.com
+IMAP_PORT=993
+IMAP_ENCRYPTION=ssl
+IMAP_VALIDATE_CERT=false
+IMAP_USERNAME=gm@ilusern@me
+IMAP_PASSWORD=gm@ilp@ss
+IMAP_DEFAULT_ACCOUNT=default
+IMAP_PROTOCOL=imap
+```
+
+**Για να εφαρμοστούν οι αλλαγές** που κάνατε πρέπει να καθαρίσετε τις ήδη αποθηκευμένες ρυθμίσεις **config** με:
+``` php artisan config:clear```
+
+
+
+Μπορείτε να ρυθμίσετε περισσότερους λογαριασμούς imap για λήψη email στο αρχείο ```config/imap.php```. Υπάρχουν ήδη λογαριασμοί με τις κατάλληλες ρυθμίσεις και πρέπει να συμπληρωθεί μόνο **username** και **password**. Ο Διαχειριστής μπορεί να επιλέγει τον ενεργό λογαριασμό email.
+
+Τα μηνύματα από τον φάκελο **INBOX** μεταφέρονται ή στον φάκελο **INBOX.beenRead** αν δεν Πρωτοκολληθούν, έιτε στον **INBOX.inProtocol** όταν Πρωτοκολληθούν.
+
 
 
 ### Ενδεικτικά σας παρουσιάζω αναλυτικά τις ενέργειες που πρέπει να γίνουν για εγκατάσταση σε Ubuntu 18.04
@@ -155,18 +211,6 @@ sudo systemctl restart apache2.service
 
 #### Το Ηλ. Πρωτόκολλο είναι προσβάσιμο στον υπερσύνδεσμο
 http://localhost/protocol
-
-#### Για να ρυθμίσετε την αποστολή email συμπληρώστε ανάλογα τα στοιχεία στο αρχείο ```.env```.
-
-γραμμές 26 έως 31:
-```
-MAIL_DRIVER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=gm@ilusern@me
-MAIL_PASSWORD=gm@ilp@ss
-MAIL_ENCRYPTION=tls
-```
 
 
 ## Εγκατάσταση σε Windows 7 και νεότερα με το phpdesktop
