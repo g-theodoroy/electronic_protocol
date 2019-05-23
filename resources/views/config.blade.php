@@ -308,9 +308,35 @@
                              </div>
                          </div>
 
+                         <div class="panel panel-default col-md-12 col-sm-12  ">
+                                  <div class="row bg-success">
+                                      <div class="form-control-static h4 text-center">Ρυθμίσεις εισερχομένων email</div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                          Χρησιμοποίησε τον λογαριασμό email
+                                      </div>
+                                      <div class="col-md-2 col-sm-2  " id="defaultImapEmaildiv">
+                                          <select id='defaultImapEmail' name='defaultImapEmail' class="form-control text-center"  title='Οι λογαριασμοί ρυθμίζονται στο config/imap.php'>
+                                            @foreach(array_keys(config('imap.accounts')) as $key)
+                                            <option value="{{$key}}" @if ($configs['defaultImapEmail'] == $key) selected @endif >{{$key}}</option>
+                                            @endforeach
+                                          </select>
+                                      </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                          Αριθμός εμφανιζομένων εισερχομένων email
+                                      </div>
+                                      <div class="col-md-2 col-sm-2  " id="emailNumFetchdiv">
+                                          <input id="emailNumFetch" type="text" class="form-control text-center" name="emailNumFetch" placeholder="emailNumFetch" value="{{$configs['emailNumFetch']}}" title=''>
+                                      </div>
+                                  </div>
+                              </div>
+
 		@if (env('DB_CONNECTION') !== 'sqlite')
                <div class="panel panel-default col-md-12 col-sm-12  ">
-                        <div class="row bg-success">
+                        <div class="row bg-danger">
                             <div class="form-control-static h4 text-center">Ρυθμίσεις αντιγράφων ασφαλείας</div>
                         </div>
                         <div class="row">
@@ -339,139 +365,10 @@
 
                 </form> <!-- ________________________________end form______________________________________________________ -->
 
-                    <div id='showFindData' ></div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
-
-function chkNum (id ,notnull){
-    var value = $('#' + id ).val()
-    if(notnull){
-        if (! value){
-            toastr.error("<center><h4>Ενημέρωση...</h4><hr>Πληκτρολογείστε Αριθμό Πρωτοκόλλου.<br>&nbsp;</center>")
-            $('#' + id + 'div').addClass ('has-error')
-            return false;
-        }else{
-            $('#' + id + 'div').removeClass ('has-error')
-        }
-    }
-    if(value){
-        var myRe = /^\d+$/g;
-
-        if (! myRe.test(value)){
-            toastr.error("<center><h4>Λάθος !!!</h4><hr>Πληκτρολογείστε μόνο Αριθμούς.<br>&nbsp;</center>")
-            $('#' + id + 'div').addClass ('has-error')
-            return false;
-        }
-            $('#' + id + 'div').removeClass ('has-error')
-        }
-        return true;
-}
-
-function chkEtos (id ,notnull){
-    var value = $('#' + id ).val()
-    if(notnull){
-        if (! value){
-            toastr.error("<center><h4>Ενημέρωση...</h4><hr>Πληκτρολογείστε Έτος.<br>&nbsp;</center>")
-            $('#' + id + 'div').addClass ('has-error')
-            return false;
-        }else{
-            $('#' + id + 'div').removeClass ('has-error')
-        }
-    }
-    if(value){
-        var myRe = /^\d{4}$/g ;
-
-        if (! myRe.test(value)){
-            toastr.error("<center><h4>Λάθος !!!</h4><hr>Το έτος πρέπει να έιναι τετραψήφιος αριθμός με μορφή ''εεεε''.<br>&nbsp;</center>")
-            $('#' + id + 'div').addClass ('has-error')
-            return false;
-        }else{
-            $('#' + id + 'div').removeClass ('has-error')
-        }
-    }
-    return true;
-}
-
-function chkDate (id ,notnull){
-    var value = $('#' + id ).val()
-    if(notnull){
-        if (! value){
-            toastr.error("<center><h4>Ενημέρωση...</h4><hr>Πληκτρολογείστε Έτος.<br>&nbsp;</center>")
-            $('#' + id + 'div').addClass ('has-error')
-            return false;
-        }else{
-            $('#' + id + 'div').removeClass ('has-error')
-        }
-    }
-    if(value){
-        var myRe = /\d{2}\/\d{2}\/\d{4}/g ;
-
-        if (! myRe.test(value)){
-            toastr.error("<center><h4>Λάθος !!!</h4><hr>η Ημερομηνία πρέπει να έιναι έχει τη μορφή ''ηη/μμ/εεεε''.<br>&nbsp;</center>")
-            $('#' + id + 'div').addClass ('has-error')
-            return false;
-        }else{
-            $('#' + id + 'div').removeClass ('has-error')
-        }
-    }
-    return true;
-}
-
-
-function getPrintData() {
-    var chk_ok = 1
-    var aponum = chkNum('aponum',false)
-    if(!aponum){
-        chk_ok=0
-    }
-    var eosnum = chkNum('eosnum',false)
-    if(!eosnum){
-        chk_ok=0
-    }
-    var etosForMany = chkEtos('etosForMany',false)
-    if(!etosForMany){
-        chk_ok=0
-    }
-    var apoProtocolDate = chkDate('apoProtocolDate', false)
-    if(! apoProtocolDate){
-        chk_ok=0
-    }
-    var eosProtocolDate = chkDate('eosProtocolDate', false)
-    if(! eosProtocolDate){
-        chk_ok=0
-    }
-    if(chk_ok == 0){
-        return false
-    }
-    $("#printform").submit()
-    return true
-}
-
-
-</script>
 
 @endsection

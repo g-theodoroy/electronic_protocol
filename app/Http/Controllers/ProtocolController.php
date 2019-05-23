@@ -17,6 +17,8 @@ use Illuminate\Validation\Rule;
 use Validator;
 use DB;
 use Active;
+use Illuminate\Support\Facades\Mail;
+use Webklex\IMAP\Facades\Client;
 
 /*
 
@@ -482,6 +484,7 @@ class ProtocolController extends Controller
         $protocolNewNum = $data['protocolnum'];
       }
 
+  try{
     Protocol::create([
         'user_id' => Auth::user()->id ,
         'protocolnum'=> $protocolNewNum,
@@ -504,6 +507,14 @@ class ProtocolController extends Controller
         'keywords' => $data['keywords'],
         'paratiriseis' => $data['paratiriseis']
         ]);
+      } catch (\Exception $e) {
+          $notification = array(
+             'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση του Πρωτοκόλλου<br>Παρακαλώ επαναλάβετε την καταχώριση.',
+             'alert-type' => 'error'
+             );
+          session()->flash('notification',$notification);
+          return redirect("home");
+        }
 
     $filescount = 3 * $data['file_inputs_count'];
     $protocol_id = Protocol::where("etos",$data['etos'])->where('protocolnum', $protocolNewNum)->first()->id ;
@@ -529,7 +540,7 @@ class ProtocolController extends Controller
            $dt->addYears($data['keep']);
            $expires = $dt->format('Ymd');
        }
-
+    try{
        Attachment::create([
           'protocol_id' => $protocol_id,
           'ada' => $data["ada$i"],
@@ -539,9 +550,16 @@ class ProtocolController extends Controller
           'keep' => $data['keep'],
           'expires' => $expires,
           ]);
-     }
- }
-
+        } catch (\Exception $e) {
+        $notification = array(
+           'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση των συνημμένων αρχείων<br>Ελέγξτε αν καταχωρίστηκαν όλα σωστά.',
+           'alert-type' => 'error'
+           );
+        session()->flash('notification',$notification);
+        return redirect("home/$protocol_id");
+      }
+    }
+}
  $notification = array(
     'message' => 'Επιτυχημένη καταχώριση.',
     'alert-type' => 'success'
@@ -632,7 +650,7 @@ public function update(Protocol $protocol){
 
         }
     }
-
+    try{
     Protocol::whereId($id)->update([
         'user_id' => Auth::user()->id ,
         'protocolnum'=> $data['protocolnum'],
@@ -655,6 +673,14 @@ public function update(Protocol $protocol){
         'keywords' => $data['keywords'],
         'paratiriseis' => $data['paratiriseis']
         ]);
+      } catch (\Exception $e) {
+        $notification = array(
+           'message' => 'Υπήρξε κάποιο πρόβλημα στην ενημέρωση του Πρωτοκόλλου<br>Παρακαλώ επαναλάβετε την ενημέρωση.',
+           'alert-type' => 'error'
+           );
+        session()->flash('notification',$notification);
+        return redirect("home/$protocol_id");
+      }
 
 
     $filescount = 3 * $data['file_inputs_count'];
@@ -680,7 +706,7 @@ public function update(Protocol $protocol){
              $dt->addYears($data['keep']);
              $expires = $dt->format('Ymd');
          }
-
+        try{
          Attachment::create([
             'protocol_id' => $id,
             'ada' => $data["ada$i"],
@@ -690,7 +716,15 @@ public function update(Protocol $protocol){
             'keep' => $data['keep'],
             'expires' => $expires,
             ]);
+          } catch (\Exception $e) {
+          $notification = array(
+             'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση των συνημμένων αρχείων<br>Ελέγξτε αν καταχωρίστηκαν όλα σωστά.',
+             'alert-type' => 'error'
+             );
+          session()->flash('notification',$notification);
+          return redirect("home/$protocol_id");
      }
+   }
  }
 
  $notification = array(
@@ -1008,6 +1042,321 @@ public function printedAttachments(){
     }
 
     return view('printedAttachments', compact('protocols', 'etos', 'datetime'));
+}
+
+public function getEmailNum(){
+  $config = new Config;
+  $defaultImapEmail = $config->getConfigValueOf('defaultImapEmail');
+  // Alternative by using the Facade
+  $oClient = Client::account($defaultImapEmail);
+  try{
+  //Connect to the IMAP Server
+  $oClient->connect();
+  } catch (\Exception $e) {
+  return 0;
+  }
+  $aMessageNum = $oClient->countMessages();
+  return $aMessageNum;
+}
+
+public function viewEmails(){
+
+  $config = new Config;
+  $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
+  $emailNumFetch = $config->getConfigValueOf('emailNumFetch');
+  $defaultImapEmail = $config->getConfigValueOf('defaultImapEmail');
+
+  // Alternative by using the Facade
+  $oClient = Client::account($defaultImapEmail);
+  try{
+  //Connect to the IMAP Server
+  $oClient->connect();
+  } catch (\Exception $e) {
+  $notification = array(
+  'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
+  'alert-type' => 'error'
+  );
+  session()->flash('notification',$notification);
+  return back();
+  }
+  $fakeloi = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-3)+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->select('fakelos', 'describe')->get();
+  // γεμίζω τη λίστα με τη διατήρηση αρχείων
+  $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
+  $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
+
+  $aMessageNum = $oClient->countMessages();
+  /** @var \Webklex\IMAP\Folder $oFolder */
+  $oFolder = $oClient->getFolder('INBOX');
+  $aMessage = $oFolder->query()->whereAll()->limit($emailNumFetch)->get();
+
+      return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words'));
+}
+
+public function viewEmailAttachment( $messageUid, $attachmentKey){
+  $config = new Config;
+  $defaultImapEmail = $config->getConfigValueOf('defaultImapEmail');
+// Alternative by using the Facade
+  $oClient = Client::account(  $defaultImapEmail);
+  //Connect to the IMAP Server
+  try{
+  //Connect to the IMAP Server
+  $oClient->connect();
+  } catch (\Exception $e) {
+  $notification = array(
+  'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
+  'alert-type' => 'error'
+  );
+  session()->flash('notification',$notification);
+  return back();
+  }
+  /** @var \Webklex\IMAP\Folder $oFolder */
+  $oFolder = $oClient->getFolder('INBOX');
+  $oMessage = $oFolder->getMessage($messageUid, null, null, true, true, false);
+  $aAttachment = $oMessage->getAttachments();
+  $oAttachment = $aAttachment->get($attachmentKey);
+  $content = $oAttachment->getContent();
+  return response($content)
+  ->header('Content-Type', $oAttachment->getMimeType())
+  ->header('Content-Disposition', "filename=" . $oAttachment->getName());
+}
+
+public function setEmailRead($messageUid){
+  $config = new Config;
+  $defaultImapEmail = $config->getConfigValueOf('defaultImapEmail');
+// Alternative by using the Facade
+  $oClient = Client::account($defaultImapEmail);
+  //Connect to the IMAP Server
+  try{
+  //Connect to the IMAP Server
+  $oClient->connect();
+  } catch (\Exception $e) {
+  $notification = array(
+  'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
+  'alert-type' => 'error'
+  );
+  session()->flash('notification',$notification);
+  return back();
+  }
+
+  if(! $oClient->getFolder('INBOX.beenRead')) $oClient->createFolder('INBOX.beenRead');
+
+  /** @var \Webklex\IMAP\Folder $oFolder */
+  $oFolder = $oClient->getFolder('INBOX');
+  $oMessage = $oFolder->getMessage($messageUid, null, null, false, false, false);
+  $oMessage->moveToFolder('INBOX.beenRead');
+  $notification = array(
+  'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
+  'alert-type' => 'success'
+  );
+  session()->flash('notification',$notification);
+return back();
+}
+
+public function storeFromEmail(){
+
+  $data = request()->all();
+  $uid = $data['uid'];
+  isset($data["fakelos$uid"]) ? $fakelos = $data["fakelos$uid"]:$fakelos = null ;
+  isset($data["keep$uid"]) ? $keep = $data["keep$uid"]:$keep = null ;
+  $sendReceipt = $data["sendReceipt$uid"];
+  $chkboxes = array_filter($data, function($k) use ($uid) {
+    return strpos($k, "chk$uid-") !== false;
+  }, ARRAY_FILTER_USE_KEY);
+  $attachmentKeys = array();
+  foreach ($chkboxes as $key => $val){
+     $attachmentKeys[] = substr($key, strpos($key, "-")+1);
+  }
+
+  $config = new Config;
+  $defaultImapEmail = $config->getConfigValueOf('defaultImapEmail');
+  // Alternative by using the Facade
+  $oClient = Client::account($defaultImapEmail);
+  //Connect to the IMAP Server
+  try{
+  //Connect to the IMAP Server
+  $oClient->connect();
+  } catch (\Exception $e) {
+  $notification = array(
+  'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
+  'alert-type' => 'error'
+  );
+  session()->flash('notification',$notification);
+  return back();
+  }
+  /** @var \Webklex\IMAP\Folder $oFolder */
+  // αν δεν υπάρχει ο φακελος INBOX.inProtocol τον φτιάχνω
+  if(! $oClient->getFolder('INBOX.inProtocol')) $oClient->createFolder('INBOX.inProtocol');
+
+  $oFolder = $oClient->getFolder('INBOX');
+  $oMessage = $oFolder->getMessage($uid, null, null, true, true, false);
+
+
+  $thema = $oMessage->getSubject();
+  $in_num = Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('H:i:s');
+  $in_date = Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Ymd');
+  $in_arxi_ekdosis = $oMessage->getFrom()[0]->full;
+  $in_paraliptis = Auth::user()->name;
+  $in_perilipsi = substr($oMessage->getTextBody(), 0, 250);
+  $paratiriseis = 'παρελήφθη με email';
+
+  $etos = Carbon::now()->format('Y');
+
+  // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
+  $firstProtocolNum = $config->getConfigValueOf('firstProtocolNum');
+  if (Protocol::all()->count()){
+      if ($config->getConfigValueOf('yearInUse')){
+        $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1 ;
+        }else{
+        $newprotocolnum = Protocol::all() -> last() -> protocolnum ? Protocol::all() -> last() -> protocolnum + 1 : 1 ;
+        }
+    }else{
+        if($firstProtocolNum){
+            $newprotocolnum = $firstProtocolNum;
+        }else{
+            $newprotocolnum = 1;
+        }
+    }
+
+    if(Protocol::whereIn_num($in_num)->whereThema($thema)->count()){
+      $protocolExists = Protocol::whereIn_num($in_num)->whereThema($thema)->first(['protocolnum', 'etos', 'protocoldate']);
+      $message ='Υπάρχει ήδη καταχωρισμένο Πρωτόκολλο από ληφθέν email με ίδιο <strong>Θέμα</strong> και <strong>Ημνία αποστολής</strong> με τα παρακάτω στοιχεία: <br>Αρ Πρωτ: ' . $protocolExists->protocolnum . '<br>Ημνία: ' . Carbon::createFromFormat('Ymd', $protocolExists->protocoldate)->format('d/m/Y') . '<br>Έτος: ' . $protocolExists->etos . '.' ;
+      $notification = array(
+          'message' =>  $message ,
+          'alert-type' => 'warning'
+          );
+      session()->flash('notification',$notification);
+      return back();
+    }
+    try{
+      $protocolCreated = Protocol::create([
+    'user_id' => Auth::user()->id ,
+    'protocolnum'=> $newprotocolnum,
+    'protocoldate'=> Carbon::now()->format('Ymd'),
+    'etos' => $etos,
+    'fakelos' => $fakelos,
+    'thema' => $thema,
+    'in_num' => $in_num,
+    'in_date' => $in_date,
+    'in_topos_ekdosis'=>  "-",
+    'in_arxi_ekdosis' => $in_arxi_ekdosis,
+    'in_paraliptis' => $in_paraliptis,
+    'diekperaiosi' => null,
+    'in_perilipsi' => $in_perilipsi,
+    'out_date' => null,
+    'diekp_date' => null,
+    'sxetiko' => null,
+    'out_to' => null,
+    'out_perilipsi' => null,
+    'keywords' => null,
+    'paratiriseis' => $paratiriseis
+    ]);
+    } catch (\Exception $e) {
+      $notification = array(
+         'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση του email στο Πρωτόκολλο<br>Παρακαλώ επαναλάβετε την καταχώριση.',
+         'alert-type' => 'error'
+         );
+      session()->flash('notification',$notification);
+      return back();
+    }
+
+if ($protocolCreated){
+  $message = "Το email καταχωρίστηκε.";
+}
+
+$protocol = Protocol::where("etos",$etos)->where('protocolnum', $newprotocolnum)->first();
+
+// αποθηκεύω το email σαν συνημμένο html
+$html = view('viewEmail', compact('oMessage'))->render();
+$filename = 'email_' . Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Y-m-d_H:i:s') . '.html';
+$filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
+$dir = '/arxeio/emails/';
+$savedPath = $dir . $filenameToStore;
+Storage::put($savedPath, $html);
+$expires = null;
+if ($keep and is_numeric($keep)){
+ $dt = Carbon::createFromFormat('Ymd', $protocol->protocoldate);
+ $dt->addYears($keep);
+ $expires = $dt->format('Ymd');
+}
+
+try{
+Attachment::create([
+'protocol_id' => $protocol->id,
+'ada' => null,
+'name' => $filename,
+'mimeType' => 'text/html',
+'savedPath' => $savedPath,
+'keep' => $keep,
+'expires' => $expires,
+]);
+
+// αποθηκεύω τα συνημμένα
+$aAttachment = $oMessage->getAttachments();
+$numCreatedAttachments = 0;
+foreach($attachmentKeys as $attachmentKey){
+      $oAttachment = $aAttachment->get($attachmentKey);
+      $content = $oAttachment->getContent();
+      $mimeType = $oAttachment->getMimeType();
+      $filename = $oAttachment->getName();
+
+      $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
+
+      $dir = '/arxeio/' . $fakelos . '/';
+      $savedPath = $dir . $filenameToStore;
+      Storage::put($savedPath, $content);
+
+   $createdAttachment = Attachment::create([
+      'protocol_id' => $protocol->id,
+      'ada' => null,
+      'name' => $filename,
+      'mimeType' => $mimeType,
+      'savedPath' => $savedPath,
+      'keep' => $keep,
+      'expires' => $expires,
+      ]);
+      if($createdAttachment)$numCreatedAttachments++;
+ }
+} catch (\Exception $e) {
+$notification = array(
+   'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση των συνημμένων αρχείων<br>Ελέγξτε αν καταχωρίστηκαν όλα σωστά.',
+   'alert-type' => 'error'
+   );
+session()->flash('notification',$notification);
+return redirect("home/$protocol_id");
+}
+
+if($numCreatedAttachments) $message .= "<br>Εισήχθηκαν $numCreatedAttachments συνημμένα αρχεία.";
+
+
+if($sendReceipt){
+  if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
+  $emaildate = $oMessage->getDate();
+  $html = view('receiptEmail', compact('protocol', 'emaildate'))->render();
+  Mail::send([], [], function ($message) use ($oMessage, $html)
+{
+    $message->from('electronic_protocol@gmail.com');
+    if ($oMessage->getReplyTo()){
+      $message->to($oMessage->getReplyTo()[0]->mail);
+    }else{
+      $message->to($oMessage->getFrom()[0]->mail);
+    }
+    $message->subject("Καταχώριση email στο Ηλεκτρονικό Πρωτόκολλο.");
+    $message->setBody($html,'text/html');
+});
+if(! count(Mail::failures()))$message .= "<br>Στάλθηκε με email αποδεικτικό καταχώρισης.";
+}
+
+// μεταφέρωτο μύνημα στα πρωτοκολλημένα
+ $oMessage->moveToFolder('INBOX.inProtocol');
+
+
+ $notification = array(
+ 'message' => $message,
+ 'alert-type' => 'success'
+ );
+ session()->flash('notification',$notification);
+
+return back();
 }
 
 }

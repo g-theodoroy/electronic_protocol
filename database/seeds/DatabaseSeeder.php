@@ -199,6 +199,20 @@ class DatabaseSeeder extends Seeder
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
+        DB::table('configs')->insert([
+           'key' => 'defaultImapEmail',
+           'value' => 'default',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
+           'key' => 'emailNumFetch',
+           'value' => 5,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
         //$this->call(KeepvaluesTableSeeder::class);
 
     }

@@ -130,14 +130,18 @@
                                     <li class="dropdown-submenu">
                                         <a class="test" tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
                                         <ul class="dropdown-menu">
-                                            <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
+                                          <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
+                                          @if( Auth::user()->role_description() != "Αναγνώστης")
+                                          <li class="divider"></li>
+                                          <li><a  tabindex="-1" href="{{ url('/viewEmails') }}">Εισερχόμενα Email</a></li>
+                                          @endif
                                             <li class="divider"></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
                                             <li class="dropdown-submenu">
                                             <a class="test" tabindex="-1" href="#">Εκτύπωση</a>
                                                 <ul class="dropdown-menu">
                                                     <li><a  tabindex="-1" href="{{ url('/print') }}">Πρωτόκολλο</a></li>
-                                                    <li><a  tabindex="-1" href="{{ url('/printAttachments') }}">με Συνημμένα</a></li>
+                                                    <li><a  tabindex="-1" href="{{ url('/printAttachments') }}">Συνημμένα</a></li>
                                                 </ul>
                                             </li>
                                             <li><a  tabindex="-1" href="{{ url('/keep') }}">Διατήρηση</a></li>

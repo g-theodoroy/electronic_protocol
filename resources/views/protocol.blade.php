@@ -125,7 +125,9 @@ function periigisi(id){
                 @endforeach
               </div>
               @endif
-                <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
+              <div class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
+              <div class="panel-heading h1 text-center col-md-10 col-sm-10" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
+              <div id="emailNumDiv" class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
 
                 <div class="panel-body">
                 <div class="panel panel-default col-md-12 col-sm-12  ">
@@ -464,10 +466,8 @@ function getKeep4Fakelos(){
         $("#keep").val(data).change()
     });
 }
-</script>
 
 @if ($time2update > 0)
-<script type="text/javascript">
 function startTimer(duration, display) {
     var timer = duration, minutes, seconds
     interval = setInterval(function () {
@@ -484,13 +484,27 @@ function startTimer(duration, display) {
         }
     }, 1000)
 }
+@endif
 
 window.onload = function () {
+  @if ($time2update > 0)
     var duration =  {{$time2update}},
-        display = document.querySelector('#timer')
+    display = document.querySelector('#timer')
     startTimer(duration, display);
+    @endif
+    $.ajax({
+      url: '{{ URL::to('/') }}/getEmailNum',
+      success: function(data){
+        if(data > 0){
+          $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+          $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
+          $('#emailNum').show();
+        }
+      }
+    })
+
 }
+
 </script>
-@endif
 
 @endsection

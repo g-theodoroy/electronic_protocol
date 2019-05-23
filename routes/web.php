@@ -79,10 +79,13 @@ Route::post('/printedAttachments','ProtocolController@printedAttachments');
 
 Route::get('/receipt/{protocol}','ProtocolController@receipt');
 Route::get('/about','ProtocolController@about');
-
 Route::get('/updated','ProtocolController@updated');
 
-
+Route::get('/viewEmails','ProtocolController@viewEmails');
+Route::get('/getEmailNum','ProtocolController@getEmailNum');
+Route::get('/viewEmailAttachment/{messageUid}/{attachmentKey}','ProtocolController@viewEmailAttachment');
+Route::get('/setEmailRead/{messageUid}','ProtocolController@setEmailRead');
+Route::post('/storeFromEmail','ProtocolController@storeFromEmail');
 
 Route::get('/config','ConfigController@index');
 Route::post('/config','ConfigController@store');

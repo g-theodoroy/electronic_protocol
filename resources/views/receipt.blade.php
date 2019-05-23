@@ -52,8 +52,10 @@
 
             </div>
         </div>
+        @if($datetime)
         <div class="col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-8 col-xs-offset-2 text-right ">
             Εκτυπώθηκε: {{$datetime}}
         </div>
+        @endif
     </body>
 </html>

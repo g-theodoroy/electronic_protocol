@@ -14,15 +14,16 @@
                 @endforeach
               </div>
               @endif
-                <div class="panel-heading h1 text-center" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
-
+              <div class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
+              <div class="panel-heading h1 text-center col-md-10 col-sm-10" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
+              <div id="emailNumDiv" class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
                 <div class="panel-body">
                 <div class="panel panel-default col-md-12 col-sm-12  ">
-
                     <div class='row'>
                         <div class="col-md-3 col-sm-3 form-control-static">
                           <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
                           &nbsp;<span id='timer' style='color:#BFBFBF' title='Αυτόματη ανανέωση σε'></span>
+                          <a href="{{ URL::to('/') }}/viewEmails" id="emailNum" class="active" role="button" title="" style="display:none"> <img src="{{ URL::to('/') }}/images/email-in.png" height=30 / ></a>
                         </div>
                     @if ($protocols->links())
                         <div class="col-md-6 col-sm-6 small text-center">
@@ -31,8 +32,10 @@
                     @endif
                         <div class="col-md-3 col-sm-3 form-control-static text-right">
                           <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=30 / ></a>
+                          @if( Auth::user()->role_description() != "Αναγνώστης")
                           <a href="{{ URL::to('/') }}/home/list/d" class="active" role="button" title="προς Διεκπεραίωση" > <img src="{{ URL::to('/') }}/images/todo.png" height=30 / ></a>
                           <a href="{{ URL::to('/') }}/home/list/f" class="active" role="button" title="Διεκπεραιώθηκε" > <img src="{{ URL::to('/') }}/images/done.png" height=30 / ></a>
+                          @endif
                           <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height=30 / ></a>
                         </div>
                     </div>
@@ -301,6 +304,7 @@ function startTimer(duration, display) {
 
         if (--timer < 0) {
             window.location.reload()
+
         }
     }, 1000)
 }
@@ -309,6 +313,16 @@ window.onload = function () {
     var duration =  {{$refreshInterval}},
         display = document.querySelector('#timer')
     startTimer(duration, display);
+    $.ajax({
+      url: '{{ URL::to('/') }}/getEmailNum',
+      success: function(data){
+        if(data > 0){
+          $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+          $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
+          $('#emailNum').show();
+        }
+      }
+    })
 }
 </script>
 @endif

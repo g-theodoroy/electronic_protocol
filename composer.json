@@ -13,7 +13,8 @@
         "fideloper/proxy": "^4.0",
         "joshrainwater/active-users": "^1.0",
         "laravel/framework": "5.8.*",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "webklex/laravel-imap": "^1.4"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

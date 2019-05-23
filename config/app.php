@@ -168,6 +168,7 @@ return [
 
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Rainwater\Active\ActiveServiceProvider::class,
+        Webklex\IMAP\Providers\LaravelServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -235,7 +236,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Active' => Rainwater\Active\ActiveFacade::class,
-
+        'Client' => Webklex\IMAP\Facades\Client::class,
     ],
 
 ];

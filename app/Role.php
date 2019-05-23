@@ -26,7 +26,7 @@ class Role extends Model
 
         /**
      * Βρίσκω τον id του Διαχειριστή
-     * 
+     *
      * @var array
      */
     public function get_admin_id(){
