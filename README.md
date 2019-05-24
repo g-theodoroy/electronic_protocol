@@ -119,7 +119,7 @@ IMAP_PROTOCOL=imap
 
 Μπορείτε να ρυθμίσετε περισσότερους λογαριασμούς imap για λήψη email στο αρχείο ```config/imap.php```. Υπάρχουν ήδη λογαριασμοί με τις κατάλληλες ρυθμίσεις και πρέπει να συμπληρωθεί μόνο **username** και **password**. Ο Διαχειριστής μπορεί να επιλέγει τον ενεργό λογαριασμό email.
 
-Τα μηνύματα από τον φάκελο **INBOX** μεταφέρονται ή στον φάκελο **INBOX.beenRead** αν δεν Πρωτοκολληθούν, έιτε στον **INBOX.inProtocol** όταν Πρωτοκολληθούν.
+Τα μηνύματα από τον φάκελο **INBOX** μεταφέρονται ή στον φάκελο **INBOX.beenRead** αν δεν Πρωτοκολληθούν, είτε στον **INBOX.inProtocol** όταν Πρωτοκολληθούν.
 
 
 
@@ -128,7 +128,7 @@ IMAP_PROTOCOL=imap
 
 ## Εγκατάσταση σε Ubuntu 18.04
 
-Ενημερώθηκε 7 Απρ 2019. Μπορέιτε να δείτε σχετικό βίντεο: https://www.youtube.com/watch?v=7x3zE0tEaLI
+Ενημερώθηκε 7 Απρ 2019. Μπορείτε να δείτε σχετικό βίντεο: https://www.youtube.com/watch?v=7x3zE0tEaLI
 
 #### Ενημέρωση του συστήματος
 ```
@@ -141,6 +141,7 @@ sudo apt upgrade
 sudo apt install apache2 sqlite3
 
 sudo apt install php libapache2-mod-php php-mbstring php-xmlrpc php-soap php-gd php-xml php-cli php-zip php-sqlite3
+sudo apt-get install php-imap php-mcrypt
 ```
 
 #### Ρύθμιση της php (php.ini) για το laravel
