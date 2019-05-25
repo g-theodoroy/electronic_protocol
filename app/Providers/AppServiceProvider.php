@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+		error_reporting(E_ALL ^ E_NOTICE);
       try{
         View::share('myActiveUsers', User::my_active_users());
         View::share('myUsers', User::my_users());
