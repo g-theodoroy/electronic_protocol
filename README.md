@@ -233,7 +233,7 @@ https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
 
 Κατεβάστε και χρησιμοποιείστε το Ηλ. Πρωτόκολλο σαν εφαρμογή desktop σε linux.
 
-https://drive.google.com/uc?export=download&id=1Y1xqmA1llK1JAmswGS0m92S6XOJFpVCR
+https://github.com/g-theodoroy/electronic_protocol/releases/download/untagged-1c6d46b0a12125fbcdbc/electronic-protocol-phpdesktop-linux-72.1.zip
 
 Τρέξτε το αρχείο **electronic-protocol**
 
