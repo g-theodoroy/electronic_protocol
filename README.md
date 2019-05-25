@@ -243,6 +243,18 @@ https://github.com/g-theodoroy/electronic_protocol/releases/download/untagged-1c
 
 Κάντε το αρχείο ```php-cgi``` εκτελέσιμο με την εντολή ```chmod +x php-cgi```.
 
+**Παρατήρηση**: Παρατήρησα ότι το build στο Archlinux δεν δουλεύει σε Debian - Ubuntu. Στην αρχειοθήκη υπάρχει php-cgi για Debian - Ubuntu. Αν στη διανομή σας δεν δουλεύει αφού κάνετε τα παραπάνω τότε θα πρέπει να "χτίσετε" την php-cgi για τη διανομή σας, ακολουθώντας τις παρακάτω οδηγίες:
+
+Κατεβάστε από το https://www.php.net/downloads.php τα αρχεία της Php και αποσυμπιέστε τα σε ένα φάκελο. Πηγαίνετε με το τερματικό στον φάκελο και τρέξτε τις παρακάτω εντολές.
+
+```
+php_dir=$(pwd)
+
+./configure --prefix=${php_dir}/dist-install --exec-prefix=${php_dir}/dist-install-exec-prefix --with-openssl --with-imap --with-imap-ssl --with-kerberos
+
+make
+```
+Αντιγράψτε το αρχείο ```sapi/cgi/php-cgi``` στον φάκελο του phpdesktop.
 
 #
 # Εναλλακτικές λύσεις
