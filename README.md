@@ -220,9 +220,9 @@ http://localhost/protocol
 
 Χάρη στη εξαιρετική δουλειά του cztomczak με το phpdesktop μπορεί στα windows να τρέξει η php σαν desktop εφαρμογή χρησιμοποιώντας τον chrome. https://github.com/cztomczak/phpdesktop
 
-Το Ηλεκτρονικό Πρωτόκολλο προσαρμόστηκε και ρυθμίστηκε. Κατεβάστε το συμπιεσμένο αρχείο 7z από τον παρακάτω σύνδεσμο:
+Το Ηλεκτρονικό Πρωτόκολλο προσαρμόστηκε και ρυθμίστηκε. Κατεβάστε το συμπιεσμένο αρχείο zip από τον παρακάτω σύνδεσμο:
 
-https://drive.google.com/uc?export=download&id=1cIsVgazA9gHpTZPBtWIkibfyxxun2mGi
+https://github.com/g-theodoroy/electronic_protocol/releases/download/win.0.0/electronic_protocol-win.zip
 
 Τρέξτε το αρχείο **electronic_protocol.exe**
 
