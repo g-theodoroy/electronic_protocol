@@ -40,11 +40,8 @@ class ConfigController extends Controller
     }
 
     public function index(){
-        $c =  new Config;
-        $configs = $c->getConfigValues();
-	$fields = array_merge($this->protocolfields,$this->attachmentfields);
-
-        return view('config', compact('configs','fields'));
+				$fields = array_merge($this->protocolfields,$this->attachmentfields);
+        return view('config', compact('fields'));
     }
 
     public function store(){
