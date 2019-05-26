@@ -233,7 +233,7 @@ https://github.com/g-theodoroy/electronic_protocol/releases/download/win.0.0/ele
 
 Κατεβάστε και χρησιμοποιείστε το Ηλ. Πρωτόκολλο σαν εφαρμογή desktop σε linux.
 
-https://github.com/g-theodoroy/electronic_protocol/releases/download/untagged-1c6d46b0a12125fbcdbc/electronic-protocol-phpdesktop-linux-72.1.zip
+https://github.com/g-theodoroy/electronic_protocol/releases/download/lnx.0.0/electronic-protocol-phpdesktop-linux-72.1.zip
 
 Τρέξτε το αρχείο **electronic-protocol**
 
