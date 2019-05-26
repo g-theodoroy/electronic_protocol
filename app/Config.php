@@ -8,7 +8,7 @@ class Config extends Model
 {
     protected $fillable = ['key', 'value'];
 
-    public function getConfigValueOf($key) {
+    public static function getConfigValueOf($key) {
         $c = Config::firstOrCreate(['key' => $key]);
         return $c->value;
     }
