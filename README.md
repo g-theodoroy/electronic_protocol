@@ -379,7 +379,6 @@ Eκτελέστε τις παρακάτω εντολές για να εγκατ�
 composer install
 
 php artisan key:generate
-php artisan optimize
 ```
 ## με mysql
 ```
@@ -388,6 +387,7 @@ php artisan db:seed --class=KeepvaluesTableSeeder
 ```
 ## με sqlite
 Η βάση είναι ήδη έτοιμη
+
 
 Κατευθύνετε τον φυλομετρητή σας στη σελίδα http://localhost/protocol
 
