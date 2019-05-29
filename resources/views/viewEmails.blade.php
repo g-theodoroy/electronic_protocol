@@ -101,8 +101,7 @@
                           <div class="form-control-static col-md-1 col-sm-1"><strong>Κοιν:</strong></div>
                           <div class="form-control-static col-md-11 col-sm-11">
                             @foreach($oMessage->getCc() as $getCc)
-                            {{$getCc->full}}
-                            @if(! $loop->last), &nbsp; @endif
+                            {{$getCc->name}}{{$getCc->mail}}@if(! $loop->last),&nbsp;@endif
                             @endforeach
                           </div>
                       </div>
@@ -112,8 +111,7 @@
                           <div class="form-control-static col-md-1 col-sm-1"><strong>Απάντηση:</strong></div>
                           <div class="form-control-static col-md-11 col-sm-11">
                             @foreach($oMessage->getReplyTo() as $getReplyTo)
-                            {{$getReplyTo->full}}
-                            @if(! $loop->last), &nbsp; @endif
+                            {{$getReplyTo->name}}{{$getReplyTo->mail}}@if(! $loop->last),&nbsp;@endif
                             @endforeach
                           </div>
                       </div>
