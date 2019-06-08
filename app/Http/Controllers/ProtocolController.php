@@ -836,12 +836,13 @@ public function download(Attachment $attachment){
 public function find(){
 
     $fields = array_merge($this->protocolfields,$this->attachmentfields);
+    $attachmentfields = $this->attachmentfields;
     $config = new Config;
     $searchField1 = $config->getConfigValueOf('searchField1');
     $searchField2 = $config->getConfigValueOf('searchField2');
     $searchField3 = $config->getConfigValueOf('searchField3');
 
-    return view('find', compact('fields','searchField1', 'searchField2','searchField3'));
+    return view('find', compact('fields', 'attachmentfields', 'searchField1', 'searchField2','searchField3'));
 }
 
 public function getFindData(){
@@ -853,7 +854,9 @@ public function getFindData(){
     $attachmentfields = $this->attachmentfields;
 
     $wherevalues = [];
+    $whereNullFields = [];
     $whereAttachmentvalues = [];
+    $whereNullAttachmentvalues = [];
 
     if(request('aponum')){
         $wherevalues[] = ['protocolnum', '>',request('aponum')-1 ];
@@ -883,36 +886,68 @@ public function getFindData(){
     if(request('eosExerxDate')){
         $wherevalues[] = ['out_date', '<=', Carbon::createFromFormat('d/m/Y', request('eosExerxDate'))->format('Ymd')];
     }
-    if(request('searchData1')){
+    if(request('searchData1') or request('searchData1chk')){
+      if(request('searchData1chk')){
+        if( array_key_exists(request('searchField1'), $attachmentfields)){
+          $whereNullAttachmentvalues[] = request('searchField1');
+        }else{
+          $whereNullFields[] = request('searchField1');
+        }
+      }else{
       if( array_key_exists(request('searchField1'), $attachmentfields)){
         $whereAttachmentvalues[] = [request('searchField1'),'LIKE', '%' . request('searchData1') . '%' ];
       }else{
         $wherevalues[] = [request('searchField1'),'LIKE', '%' . request('searchData1') . '%' ];
       }
     }
-    if(request('searchData2')){
+    }
+    if(request('searchData2') or request('searchData2chk') ){
+      if(request('searchData2chk')){
+        if( array_key_exists(request('searchField2'), $attachmentfields)){
+          $whereNullAttachmentvalues[] = request('searchField2');
+        }else{
+          $whereNullFields[] = request('searchField2');
+        }
+      }else{
       if( array_key_exists(request('searchField2'),$attachmentfields)){
         $whereAttachmentvalues[] = [request('searchField2'),'LIKE', '%' . request('searchData2') . '%' ];
       }else{
         $wherevalues[] = [request('searchField2'),'LIKE', '%' . request('searchData2')  . '%' ];
       }
+      }
     }
-    if(request('searchData3')){
+    if(request('searchData3') or request('searchData3chk')){
+      if(request('searchData3chk')){
+        if( array_key_exists(request('searchField3'), $attachmentfields)){
+          $whereNullAttachmentvalues[] = request('searchField3');
+        }else{
+          $whereNullFields[] = request('searchField3');
+        }
+      }else{
       if( array_key_exists(request('searchField3'),$attachmentfields)){
         $whereAttachmentvalues[] =  [request('searchField3'),'LIKE', '%' . request('searchData3')  . '%' ];
       }else{
         $wherevalues[] = [request('searchField3'),'LIKE', '%' . request('searchData3') . '%'  ];
       }
+      }
     }
-    if (! $wherevalues and ! $whereAttachmentvalues){
+    if (! $wherevalues and ! $whereAttachmentvalues and ! $whereNullFields and ! $whereNullAttachmentvalues){
         return;
     }
 
     $foundProtocolsCount = Null;
 
     $protocols = Protocol::with('attachments');
+    foreach($whereNullFields as $whereNullField){
+      $protocols = $protocols->whereNull($whereNullField);
+    }
     if ($wherevalues){
       $protocols = $protocols->where($wherevalues);
+    }
+    foreach($whereNullAttachmentvalues as $whereNullAttachmentvalue){
+      $protocols = $protocols->whereHas('attachments', function ($query)  use ($whereNullAttachmentvalue){
+           $query->whereNull($whereNullAttachmentvalue );
+     });
     }
     if ($whereAttachmentvalues){
       $protocols = $protocols->whereHas('attachments', function ($query)  use ($whereAttachmentvalues){
@@ -1237,7 +1272,7 @@ public function storeFromEmail(){
     'thema' => $thema,
     'in_num' => $in_num,
     'in_date' => $in_date,
-    'in_topos_ekdosis'=>  "-",
+    'in_topos_ekdosis'=>  null,
     'in_arxi_ekdosis' => $in_arxi_ekdosis,
     'in_paraliptis' => $in_paraliptis,
     'diekperaiosi' => null,

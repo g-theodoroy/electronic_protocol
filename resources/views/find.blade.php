@@ -101,7 +101,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-4 col-sm-4  ">
+                            <div class="col-md-5 col-sm-5  ">
                                 <select id='searchField1' onchange="getFindData()"  name='searchField1' class="form-control selectpicker"  title="Αναζήτηση στο πεδίο {{$fields[$searchField1]}}">
                                 @foreach($fields as $key => $value)
                                 @if ($key == $searchField1)
@@ -112,12 +112,15 @@
                                 @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6 col-sm-6">
+                            <div class="col-md-5 col-sm-5">
                                 <input id="searchData1" oninput="getFindData()"  type="text" class="form-control " name="searchData1" placeholder="Κείμενο προς αναζήτηση" value="" title='Κείμενο προς αναζήτηση'>
+                            </div>
+                            <div id="searchData1chkDiv" class="checkbox-inline col-md-2 col-sm-2" title='Επιλέξτε για αναζήτηση κενών (Null) τιμών στο πεδίο {{$searchField1}}' >
+                                <label><input id="searchData1chk" onchange="getFindData()"  type="checkbox" name="searchData1chk" value="1" >Κενό</label>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4 col-sm-4  ">
+                            <div class="col-md-5 col-sm-5  ">
                                 <select id='searchField2' onchange="getFindData()"  name='searchField2' class="form-control selectpicker"  title="Αναζήτηση στο πεδίο {{$fields[$searchField2]}}">
                                 @foreach($fields as $key => $value)
                                 @if ($key == $searchField2)
@@ -128,12 +131,15 @@
                                 @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6 col-sm-6">
+                            <div class="col-md-5 col-sm-5">
                                 <input id="searchData2" oninput="getFindData()"  type="text" class="form-control" name="searchData2" placeholder="Κείμενο προς αναζήτηση" value="" title='Κείμενο προς αναζήτηση'>
+                            </div>
+                            <div id="searchData2chkDiv" class="checkbox-inline col-md-2 col-sm-2" title='Επιλέξτε για αναζήτηση κενών (Null) τιμών στο πεδίο {{$searchField2}}' >
+                                <label><input id="searchData2chk" onchange="getFindData()"  type="checkbox" name="searchData2chk" value="1" >Κενό</label>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4 col-sm-4  ">
+                            <div class="col-md-5 col-sm-5  ">
                                 <select id='searchField3' onchange="getFindData()"  name='searchField3' class="form-control selectpicker"  title="Αναζήτηση στο πεδίο {{$fields[$searchField3]}}"  >
                                 @foreach($fields as $key => $value)
                                 @if ($key == $searchField3)
@@ -144,8 +150,11 @@
                                 @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6 col-sm-6">
+                            <div class="col-md-5 col-sm-5">
                                 <input id="searchData3" oninput="getFindData()"  type="text" class="form-control " name="searchData3" placeholder="Κείμενο προς αναζήτηση" value="" title='Κείμενο προς αναζήτηση'>
+                            </div>
+                            <div id="searchData3chkDiv" class="checkbox-inline col-md-2 col-sm-2" title='Επιλέξτε για αναζήτηση κενών (Null) τιμών στο πεδίο {{$searchField3}}' >
+                                <label><input id="searchData3chk" onchange="getFindData()"  type="checkbox" name="searchData3chk" value="1" >Κενό</label>
                             </div>
                         </div>
                     </div>
@@ -280,6 +289,9 @@ function getFindData() {
     $('#searchField1').attr('title', 'Αναζήτηση στο πεδίο ' + $('#searchField1 :selected').text())
     $('#searchField2').attr('title', 'Αναζήτηση στο πεδίο ' + $('#searchField2 :selected').text())
     $('#searchField3').attr('title', 'Αναζήτηση στο πεδίο ' + $('#searchField3 :selected').text())
+    $('#searchData1chkDiv').attr('title', 'Επιλέξτε για αναζήτηση κενών (Null) τιμών στο πεδίο ' + $('#searchField1 :selected').text())
+    $('#searchData2chkDiv').attr('title', 'Επιλέξτε για αναζήτηση κενών (Null) τιμών στο πεδίο ' + $('#searchField2 :selected').text())
+    $('#searchData3chkDiv').attr('title', 'Επιλέξτε για αναζήτηση κενών (Null) τιμών στο πεδίο ' + $('#searchField3 :selected').text())
 
     var chk_ok = 1
     var aponum = chkNum('aponum',false)
