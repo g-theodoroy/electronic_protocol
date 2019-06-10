@@ -325,7 +325,8 @@ function periigisi(id){
                             <strong>Λέξεις<br>κλειδιά</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('keywords') ? ' has-error' : '' }}">
-                            <textarea id="keywords" type="text" class="form-control" name="keywords"  placeholder="keywords" >{{ old('keywords') ? old('keywords') : $protocol->keywords }}</textarea>
+                            <textarea id="keywords" oninput="getKeywords()" type="text" class="form-control" name="keywords"  placeholder="keywords" >{{ old('keywords') ? old('keywords') : $protocol->keywords }}</textarea>
+                            <div id="keywordsList" class="col-md-5 col-sm-5" ></div>
                             </div>
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Παρατηρήσεις</strong>
@@ -503,6 +504,50 @@ window.onload = function () {
       }
     })
 
+}
+
+function getKeywords(){
+  var keyword = $("#keywords").val().trim()
+    if (keyword == ''){
+      $('#keywordsList').empty()
+      $('#keywordsList').hide()
+      return
+    }
+    var term = extractLast(keyword)
+    $.ajax({
+      url: '{{ URL::to('/') }}/getKeywords/' + term ,
+      success: function(data){
+        if(data){
+          var front = '<ul id="keywordsUl" class="dropdown-menu" style="display:block; position:absolute; max-height:{{\App\Config::getConfigValueOf('maxRowsInFindPage')*2/3}}em; overflow:auto" >'
+          var end = '</ul>'
+          $('#keywordsList').html(front + data + end)
+          $('#keywordsList').show()
+        }else{
+          $('#keywordsList').empty()
+          $('#keywordsList').hide()
+        }
+      }
+    })
+}
+
+function split( val ) {
+      return val.split( /\s*,\s*/ );
+    }
+function extractLast( term ) {
+  return split( term ).pop();
+}
+
+function appendKeyword(keyword){
+  var terms = split($('#keywords').val());
+  terms.pop()
+  if (!terms.includes(keyword)){
+    terms.push(keyword)
+  }
+  terms.push('')
+  $('#keywords').val(terms.join( ', ' ))
+  $('#keywords').focus()
+  $('#keywordsList').empty()
+  $('#keywordsList').hide()
 }
 
 </script>
