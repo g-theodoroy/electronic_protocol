@@ -228,7 +228,7 @@ http://localhost/protocol
 
 Το Ηλεκτρονικό Πρωτόκολλο προσαρμόστηκε και ρυθμίστηκε. Κατεβάστε το συμπιεσμένο αρχείο zip από τον παρακάτω σύνδεσμο:
 
-https://github.com/g-theodoroy/electronic_protocol/releases/download/win.0.0/electronic_protocol-win.zip
+https://github.com/g-theodoroy/electronic_protocol/releases
 
 Τρέξτε το αρχείο **electronic_protocol.exe**
 
@@ -239,7 +239,7 @@ https://github.com/g-theodoroy/electronic_protocol/releases/download/win.0.0/ele
 
 Κατεβάστε και χρησιμοποιείστε το Ηλ. Πρωτόκολλο σαν εφαρμογή desktop σε linux.
 
-https://github.com/g-theodoroy/electronic_protocol/releases/download/lnx.0.0/electronic-protocol-phpdesktop-linux-72.1.zip
+https://github.com/g-theodoroy/electronic_protocol/releases
 
 Τρέξτε το αρχείο **electronic-protocol**
 
