@@ -1234,7 +1234,7 @@ public function storeFromEmail(){
   $thema = $oMessage->getSubject();
   $in_num = Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('H:i:s');
   $in_date = Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Ymd');
-  $in_arxi_ekdosis = $oMessage->getFrom()[0]->full;
+  $in_arxi_ekdosis = $oMessage->getFrom()[0]->mail;
   $in_paraliptis = Auth::user()->name;
   $in_perilipsi = substr($oMessage->getTextBody(), 0, 250);
   $paratiriseis = 'παρελήφθη με email';
