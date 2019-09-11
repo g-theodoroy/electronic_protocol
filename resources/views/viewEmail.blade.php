@@ -16,7 +16,7 @@
         <div class="panel panel-default col-md-12 col-sm-12  ">
           <div class="row bg-warning">
             <div class="form-control-static col-md-1 col-sm-1  "><strong>Από:</strong></div>
-            <div class="form-control-static col-md-8 col-sm-8  ">{{$oMessage->getFrom()[0]->mail}}</div>
+            <div class="form-control-static col-md-8 col-sm-8  ">@if(htmlspecialchars($oMessage->getFrom()[0]->personal)){{$oMessage->getFrom()[0]->personal}} &lt;@endif{{$oMessage->getFrom()[0]->mail }}@if(htmlspecialchars($oMessage->getFrom()[0]->personal))&gt;@endif</div>
             <div class="form-control-static col-md-1 col-sm-1 "><strong>Ημνία:</strong></div>
             <div class="form-control-static col-md-2 col-sm-2 ">{{$oMessage->getDate()}}</div>
           </div>
