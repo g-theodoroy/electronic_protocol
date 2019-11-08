@@ -213,6 +213,13 @@ class DatabaseSeeder extends Seeder
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
+        DB::table('configs')->insert([
+           'key' => 'allowListValuesMatchingInput',
+           'value' => 1,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
         //$this->call(KeepvaluesTableSeeder::class);
 
     }

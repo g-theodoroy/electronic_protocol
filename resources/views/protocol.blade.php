@@ -198,7 +198,8 @@ function periigisi(id){
                             <strong>Θέμα</strong>
                         </div>
                         <div class="col-md-7 col-sm-7 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
-                            <input id="thema" type="text" class="form-control" name="thema" placeholder="thema" value="{{ old('thema') ? old('thema') : $protocol->thema }}" title='Θέμα'>
+                            <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control" name="thema" placeholder="thema" value="{{ old('thema') ? old('thema') : $protocol->thema }}" title='Θέμα'>
+                            <div id="themaList" class="col-md-12 col-sm-12" ></div>
                         </div>
                         <div class="col-md-1 col-sm-1 text-center">
                             @if($protocol->id)
@@ -227,7 +228,8 @@ function periigisi(id){
                             <strong>Τόπος<br>Έκδοσης</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
-                            <input id="in_topos_ekdosis" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
+                            <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
+                            <div id="in_topos_ekdosisList" class="col-md-12 col-sm-12" ></div>
                         </div>
                     </div>
 
@@ -238,7 +240,8 @@ function periigisi(id){
                                     <strong>Αρχή<br>Έκδοσης</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
-                                    <input id="in_arxi_ekdosis" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ old('in_arxi_ekdosis') ? old('in_arxi_ekdosis') : $protocol->in_arxi_ekdosis }}" title='5. Αρχή που το έχει εκδώσει'>
+                                    <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ old('in_arxi_ekdosis') ? old('in_arxi_ekdosis') : $protocol->in_arxi_ekdosis }}" title='5. Αρχή που το έχει εκδώσει'>
+                                    <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                                 </div>
                                 <div class="row">
@@ -246,7 +249,8 @@ function periigisi(id){
                                     <strong>Παραλήπτης</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
-                                    <input id="in_paraliptis" type="text" class="form-control" name="in_paraliptis" placeholder="in_paraliptis" value="{{ old('in_paraliptis') ? old('in_paraliptis') : $protocol->in_paraliptis }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε'>
+                                    <input id="in_paraliptis" oninput="getValues(this.id, 'in_paraliptis', 'in_paraliptisList', 0)" type="text" class="form-control" name="in_paraliptis" placeholder="in_paraliptis" value="{{ old('in_paraliptis') ? old('in_paraliptis') : $protocol->in_paraliptis }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε'>
+                                    <div id="in_paraliptisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                             </div>
                         </div>
@@ -295,7 +299,8 @@ function periigisi(id){
                                     <strong>Απευθύνεται</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('out_to') ? ' has-error' : '' }}">
-                                    <input id="out_to" type="text" class="form-control" name="out_to" placeholder="out_to" value="{{ old('out_to') ? old('out_to') : $protocol->out_to }}"  title='8. Αρχή στην οποία απευθύνεται'>
+                                    <input id="out_to" oninput="getValues(this.id, 'out_to', 'out_toList', 0)" type="text" class="form-control" name="out_to" placeholder="out_to" value="{{ old('out_to') ? old('out_to') : $protocol->out_to }}"  title='8. Αρχή στην οποία απευθύνεται'>
+                                    <div id="out_toList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                                 </div>
                                 <div class="row">
@@ -325,8 +330,8 @@ function periigisi(id){
                             <strong>Λέξεις<br>κλειδιά</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('keywords') ? ' has-error' : '' }}">
-                            <textarea id="keywords" oninput="getKeywords()" type="text" class="form-control" name="keywords"  placeholder="keywords" >{{ old('keywords') ? old('keywords') : $protocol->keywords }}</textarea>
-                            <div id="keywordsList" class="col-md-5 col-sm-5" ></div>
+                            <textarea id="keywords" oninput="getValues(this.id, 'keywords', 'keywordsList', 1)" type="text" class="form-control" name="keywords"  placeholder="keywords" >{{ old('keywords') ? old('keywords') : $protocol->keywords }}</textarea>
+                            <div id="keywordsList" class="col-md-12 col-sm-12" ></div>
                             </div>
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Παρατηρήσεις</strong>
@@ -506,28 +511,40 @@ window.onload = function () {
 
 }
 
-function getKeywords(){
-  var keyword = $("#keywords").val().trim()
-    if (keyword == ''){
-      $('#keywordsList').empty()
-      $('#keywordsList').hide()
-      return
+function getValues(id, field, divId,  multi){
+    @if (! $allowListValuesMatchingInput)
+    return
+    @endif
+  var searchStr = $('#' + id).val().trim()
+    if (searchStr == ''){
+        clearDiv( divId )
+        return
     }
-    var term = extractLast(keyword)
+    var term = extractLast(searchStr)
+    if (term == ''){
+        clearDiv( divId )
+        return
+     }
+
     $.ajax({
-      url: '{{ URL::to('/') }}/getKeywords/' + term ,
+      url: '{{ URL::to('/') }}/getValues/' + term + '/' + field + '/' + id + '/' + divId + '/' + multi ,
       success: function(data){
         if(data){
-          var front = '<ul id="keywordsUl" class="dropdown-menu" style="display:block; position:absolute; max-height:{{\App\Config::getConfigValueOf('maxRowsInFindPage')*2/3}}em; overflow:auto" >'
+          var front = '<ul id="' + id + 'Ul" class="dropdown-menu" style="display:block; position:absolute; max-height:{{\App\Config::getConfigValueOf('maxRowsInFindPage')*2/3}}em; max-width: 100%; overflow:auto" >'
           var end = '</ul>'
-          $('#keywordsList').html(front + data + end)
-          $('#keywordsList').show()
+          $('#' + divId).html(front + data + end)
+          $('#' + divId).show()
         }else{
-          $('#keywordsList').empty()
-          $('#keywordsList').hide()
+          $('#' + divId).empty()
+          $('#' + divId).hide()
         }
       }
     })
+}
+
+function clearDiv( divId ) {
+      $('#' + divId).empty()
+      $('#' + divId).hide()
 }
 
 function split( val ) {
@@ -537,17 +554,22 @@ function extractLast( term ) {
   return split( term ).pop();
 }
 
-function appendKeyword(keyword){
-  var terms = split($('#keywords').val());
-  terms.pop()
-  if (!terms.includes(keyword)){
-    terms.push(keyword)
-  }
-  terms.push('')
-  $('#keywords').val(terms.join( ', ' ))
-  $('#keywords').focus()
-  $('#keywordsList').empty()
-  $('#keywordsList').hide()
+function appendValue(id, value, divId, multi){
+    if ( multi == 0) {
+        $('#' + id).val(value)
+    }
+    if ( multi == 1) {
+      var terms = split($('#' + id).val());
+      terms.pop()
+      if (!terms.includes(value)){
+        terms.push(value)
+      }
+     terms.push('')
+      $('#' + id).val(terms.join( ', ' ))
+    }
+  $('#' + id).focus()
+  $('#' + divId).empty()
+  $('#' + divId).hide()
 }
 
 </script>

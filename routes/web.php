@@ -71,7 +71,7 @@ Route::get('/download/{attachment}','ProtocolController@download');
 
 Route::get('/find','ProtocolController@find');
 Route::get('/getFindData','ProtocolController@getFindData');
-Route::get('/getKeywords/{term}','ProtocolController@getKeywords');
+Route::get('/getValues/{term}/{field}/{id}/{divId}/{multi}','ProtocolController@getValues');
 
 Route::get('/print','ProtocolController@printprotocols');
 Route::post('/printed','ProtocolController@printed');

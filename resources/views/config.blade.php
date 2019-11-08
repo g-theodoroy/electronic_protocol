@@ -116,7 +116,23 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                         <div class="row">
+                            <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1 ">
+                                Εμφάνιση λίστας με τιμές που ταιριάζουν σε ότι πληκτρολογούμε
+                            </div>
+                            <div class="col-md-2 col-sm-2  " id="allowListValuesMatchingInputdiv">
+                                <select id='allowListValuesMatchingInput' name='allowListValuesMatchingInput' class="form-control"  title=''>
+                                @if (App\Config::getConfigValueOf('allowListValuesMatchingInput') )
+                                <option value="0"  >ΟΧΙ</option>
+                                <option value="1" selected >ΝΑΙ</option>
+                                @else
+                                <option value="0" selected >ΟΧΙ</option>
+                                <option value="1"  >ΝΑΙ</option>
+                                @endif
+                                </select>
+                            </div>
+                        </div>
+                   </div>
 
                 <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-success">

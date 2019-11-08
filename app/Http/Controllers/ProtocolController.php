@@ -98,6 +98,7 @@ class ProtocolController extends Controller
         $protocolValidate = $config->getConfigValueOf('protocolValidate');
         $diavgeiaUrl = $config->getConfigValueOf('diavgeiaUrl');
         $allowUserChangeKeepSelect = $config->getConfigValueOf('allowUserChangeKeepSelect');
+        $allowListValuesMatchingInput = $config->getConfigValueOf('allowListValuesMatchingInput');
 
         // βρίσκω το νέο αριθμό πρωτοκόλλου
         if (Protocol::all()->count()){
@@ -253,7 +254,7 @@ class ProtocolController extends Controller
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible','delVisible', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo' , 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput'));
     }
 
     public function chkForUpdates(){
@@ -1234,11 +1235,18 @@ public function storeFromEmail(){
   $thema = $oMessage->getSubject();
   $in_num = Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('H:i:s');
   $in_date = Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Ymd');
-  if(htmlspecialchars($oMessage->getFrom()[0]->personal)){
-    $in_arxi_ekdosis = $oMessage->getFrom()[0]->personal . " <" . $oMessage->getFrom()[0]->mail . ">";
-  }else{
-    $in_arxi_ekdosis = $oMessage->getFrom()[0]->mail;
+  if( $oMessage->getFrom()[0]->personal ) {
+    if(mb_detect_encoding($oMessage->getFrom()[0]->personal, 'UTF-8, ISO-8859-7', true)== 'ISO-8859-7') {
+        $in_arxi_ekdosis = iconv("ISO-8859-7", "UTF-8//IGNORE", $oMessage->getFrom()[0]->personal);
+    }else{
+        $in_arxi_ekdosis = $oMessage->getFrom()[0]->personal;
+    }
+     $in_arxi_ekdosis .= " <";
   }
+    $in_arxi_ekdosis .= $oMessage->getFrom()[0]->mail;
+  if($oMessage->getFrom()[0]->personal){
+    $in_arxi_ekdosis .= ">";
+  }    
   $in_paraliptis = Auth::user()->name;
   $in_perilipsi = substr($oMessage->getTextBody(), 0, 250);
   $paratiriseis = 'παρελήφθη με email';
@@ -1403,19 +1411,28 @@ if(! count(Mail::failures()))$message .= "<br>Στάλθηκε με email απο
 return back();
 }
 
-public function getKeywords($term){
-  $protocols = Protocol::where('keywords', 'like', "%" . $term . "%")->orderby('keywords')->get('keywords');
+public function getValues($term, $field, $id, $divId, $multi){
+  $protocols = Protocol::where( $field , 'like', "%" . $term . "%")->distinct($field)->orderby($field)->get($field);
   if (! $protocols ) return;
-  $keywordsArray = [];
-    foreach($protocols as $protocol) {
-      $keywordsArray = array_merge($keywordsArray, preg_split('/\s*,\s*/', $protocol->keywords));
-    }
-      $collection = collect($keywordsArray)->unique()->sortBy('Key', SORT_NATURAL)->values()->all();
-      foreach ($collection as $keyword){
-        if (mb_stristr($this->removeAccents($keyword), $this->removeAccents($term))) {
-        $output .= '<li><a href="#" onclick="javascript:appendKeyword(\''.$keyword.'\')">'.$keyword.'</a></li>
-        ';
-      }
+
+    if($multi){
+      $valuesArray = [];
+        foreach($protocols as $protocol) {
+          $valuesArray = array_merge($valuesArray, preg_split('/\s*,\s*/', $protocol->$field));
+        }
+          $collection = collect($valuesArray)->unique()->sortBy('Key')->values()->all();
+          foreach ($collection as $value){
+            if (mb_stristr($this->removeAccents($value), $this->removeAccents($term))) {
+            $output .= '<li><a href="#" onclick="javascript:appendValue(\''.$id.'\',\''.$value.'\',\''.$divId.'\',\''.$multi.'\')">'.e($value).'</a></li>
+            ';
+          }
+        }
+    }else{
+        foreach($protocols as $protocol) {
+            $value = $protocol->$field;
+            $output .= '<li><a href="#" onclick="javascript:appendValue(\''.$id.'\',\''.$value.'\',\''.$divId.'\',\''.$multi.'\')">'.e($value).'</a></li>
+            ';
+        }    
     }
   echo $output;
 }
