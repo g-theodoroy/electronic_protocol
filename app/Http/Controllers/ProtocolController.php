@@ -532,6 +532,9 @@ class ProtocolController extends Controller
           $file = request()->file("att$i");
 
           $filename = $file->getClientOriginalName();
+          // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
+          $filename = $this->filter_filename($filename, false);
+
           $mimeType = $file->getMimeType();
 
           $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
@@ -701,6 +704,9 @@ public function update(Protocol $protocol){
             $file = request()->file("att$i");
 
             $filename = $file->getClientOriginalName();
+            // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
+            $filename = $this->filter_filename($filename, false);
+
             $mimeType = $file->getMimeType();
 
             $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
@@ -1246,7 +1252,7 @@ public function storeFromEmail(){
     $in_arxi_ekdosis .= $oMessage->getFrom()[0]->mail;
   if($oMessage->getFrom()[0]->personal){
     $in_arxi_ekdosis .= ">";
-  }    
+  }
   $in_paraliptis = Auth::user()->name;
   $in_perilipsi = substr($oMessage->getTextBody(), 0, 250);
   $paratiriseis = 'παρελήφθη με email';
@@ -1319,7 +1325,7 @@ $protocol = Protocol::where("etos",$etos)->where('protocolnum', $newprotocolnum)
 
 // αποθηκεύω το email σαν συνημμένο html
 $html = view('viewEmail', compact('oMessage'))->render();
-$filename = 'email_' . Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Y-m-d_H:i:s') . '.html';
+$filename = 'email_' . Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Ymd_His') . '.html';
 $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
 $dir = '/arxeio/emails/';
 $savedPath = $dir . $filenameToStore;
@@ -1345,11 +1351,19 @@ Attachment::create([
 // αποθηκεύω τα συνημμένα
 $aAttachment = $oMessage->getAttachments();
 $numCreatedAttachments = 0;
+$numMissedAttachments = 0;
 foreach($attachmentKeys as $attachmentKey){
       $oAttachment = $aAttachment->get($attachmentKey);
+      if(!$oAttachment) {
+        $numMissedAttachments++;
+        continue;
+      }
       $content = $oAttachment->getContent();
       $mimeType = $oAttachment->getMimeType();
       $filename = $oAttachment->getName();
+
+      // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
+      $filename = $this->filter_filename($filename, false);
 
       $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
 
@@ -1378,7 +1392,7 @@ return redirect("home/$protocol_id");
 }
 
 if($numCreatedAttachments) $message .= "<br>Εισήχθηκαν $numCreatedAttachments συνημμένα αρχεία.";
-
+if($numMissedAttachments) $message .= "<br><br>Παραλείφθηκαν $numMissedAttachments συνημμένα αρχεία.<br> Δοκιμαστε να τα εισάγετε στο Ηλ. Πρωτόκολλο χειροκίνητα αφού πρώτα τα αποθηκεύσετε στο δίσκο σας";
 
 if($sendReceipt){
   if($protocol->protocoldate) $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
@@ -1401,10 +1415,12 @@ if(! count(Mail::failures()))$message .= "<br>Στάλθηκε με email απο
 // μεταφέρωτο μύνημα στα πρωτοκολλημένα
  $oMessage->moveToFolder('INBOX.inProtocol');
 
+ $alertType ='success';
+ if($numMissedAttachments)$alertType ='warning';
 
  $notification = array(
  'message' => $message,
- 'alert-type' => 'success'
+ 'alert-type' => $alertType
  );
  session()->flash('notification',$notification);
 
@@ -1432,7 +1448,7 @@ public function getValues($term, $field, $id, $divId, $multi){
             $value = $protocol->$field;
             $output .= '<li><a href="#" onclick="javascript:appendValue(\''.$id.'\',\''.$value.'\',\''.$divId.'\',\''.$multi.'\')">'.e($value).'</a></li>
             ';
-        }    
+        }
     }
   echo $output;
 }
@@ -1449,4 +1465,49 @@ public function removeAccents($str) {
   $b = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι', 'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η');
   return str_replace($a, $b, $str);
 }
+
+public function filter_filename($filename, $beautify=true) {
+    // sanitize filename
+    $filename = preg_replace(
+        '~
+        [<>:"/\\|?*]|            # file system reserved https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
+        [\x00-\x1F]|             # control characters http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx
+        [\x7F\xA0\xAD]|          # non-printing characters DEL, NO-BREAK SPACE, SOFT HYPHEN
+        [#\[\]@!$&\'()+,;=]|     # URI reserved https://tools.ietf.org/html/rfc3986#section-2.2
+        [{}^\~`]                 # URL unsafe characters https://www.ietf.org/rfc/rfc1738.txt
+        ~x',
+        '-', $filename);
+    // avoids ".", ".." or ".hiddenFiles"
+    $filename = ltrim($filename, '.-');
+    // optional beautification
+    if ($beautify) $filename = $this->beautify_filename($filename);
+    // maximize filename length to 255 bytes http://serverfault.com/a/9548/44086
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    $filename = mb_strcut(pathinfo($filename, PATHINFO_FILENAME), 0, 255 - ($ext ? strlen($ext) + 1 : 0), mb_detect_encoding($filename)) . ($ext ? '.' . $ext : '');
+    return $filename;
+}
+
+public function beautify_filename($filename) {
+    // reduce consecutive characters
+    $filename = preg_replace(array(
+        // "file   name.zip" becomes "file-name.zip"
+        '/ +/',
+        // "file___name.zip" becomes "file-name.zip"
+        '/_+/',
+        // "file---name.zip" becomes "file-name.zip"
+        '/-+/'
+    ), '-', $filename);
+    $filename = preg_replace(array(
+        // "file--.--.-.--name.zip" becomes "file.name.zip"
+        '/-*\.-*/',
+        // "file...name..zip" becomes "file.name.zip"
+        '/\.{2,}/'
+    ), '.', $filename);
+    // lowercase for windows/unix interoperability http://support.microsoft.com/kb/100625
+    $filename = mb_strtolower($filename, mb_detect_encoding($filename));
+    // ".file-name.-" becomes "file-name"
+    $filename = trim($filename, '.-');
+    return $filename;
+}
+
 }
