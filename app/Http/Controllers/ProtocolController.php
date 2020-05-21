@@ -537,7 +537,7 @@ class ProtocolController extends Controller
 
           $mimeType = $file->getMimeType();
 
-          $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
+          $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $filename;
           $dir = '/arxeio/' . request()->fakelos . '/';
           $savedPath = $file->storeas($dir,$filenameToStore);
         }
@@ -709,7 +709,7 @@ public function update(Protocol $protocol){
 
             $mimeType = $file->getMimeType();
 
-            $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $file->getClientOriginalName();
+            $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $filename;
             $dir = '/arxeio/' . request()->fakelos . '/';
             $savedPath = $file->storeas($dir,$filenameToStore);
           }
@@ -1475,7 +1475,7 @@ public function filter_filename($filename, $beautify=true) {
         [\x7F\xA0\xAD]|          # non-printing characters DEL, NO-BREAK SPACE, SOFT HYPHEN
         [#\[\]@!$&\'()+,;=]|     # URI reserved https://tools.ietf.org/html/rfc3986#section-2.2
         [{}^\~`]                 # URL unsafe characters https://www.ietf.org/rfc/rfc1738.txt
-        ~x',
+        ~ux',
         '-', $filename);
     // avoids ".", ".." or ".hiddenFiles"
     $filename = ltrim($filename, '.-');
