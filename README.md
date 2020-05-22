@@ -17,7 +17,7 @@
 
 #
 # Βίντεο 
-https://www.youtube.com/watch?v=Xl6qhbJWTGs&t
+https://www.youtube.com/watch?v=Xl6qhbJWTGs
 
 
 #
