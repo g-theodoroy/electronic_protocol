@@ -16,6 +16,11 @@
 - **Πρωτοκόλληση email**: Σύνδεση με λογαριασμό email. Επισκόπηση εισερχομένων μηνυμάτων και των συνημμένων αρχείων και Πρωτοκόλληση με αποθήκευση των επιλεγμένων
 
 #
+# Βίντεο 
+https://www.youtube.com/watch?v=Xl6qhbJWTGs&t=2s
+
+
+#
 # Οδηγίες Χρήσης
 
 https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
