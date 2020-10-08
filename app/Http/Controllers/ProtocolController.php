@@ -1400,7 +1400,7 @@ if($sendReceipt){
   $html = view('receiptEmail', compact('protocol', 'emaildate'))->render();
   Mail::send([], [], function ($message) use ($oMessage, $html)
 {
-    $message->from('electronic_protocol@gmail.com');
+    $message->from(config('mail.from.address'));
     if ($oMessage->getReplyTo()){
       $message->to($oMessage->getReplyTo()[0]->mail);
     }else{
