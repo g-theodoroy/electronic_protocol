@@ -125,9 +125,9 @@ function periigisi(id){
                 @endforeach
               </div>
               @endif
-              <div class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
-              <div class="panel-heading h1 text-center col-md-10 col-sm-10" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
-              <div id="emailNumDiv" class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
+              <div class="panel-heading h1 text-center col-md-1 col-sm-1 col-xs-1" {!!$titleColorStyle!!}>&nbsp;</div>
+              <div class="panel-heading h1 text-center col-md-10 col-sm-10 col-xs-10" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
+              <div id="emailNumDiv" class="panel-heading h1 text-center col-md-1 col-sm-1 col-xs-1" {!!$titleColorStyle!!}>&nbsp;</div>
 
                 <div class="panel-body">
                 <div class="panel panel-default col-md-12 col-sm-12  ">
@@ -174,7 +174,7 @@ function periigisi(id){
                         </div>
                         <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                             <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 / ></a>
-                            <a href="javascript:$('#keep').removeAttr('disabled');document.forms['myProtocolForm'].submit();" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:$('#keep').removeAttr('disabled');sendEmailTo();document.forms['myProtocolForm'].submit();" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
                         </div>
                     </div>
 
@@ -271,12 +271,13 @@ function periigisi(id){
                             <strong>Διεκπεραίωση</strong>
                         </div>
                         <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                          <select id="diekperaiosi" class="form-control small selectpicker" name="diekperaiosi" title='Διεκπεραίωση' @if($forbidenChangeDiekperaiosiSelect) data-value="{{$protocol->diekperaiosi}}" onchange="this.value = this.getAttribute('data-value');" @endif>
+                          <select id="diekperaiosi" class="form-control small selectpicker" name="diekperaiosi" title='Διεκπεραίωση' data-value="{{$protocol->diekperaiosi}}" @if($forbidenChangeDiekperaiosiSelect) onchange="this.value = this.getAttribute('data-value');" @endif>
                           <option value=''></option>
                           @foreach($writers_admins as $writer_admin)
                                   <option value='{{$writer_admin->id}}' @if($writer_admin->id == $protocol->diekperaiosi) selected @endif>{{$writer_admin->name}}</option>
                               @endforeach
                             </select>
+                            <input id="sendEmailTo" name="sendEmailTo" type="hidden" />
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Διεκπεραίωσης</strong>
@@ -571,7 +572,23 @@ function appendValue(id, value, divId, multi){
   $('#' + divId).empty()
   $('#' + divId).hide()
 }
+/*
+function chkSendEmailTo(id){
+  alert(id)
+  sendEmailToDiekperaioti = null
+  if(id) sendEmailToDiekperaioti = id
+}
+*/
 
+function sendEmailTo(){
+  var oldId = $('#diekperaiosi').attr('data-value')
+  var newId = $('#diekperaiosi').val()
+  var userId = {{Auth::user()->id}}
+  if( ! newId  )return
+  if (newId == userId) return
+  if (newId == oldId) return
+  $('#sendEmailTo').val(newId)
+}
 </script>
 
 @endsection

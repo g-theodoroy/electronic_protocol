@@ -18,7 +18,7 @@
 
                 <div class="panel-body ">
                     <!-- ________________________________form______________________________________________________ -->
-                    <form id='configform' name="configform" class="form-horizontal" role="form" method="POST" action="{{ url('/config') }}" >
+                    <form id='configform' name="configform" class="form-horizontal" role="form" method="POST" action="{{ url('/settings') }}" >
                         {{ csrf_field() }}
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-info">
@@ -334,10 +334,19 @@
                                       </div>
                                       <div class="col-md-2 col-sm-2  " id="defaultImapEmaildiv">
                                           <select id='defaultImapEmail' name='defaultImapEmail' class="form-control text-center"  title='Οι λογαριασμοί ρυθμίζονται στο config/imap.php'>
+                                            <option value="" @if (!App\Config::getConfigValueOf('defaultImapEmail')) selected @endif >---</option>
                                             @foreach(array_keys(config('imap.accounts')) as $key)
-                                            <option value="{{$key}}" @if (App\Config::getConfigValueOf('defaultImapEmail') == $key) selected @endif >{{$key}}</option>
+                                            <option value="{{$key}}" @if (App\Config::getConfigValueOf('defaultImapEmail') && App\Config::getConfigValueOf('defaultImapEmail') == $key) selected @endif >{{$key}}</option>
                                             @endforeach
                                           </select>
+                                      </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                          Κατέβασε email μόνο για τις τελευταίες ημέρες
+                                      </div>
+                                      <div class="col-md-2 col-sm-2  " id="daysToCheckEmailBackdiv">
+                                          <input id="daysToCheckEmailBack" type="text" class="form-control text-center" name="daysToCheckEmailBack" placeholder="daysToCheckEmailBack" value="{{App\Config::getConfigValueOf('daysToCheckEmailBack')}}" title=''>
                                       </div>
                                   </div>
                                   <div class="row">
@@ -346,6 +355,25 @@
                                       </div>
                                       <div class="col-md-2 col-sm-2  " id="emailNumFetchdiv">
                                           <input id="emailNumFetch" type="text" class="form-control text-center" name="emailNumFetch" placeholder="emailNumFetch" value="{{App\Config::getConfigValueOf('emailNumFetch')}}" title=''>
+                                      </div>
+                                  </div>
+                                  <div class="row bg-success">
+                                      <div class="form-control-static h4 text-center">Ρυθμίσεις εξερχομένων email</div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
+                                          Στείλε email όταν Ανατίθεται Πρωτ. στον Διεκπεραιωτή
+                                      </div>
+                                      <div class="col-md-2 col-sm-2  " id="sendEmailOnDiekperaiosiChangediv">
+                                          <select id='sendEmailOnDiekperaiosiChange' name='sendEmailOnDiekperaiosiChange' class="form-control"  title=''>
+                                          @if (App\Config::getConfigValueOf('sendEmailOnDiekperaiosiChange'))
+                                          <option value="0"  >ΟΧΙ</option>
+                                          <option value="1" selected >ΝΑΙ</option>
+                                          @else
+                                          <option value="0" selected >ΟΧΙ</option>
+                                          <option value="1"  >ΝΑΙ</option>
+                                          @endif
+                                          </select>
                                       </div>
                                   </div>
                               </div>

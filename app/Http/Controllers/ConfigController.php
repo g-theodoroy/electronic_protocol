@@ -72,7 +72,7 @@ class ConfigController extends Controller
         );
         session()->flash('notification',$notification);
 
-        return redirect("/config");
+        return redirect("/settings");
     }
 
 

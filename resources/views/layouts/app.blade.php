@@ -132,8 +132,10 @@
                                         <ul class="dropdown-menu">
                                           <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
                                           @if( Auth::user()->role_description() != "Αναγνώστης")
+                                          @if(isset($defaultImapEmail))
                                           <li class="divider"></li>
                                           <li><a  tabindex="-1" href="{{ url('/viewEmails') }}">Εισερχόμενα Email</a></li>
+                                          @endif
                                           @endif
                                             <li class="divider"></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
@@ -188,7 +190,7 @@
                                             <li><a  tabindex="-1" href="{{ url('/users') }}">Χρήστες</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/backups') }}">Backup</a></li>
                                             <li><a  tabindex="-1" href="{{ url('/arxeio') }}">Εκκαθάριση</a></li>
-                                            <li><a  tabindex="-1" href="{{ url('/config') }}">Ρυθμίσεις</a></li>
+                                            <li><a  tabindex="-1" href="{{ url('/settings') }}">Ρυθμίσεις</a></li>
                                             @if(isset($needsUpdate) and $needsUpdate)
                                             <li class="divider"></li>
                                             <li><a  tabindex="-1" href="{{ url('/updated') }}" title="Να μην εμφανίζεται το μήνυμα για ενημέρωση του Ηλ.Πρωτοκόλλου.">Ενημερώθηκε</a></li>

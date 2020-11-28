@@ -88,8 +88,8 @@ Route::get('/viewEmailAttachment/{messageUid}/{attachmentKey}','ProtocolControll
 Route::get('/setEmailRead/{messageUid}','ProtocolController@setEmailRead');
 Route::post('/storeFromEmail','ProtocolController@storeFromEmail');
 
-Route::get('/config','ConfigController@index');
-Route::post('/config','ConfigController@store');
+Route::get('/settings','ConfigController@index');
+Route::post('/settings','ConfigController@store');
 
 Route::get('/backups','ConfigController@backups');
 Route::get('/backup','ConfigController@backup');
