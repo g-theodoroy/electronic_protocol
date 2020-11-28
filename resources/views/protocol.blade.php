@@ -572,13 +572,6 @@ function appendValue(id, value, divId, multi){
   $('#' + divId).empty()
   $('#' + divId).hide()
 }
-/*
-function chkSendEmailTo(id){
-  alert(id)
-  sendEmailToDiekperaioti = null
-  if(id) sendEmailToDiekperaioti = id
-}
-*/
 
 function sendEmailTo(){
   var oldId = $('#diekperaiosi').attr('data-value')
