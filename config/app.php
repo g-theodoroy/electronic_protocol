@@ -162,7 +162,6 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Rainwater\Active\ActiveServiceProvider::class,
         Webklex\IMAP\Providers\LaravelServiceProvider::class,
 
