@@ -14,11 +14,11 @@
                 @endforeach
               </div>
               @endif
-              <div class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
-              <div class="panel-heading h1 text-center col-md-10 col-sm-10" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
-              <div id="emailNumDiv" class="panel-heading h1 text-center col-md-1 col-sm-1" {!!$titleColorStyle!!}>&nbsp;</div>
+              <div class="panel-heading h1 text-center col-md-1 col-sm-1 col-xs-1" {!!$titleColorStyle!!}>&nbsp;</div>
+              <div class="panel-heading h1 text-center col-md-10 col-sm-10 col-xs-10" {!!$titleColorStyle!!}>{{$protocoltitle}}</div>
+              <div id="emailNumDiv" class="panel-heading h1 text-center col-md-1 col-sm-1 col-xs-1" {!!$titleColorStyle!!}>&nbsp;</div>
                 <div class="panel-body">
-                <div class="panel panel-default col-md-12 col-sm-12  ">
+                <div class="panel panel-default col-md-12 col-sm-12 col-xs-12  ">
                     <div class='row'>
                         <div class="col-md-3 col-sm-3 form-control-static">
                           <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
