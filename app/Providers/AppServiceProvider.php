@@ -77,7 +77,8 @@ class AppServiceProvider extends ServiceProvider
                 $defaultImapEmail = null;
             }
             View::share('defaultImapEmail', $defaultImapEmail);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            report($e);
             // καμία ενέργεια απλά πιάνει το λάθος
         // γιατί χτύπαγε στη δημιουργία των πινάκων με php artisan:migrate
         }

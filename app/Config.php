@@ -13,13 +13,13 @@ class Config extends Model
         return $c->value;
     }
 
-    public function setConfigValueOf($key, $value) {
+    public static function setConfigValueOf($key, $value) {
         $c = Config::firstOrCreate(['key' => $key]);
     	$c->update(['value' => $value]);
     	return ;
     }
 
-    public function getConfigValues() {
+    public static function getConfigValues() {
         $confs =  Config::all();
         $configs = [];
         foreach($confs as $conf){

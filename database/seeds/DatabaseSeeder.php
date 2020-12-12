@@ -221,14 +221,21 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('configs')->insert([
-           'key' => 'sendEmailOnDiekperaiosiChange',
-           'value' => 0,
+            'key' => 'sendEmailOnDiekperaiosiChange',
+            'value' => 0,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
+            'key' => 'alwaysShowFakelosInViewEmails',
+            'value' => 0,
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
 
-
+        
         //$this->call(KeepvaluesTableSeeder::class);
 
     }

@@ -24,24 +24,6 @@ function chkdelete(id, name){
 
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή Φακέλου ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
-
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "0",
-      "hideDuration": "0",
-      "timeOut": "0",
-      "extendedTimeOut": "0",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
     var $toast = toastr.warning(html,msg);
     $toast.delegate('#confirmationRevertYes', 'click', function () {
             $(location).attr('href', "{{ URL::to('/') }}" + "/keep/del/" + id)

@@ -20,24 +20,6 @@ function chkdelete(id, name){
 
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή συννημένου ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
-
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "0",
-      "hideDuration": "0",
-      "timeOut": "0",
-      "extendedTimeOut": "0",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
     var $toast = toastr.warning(html,msg);
     $toast.delegate('#confirmationRevertYes', 'click', function () {
             $('#show_arxeia').load("{{ URL::to('/') }}" + "/attach/del/" + id);
@@ -52,24 +34,6 @@ function chkprotocoldelete(id, etos, num){
 
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή πρωτοκόλλου με αριθμό ' + num + ' για το έτος ' + etos + '. Είστε σίγουροι;<br>&nbsp;</center>'
-
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "0",
-      "hideDuration": "0",
-      "timeOut": "0",
-      "extendedTimeOut": "0",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
     var $toast = toastr.warning(html,msg);
     $toast.delegate('#confirmationRevertYes', 'click', function () {
             $(location).attr('href', "{{ URL::to('/') }}" + "/delprotocol/" + id);
@@ -174,7 +138,7 @@ function periigisi(id){
                         </div>
                         <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                             <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 / ></a>
-                            <a href="javascript:$('#keep').removeAttr('disabled');sendEmailTo();document.forms['myProtocolForm'].submit();" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:$('#keep').removeAttr('disabled');sendEmailTo(){{ $protocol->id ? ';document.forms[\'myProtocolForm\'].submit();' : ';var chk = receiptToEmail();if(chk) document.forms[\'myProtocolForm\'].submit();' }}" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
                         </div>
                     </div>
 
@@ -204,7 +168,8 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 text-center">
                             @if($protocol->id)
                             <a href="javascript:chkprotocoldelete('{{ $protocol->id }}','{{$protocol->etos}}','{{$protocol->protocolnum}}')" class="{{$delVisible}}" role="button" title="Διαγραφή Πρωτοκόλλου" tabindex=-1 > <img src="{{ URL::to('/') }}/images/delete.ico" height="20" /></a>
-                            <a href="{{ URL::to('/')}}/receipt/{{$protocol->id}}" class="{{$submitVisible}}" role="button" title="Απόδειξη παραλαβής" target="_blank" tabindex=-1 > <img src="{{ URL::to('/') }}/images/receipt.png" height="20" /></a>
+                            <a href="javascript:receiptToEmail()" class="{{$submitVisible}}" role="button" title="Απόδειξη παραλαβής με email" tabindex=-1 > <img src="{{ URL::to('/') }}/images/receipt-email.png" height="20" /></a>
+                            <a href="{{ URL::to('/')}}/receipt/{{$protocol->id}}" class="{{$submitVisible}}" role="button" title="Απόδειξη παραλαβής εκτύπωση" target="_blank" tabindex=-1 > <img src="{{ URL::to('/') }}/images/receipt.png" height="20" /></a>
                             @endif
                             <a href="javascript:document.forms['myProtocolForm'].reset();" class="active" role="button" title="Καθάρισμα φόρμας" tabindex=-1 > <img src="{{ URL::to('/') }}/images/clear.ico" height="20" /></a>
                         </div>
@@ -327,18 +292,35 @@ function periigisi(id){
 
 
                     <div class="row ">
-                        <div class="col-md-1 col-sm-1 small text-center ">
-                            <strong>Λέξεις<br>κλειδιά</strong>
-                        </div>
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('keywords') ? ' has-error' : '' }}">
-                            <textarea id="keywords" oninput="getValues(this.id, 'keywords', 'keywordsList', 1)" type="text" class="form-control" name="keywords"  placeholder="keywords" >{{ old('keywords') ? old('keywords') : $protocol->keywords }}</textarea>
-                            <div id="keywordsList" class="col-md-12 col-sm-12" ></div>
+                        <div class="col-md-6 col-sm-6 ">
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2 small text-center form-control-static">
+                                    <strong>Παρατηρήσεις</strong>
+                                </div>
+                                <div class="col-md-10 col-sm-10 {{ $errors->has('paratiriseis') ? ' has-error' : '' }}">
+                                    <textarea id="paratiriseis" type="text" class="form-control" name="paratiriseis"  placeholder="paratiriseis" title='Παρατηρήσεις' >{{ old('paratiriseis') ? old('paratiriseis') : $protocol->paratiriseis }}</textarea>
+                                </div>
                             </div>
-                        <div class="col-md-1 col-sm-1 small text-center form-control-static">
-                            <strong>Παρατηρήσεις</strong>
                         </div>
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('paratiriseis') ? ' has-error' : '' }}">
-                            <textarea id="paratiriseis" type="text" class="form-control" name="paratiriseis"  placeholder="paratiriseis" title='Παρατηρήσεις' >{{ old('paratiriseis') ? old('paratiriseis') : $protocol->paratiriseis }}</textarea>
+                        <div class="col-md-6 col-sm-6 ">
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2 small text-center ">
+                                    <strong>Λέξεις<br>κλειδιά</strong>
+                                </div>
+                                <div class="col-md-10 col-sm-10 {{ $errors->has('keywords') ? ' has-error' : '' }}">
+                                    <input id="keywords" oninput="getValues(this.id, 'keywords', 'keywordsList', 1)" type="text" class="form-control" name="keywords"  placeholder="keywords" value="{{ old('keywords') ? old('keywords') : $protocol->keywords }}" title='Παρατηρήσεις'>
+                                    <div id="keywordsList" class="col-md-12 col-sm-12" ></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2 small text-center " title="Email για αποστολή Απόδειξης παραλαβής">
+                                    <strong>Απ.Παραλ.<br>στο email</strong>
+                                </div>
+                                <div class="col-md-10 col-sm-10 {{ $errors->has('reply_to_email') ? ' has-error' : '' }}">
+                                    <input id="reply_to_email"  type="text" class="form-control" name="reply_to_email"  placeholder="reply_to_email" value="{{ old('reply_to_email') ? old('reply_to_email') : '' }}" title='Συμπληρώστε το email στο οποίο θέλετε να στείλετε Απόδειξη παραλαβής' >
+                                    <div id="reply_toList" class="col-md-12 col-sm-12" ></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -438,24 +420,8 @@ function periigisi(id){
     </div>
 </div>
 <script>
+
 function getFileInputs() {
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
     if (! $("#fakelos").val()){
         toastr.info("<center><h4>Ενημέρωση...</h4><hr>Για να προσθέσετε συνημμένα αρχεία είναι απαραίτητο να επιλέξετε Φάκελο<br>&nbsp;</center>")
         return false;
@@ -572,13 +538,6 @@ function appendValue(id, value, divId, multi){
   $('#' + divId).empty()
   $('#' + divId).hide()
 }
-/*
-function chkSendEmailTo(id){
-  alert(id)
-  sendEmailToDiekperaioti = null
-  if(id) sendEmailToDiekperaioti = id
-}
-*/
 
 function sendEmailTo(){
   var oldId = $('#diekperaiosi').attr('data-value')
@@ -589,6 +548,55 @@ function sendEmailTo(){
   if (newId == oldId) return
   $('#sendEmailTo').val(newId)
 }
+
+function receiptToEmail(){
+    var isNewProtocol = {{ $protocol->id ? 'false' : 'true' }}
+    var email = $('#reply_to_email').val();
+    if (isNewProtocol){
+        if(email && ! ValidateEmail(email)){
+            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Το email αποστολής<br>Απόδειξης παραλαβής<br><br><strong>''" + email + "''</strong><br><br>δεν έχει έγκυρη μορφή.<br>Παρακαλώ διορθώστε. <br>&nbsp;</center>")
+            $('#reply_to_email').select()
+            return false
+        }
+        return true
+    }else{
+        if( ! email ){
+            toastr.info("<center><h4>Ενημέρωση...</h4></center><hr>Για να στείλετε ''Απόδειξη παραλαβής με email'' πρέπει να συμπληρώσετε... το email.<br>&nbsp;</center>")
+            $('#reply_to_email').select()
+        }else if(email && ! ValidateEmail(email)){
+            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Το email αποστολής<br>Απόδειξης παραλαβής<br><br><strong>''" + email + "''</strong><br><br>δεν έχει σωστή μορφή.<br>Παρακαλώ διορθώστε. <br>&nbsp;</center>")
+            $('#reply_to_email').select()
+        }else{
+            $.ajax({
+                type: "POST",
+                url: '{{ route('receiptToEmail') }}',
+                dataType: 'JSON',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    'id': {{ $protocol->id | null }},
+                    'email': email
+                },
+                success: function(response) {
+                    toastr.success("<center><h4>Ωραία !!!</h4><hr></center>Επιτυχής αποστολή βεβαίωσης καταχώρισης με Email.<br>&nbsp;</center>")
+                    $('#paratiriseis').val(response)
+                },
+                error: function (data) {
+                    toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Δεν κατέστη δυνατή η αποστολή βεβαίωσης παραλαβής με Email<br>&nbsp;</center>")
+                }
+            });
+
+        }
+    }
+}
+
+function ValidateEmail(mail){
+ if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail))
+  {
+    return (true)
+  }
+    return (false)
+}
+
 </script>
 
 @endsection

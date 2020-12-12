@@ -17,6 +17,7 @@
         <link href="{{ asset('css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap-select.min.css') }}" rel="stylesheet">
+        <link rel="icon" href="{{ URL::asset('favicon.ico') }}" type="image/x-icon" />
         <style>
 
 
@@ -247,22 +248,17 @@
            format: 'dd/mm/yyyy'
 
          });
-
-       </script>
-
-        <script>
-
             toastr.options = {
               "closeButton": true,
               "debug": false,
               "newestOnTop": false,
-              "progressBar": false,
+              "progressBar": true,
               "positionClass": "toast-top-center",
-              "preventDuplicates": false,
+              "preventDuplicates": true,
               "onclick": null,
               "showDuration": "300",
-              "hideDuration": "1000",
-              "timeOut": "5000",
+              "hideDuration": "700",
+              "timeOut": "4000",
               "extendedTimeOut": "1000",
               "showEasing": "swing",
               "hideEasing": "linear",
@@ -295,24 +291,6 @@
             @if($errors->has('in_num'))
             var html = "<center><button type='button' id='confirmRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
             var msg = '{!! $errors->first() !!}'
-
-            toastr.options = {
-              "closeButton": true,
-              "debug": false,
-              "newestOnTop": false,
-              "progressBar": false,
-              "positionClass": "toast-top-center",
-              "preventDuplicates": false,
-              "onclick": null,
-              "showDuration": "0",
-              "hideDuration": "0",
-              "timeOut": "0",
-              "extendedTimeOut": "0",
-              "showEasing": "swing",
-              "hideEasing": "linear",
-              "showMethod": "fadeIn",
-              "hideMethod": "fadeOut"
-            }
             var $toast = toastr.info(html,msg);
             $toast.delegate('#confirmRevertYes', 'click', function () {
                     $('#in_chk').attr('value', '0')

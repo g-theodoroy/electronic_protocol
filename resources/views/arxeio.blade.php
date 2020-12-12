@@ -71,24 +71,6 @@ function chkdelete(num){
  
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr></center>Διαγραφή ' + num + ' αρχείων λόγω λήξης του ορίου διατήρησης.<br><br>Είστε σίγουροι;<br>&nbsp;'
-    
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "0",
-      "hideDuration": "0",
-      "timeOut": "0",
-      "extendedTimeOut": "0",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
     var $toast = toastr.error(html,msg);
     $toast.delegate('#confirmationRevertYes', 'click', function () {
             $(location).attr('href', "{{ URL::to('/delExpired') }}")
@@ -102,24 +84,6 @@ function chkdeldelete(){
  
     var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>"
     var msg = '<center><h4>Διαγραφή ?</h4><hr></center>Άδειασμα Καδου Ανακύκλωσης<br><br>ΠΡΟΣΟΧΗ!!!<br>Η λειτουργία δεν είναι αναστρέψιμη.<br><br>Είστε σίγουροι;<br>&nbsp;'
-    
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "0",
-      "hideDuration": "0",
-      "timeOut": "0",
-      "extendedTimeOut": "0",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
     var $toast = toastr.error(html,msg);
     $toast.delegate('#confirmationRevertYes', 'click', function () {
             $(location).attr('href', "{{ URL::to('/delDeleted') }}")

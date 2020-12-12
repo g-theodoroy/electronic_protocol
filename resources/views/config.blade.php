@@ -357,6 +357,38 @@
                                           <input id="emailNumFetch" type="text" class="form-control text-center" name="emailNumFetch" placeholder="emailNumFetch" value="{{App\Config::getConfigValueOf('emailNumFetch')}}" title=''>
                                       </div>
                                   </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
+                                          Το πεδίο Φάκελος απαιτείται για την πρωτοκόλληση email
+                                      </div>
+                                      <div class="col-md-2 col-sm-2  " id="alwaysShowFakelosInViewEmailsdiv">
+                                          <select id='alwaysShowFakelosInViewEmails' name='alwaysShowFakelosInViewEmails' class="form-control"  title=''>
+                                          @if (App\Config::getConfigValueOf('alwaysShowFakelosInViewEmails'))
+                                          <option value="0"  >ΟΧΙ</option>
+                                          <option value="1" selected >ΝΑΙ</option>
+                                          @else
+                                          <option value="0" selected >ΟΧΙ</option>
+                                          <option value="1"  >ΝΑΙ</option>
+                                          @endif
+                                          </select>
+                                      </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
+                                          Αποστολή απόδειξης σε κάθε καταχώριση Ηλ. Πρωτοκόλλου από email
+                                      </div>
+                                      <div class="col-md-2 col-sm-2  " id="alwaysSendReceitForEmailsdiv">
+                                          <select id='alwaysSendReceitForEmails' name='alwaysSendReceitForEmails' class="form-control"  title=''>
+                                          @if (App\Config::getConfigValueOf('alwaysSendReceitForEmails'))
+                                          <option value="0"  >ΟΧΙ</option>
+                                          <option value="1" selected >ΝΑΙ</option>
+                                          @else
+                                          <option value="0" selected >ΟΧΙ</option>
+                                          <option value="1"  >ΝΑΙ</option>
+                                          @endif
+                                          </select>
+                                      </div>
+                                  </div>
                                   <div class="row bg-success">
                                       <div class="form-control-static h4 text-center">Ρυθμίσεις εξερχομένων email</div>
                                   </div>
