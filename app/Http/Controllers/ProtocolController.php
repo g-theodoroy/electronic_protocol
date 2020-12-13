@@ -447,7 +447,7 @@ class ProtocolController extends Controller
     {
         // παίρνω τα δεδομένα της φορμας
         $data = request()->all();
-        // το id του Διεκεπεραιωτή (άν έχει σταλεί) για αποστολή email 
+        // το id του Διεκπεραιωτή (άν έχει σταλεί) για αποστολή email 
         $sendEmailTo = request('sendEmailTo');
         // το email (αν υπάρχει) στο οποίο θα σταλεί απόδειξη παραλαβής
         $reply_to_email = request('reply_to_email');
@@ -675,7 +675,7 @@ class ProtocolController extends Controller
             $message .= $this->sendMailToDiekperaioti($sendEmailTo, $protocol);
         }
 
-        // αν έχει συμπληρωθεί email για αποστολή απόδειξηε παραλαβής
+        // αν έχει συμπληρωθεί email για αποστολή απόδειξης παραλαβής
         if ($reply_to_email) {
             // φτιάχνω τα δεδομένα
             $emaildate = Carbon::now()->format('d/m/Y H:m:s');
@@ -694,6 +694,7 @@ class ProtocolController extends Controller
                 // προσθέτω στις παρατηρήσεις ότι στάλθηκε απόδειξη παραλαβής με email
                 $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
                 $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
+                $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
                 $protocol->paratiriseis = $parMessage;
                 $protocol->update();
                 $message .= "<br><br>" . $parMessage;
@@ -857,7 +858,7 @@ class ProtocolController extends Controller
             );
             session()->flash('notification', $notification);
             // γυρνάω στην επεξεργασία Πρωτοκόλλου
-            return redirect("home/$protocol_id");
+            return redirect("home/$id");
         }
 
         // αποθηκεύω τασ υνημμένα αρχεία
@@ -912,7 +913,7 @@ class ProtocolController extends Controller
                     );
                     session()->flash('notification', $notification);
                     // γυρνάω πίσω
-                    return redirect("home/$protocol_id");
+                    return redirect("home/$id");
                 }
             }
         }
@@ -927,7 +928,7 @@ class ProtocolController extends Controller
         );
         session()->flash('notification', $notification);
         // γυρνάω στο Πρωτόκολλο
-        return redirect("home/$protocol_id");
+        return redirect("home/$id");
     }
 
     public function sendMailToDiekperaioti($sendEmailTo, $protocol)
@@ -960,7 +961,8 @@ class ProtocolController extends Controller
             // προσθέτω στις παρατηρήσεις ότι στάλθηκε email στον διεκπεραιωτή
             $emaildate = Carbon::now()->format('d/m/Y H:m:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
-            $parMessage .= "$emaildate email διεκεπεραίωσης σε $diekperaiotis";
+            $parMessage .= "$emaildate email διεκπεραίωσης σε $diekperaiotis";
+            $parMessage = mb_strlen($parMessage)> 250 ? mb_substr($parMessage, 0 , 250) . ' ...' : $parMessage ;
             $protocol->paratiriseis = $parMessage;
             $protocol->update();
             // ενημερώνω το χρήστη
@@ -1319,11 +1321,12 @@ class ProtocolController extends Controller
             $message->setBody($html, 'text/html');
         });
         if (!count(Mail::failures())) {
-            $message = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
-            $message .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
-            $protocol->paratiriseis = $message;
+            $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
+            $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
+            $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+            $protocol->paratiriseis = $parMessage;
             $protocol->update();
-            return response()->json($message);
+            return response()->json($parMessage);
         } else {
             return response()->json(Mail::failures());
         }
@@ -1578,8 +1581,6 @@ class ProtocolController extends Controller
         // παίρνω τα δεδομένα
         $data = request()->all();
 
-        return $data;
-
         // διαγράφω το προσωρινά αποθηκευμένο email
         // στον φάκελο storage/app/public/tmp
         $uid = $data['uid'];
@@ -1593,7 +1594,7 @@ class ProtocolController extends Controller
         isset($data["fakelos$uid"]) ? $fakelos = $data["fakelos$uid"] : $fakelos = null;
         // χρόνος διατήρησης
         isset($data["keep$uid"]) ? $keep = $data["keep$uid"] : $keep = null;
-        // id διεκεπεραιωτή. Αν υπάρχει θα στείλω email για ανάθεση Πρωτοκόλλου
+        // id περαιωτή. Αν υπάρχει θα στείλω email για ανάθεση Πρωτοκόλλου
         $sendEmailTo = $data["sendEmailTo"];
         // θα στείλω απόδειξη παραλαβής; ΝΑΙ(1) - ΟΧΙ(0)
         $sendReceipt = $data["sendReceipt$uid"];
@@ -1819,9 +1820,6 @@ class ProtocolController extends Controller
         }
         // στέλνω mail απόδειξης παραλαβής στον αποστολέα
         if ($sendReceipt) {
-            if ($protocol->protocoldate) {
-                $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
-            }
             $emaildate = $oMessage->getDate();
             if (!$sendReplyTo) {
                 if ($oMessage->getReplyTo()) {
@@ -1838,6 +1836,13 @@ class ProtocolController extends Controller
                 $message->setBody($html, 'text/html');
             });
             if (!count(Mail::failures())) {
+                // προσθέτω στις παρατηρήσεις ότι στάλθηκε απόδειξη παραλαβής με email
+                $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+                $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
+                $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
+                $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+                $protocol->paratiriseis = $parMessage;
+                $protocol->update();
                 $message .= "<br><br>Στάλθηκε με email αποδεικτικό καταχώρισης.";
             }
         }

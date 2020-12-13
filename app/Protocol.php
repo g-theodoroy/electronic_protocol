@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $diekperaiosi
  * @property string $in_perilipsi
  * @property integer $out_date
- * @property string $out_sintaktis
  * @property string $out_to
  * @property string $out_cc
  * @property string $out_perilipsi

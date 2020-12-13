@@ -14,25 +14,40 @@
       <h3>Αποστολή βεβαίωσης καταχώρισης στο Ηλ. Πρωτόκολλο με Email</h3>
       <h4>{{date('d/m/Y H:i:s')}}</h4>
       <p>Σας ενημερώνουμε ότι η υποβολή σας καταχωρίστηκε στο Ηλεκτρονικό Πρωτόκολλο με τα παρακάτω στοιχεία:</p>
+        @php
+            $fields = [
+              'Φάκελος' => $protocol->fakelos,
+              'Αρ.Πρωτοκόλλου' => $protocol->protocolnum,
+              'Ημνια.Πρωτοκόλλου' => $protocol->protocoldate ? \Carbon\Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y') : '',
+              'Έτος' => $protocol->etos,
+              'Θέμα' => $protocol->thema,
+              'Αρ.Εισερχομένου' => $protocol->in_num,
+              'Ημνια.Εισερχομένου' => $protocol->in_date ? \Carbon\Carbon::createFromFormat('Ymd', $protocol->in_date)->format('d/m/Y') : '',
+              'Τόπος έκδοσης' => $protocol->in_topos_ekdosis,
+              'Αρχή έκδοσης' => $protocol->in_arxi_ekdosis,
+              'Παρελήφθη από' => $protocol->in_paraliptis,
+              'Περίληψη εισερχομένου' => $protocol->in_perilipsi,
+              'Διεκπεραίση από' => $protocol->diekperaiosi ? \App\User::find($protocol->diekperaiosi)->name : '',
+              'Ημνια διεκπεραίωσης' => $protocol->diekp_date ? \Carbon\Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y') : '',
+              'Σχετικοί αριθμόι' => $protocol->sxetiko,
+              'Απευθύνεται σε' => $protocol->out_to,
+              'Ημνια εξερχομένου' => $protocol->out_date ? \Carbon\Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y') : '',
+              'Περίληψη εξερχομένου' => $protocol->out_perilipsi,
+              //'Παρατηρήσεις' => $protocol->paratiriseis,
+              //'Λέξεις κλειδιά' => $protocol-> keywords ,
+          ];
+        @endphp
       <p>
-        <table border=1>
+        <table >
+            @foreach($fields as $key => $value)
+              @if($value)
                 <tr >
-                    <th >Αρ.Πρωτ.:</th>
-                    <td >{{$protocol->protocolnum}}</td>
+                    <td >{{$key}}:</td>
+                    <td >{{$value}}</td>
                  </tr>
-                <tr >
-                    <th >Ημ.Παραλ.:</th>
-                    <td >{{$protocoldate}}</d>
-                </tr>
-                <tr >
-                    <th>Θέμα:</th>
-                    <td >{{$protocol->thema}}</td>
-                </tr>
-                <tr >
-                    <th>Αρχή έκδοσης:</th>
-                    <td >{{$protocol->in_arxi_ekdosis}}</td>
-                </tr>
-        </table>
+              @endif
+            @endforeach
+         </table>
       </p>
 
     </body>
