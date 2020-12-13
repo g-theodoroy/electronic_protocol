@@ -1475,23 +1475,7 @@ class ProtocolController extends Controller
         // παίρνω τα μηνύματα από sinceDate και μετά
         $aMessage = $oFolder->query()->since($sinceDate)->limit($emailNumFetch)->get();
         $emailFilePaths = array();
-        // για κάθε μήνυμα
-        foreach ($aMessage as $oMessage) {
-            if ($oMessage->getHTMLBody()) {
-                // κωδικός
-                $Uid = $oMessage->getUid();
-                // περιεχόμενο HTML
-                $content = $oMessage->getHTMLBody();
-                // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
-                $dir = '/tmp/';
-                $filenameToStore = "$Uid.html";
-                $savedPath = $dir . $filenameToStore;
-                // αποθηκεύω το email στο /storage/app/public/tmp
-                Storage::disk('public')->put($savedPath, $content);
-                // κρατάω σε πίνακα το path
-                $emailFilePaths[$Uid] = $savedPath;
-            }
-        }
+        
         return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails'));
     }
 
