@@ -9,6 +9,7 @@
         <title>Ηλ. Πρωτόκολλο</title>
 
         <!-- Styles -->
+        <link rel="icon" href="{{ URL::asset('favicon.ico') }}" type="image/x-icon" />
         <style>
             html, body {
                 background-image:url('images/books.jpg');
@@ -16,7 +17,6 @@
                 background-position: center;
                 background-size:cover;
                 color: #FCF4D9;
-                font-family: 'Noto', serif;
                 font-weight: 100;
                 height: 100vh;
                 margin: 0;
@@ -59,10 +59,9 @@
                 color: #FCF4D9;
                 padding: 0 1vmax;
                 font-size: 1.5vmax;
-                font-weight: 00;
+                font-weight: 100;
                 letter-spacing: 2px;
                 text-decoration: none;
-                //text-transform: uppercase;
             }
 
             .m-b-md {

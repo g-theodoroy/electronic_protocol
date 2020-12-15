@@ -237,7 +237,7 @@
                        @endphp
                       <div class="row">
                         <div class="col-md-12 col-sm-12  ">
-                          <iframe id="ifr{{$oMessage->getUid()}}" src="about:blank" width="100%" frameBorder="0" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
+                          <iframe id="ifr{{$oMessage->getUid()}}" src="{{ asset( 'tmp/' .$emailFilePaths[$uid]) }}" width="100%" frameBorder="0" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
                         </div>
                       </div>
                       @endif
@@ -268,17 +268,8 @@
     </div>
 </div>
 
-<script src="{{ asset('js/jquery.min.js') }}"></script>
  
 <script>
-$('document').ready(function() {
-  @foreach($aMessage as $oMessage)
-  var iFrameDoc = document.getElementById('ifr{{$oMessage->uid}}').contentDocument || document.getElementById('ifr{{$oMessage->uid}}').contentWindow.document;
-  iFrameDoc.write( `{!! $oMessage->getHTMLBody() !!}`);
-  iFrameDoc.close();
-  @endforeach
-})
-
 
 function getKeep4Fakelos(uid){
     var fak = $("#fakelos" + uid).val()
