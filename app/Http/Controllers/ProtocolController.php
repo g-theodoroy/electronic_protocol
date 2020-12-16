@@ -1473,10 +1473,32 @@ class ProtocolController extends Controller
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
         // σύνδεση στον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
+        // σειρά ταξινόμησης μηνυμάτων στον imap server πριν τα κατεβάσω
+        // παίρνω τα ΠΡΩΤΑ ή ΤΕΛΕΥΤΑΙΑ μηνύματα  με βάση τις ρυθμίσεις
+        // emailFetchOrderDesc == 1 => ΤΕΛΕΥΤΑΙΑ
+        if (Config::getConfigValueOf('emailFetchOrderDesc')){
+            config(['imap.options.fetch_order' => 'desc']);
+
+        }
         // παίρνω τον αριθμό των μηνυμάτων από sinceDate και μετά
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
         // παίρνω τα μηνύματα από sinceDate και μετά
         $aMessage = $oFolder->query()->since($sinceDate)->limit($emailNumFetch)->get();
+
+        // ταξινόμηση των μηνυμάτων που πήρα ΦΘΙΝΟΥΣΑ ή ΑΥΞΟΥΣΑ
+        if (Config::getConfigValueOf('emailShowOrderDesc')) {
+        $aMessage = $aMessage->sortByDesc(function($oMessage) {
+            return Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate());
+            });
+        }else{
+            $aMessage = $aMessage->sortBy(function ($oMessage) {
+                return Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate());
+            });
+        }
+        // διαγραφή τυχόν προηγούμενα αποθηκευμένων email.html
+        $files = Storage::disk('tmp')->files();
+        Storage::disk('tmp')->delete($files);
+
         $emailFilePaths = array();
         // για κάθε μήνυμα
         foreach ($aMessage as $oMessage) {

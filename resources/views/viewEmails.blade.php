@@ -12,10 +12,10 @@
                       @if(count($aMessage))
                       @if(count($aMessage)< $aMessageNum)
                       <div class="row bg-warning">
-                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εμφανίζονται {{count($aMessage)}} από {{$aMessageNum}} εισερχόμενα emails</strong></div>
+                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}}</strong> - Εμφανίζονται τα <strong>{{count($aMessage)}} {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'τελευταία' : 'πρώτα' }}</strong> από <strong>{{$aMessageNum}}</strong> εισερχόμενα emails - ταξινόμηση <strong>{{App\Config::getConfigValueOf('emailShowOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @else
                       <div class="row bg-success">
-                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εισερχόμενα emails: {{count($aMessage)}}</strong></div>
+                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εισερχόμενα emails: {{count($aMessage)}}  - ταξινόμηση {{App\Config::getConfigValueOf('emailShowOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @endif
                       @else
                       <div class="row bg-info">
@@ -26,7 +26,8 @@
                       </div>
                    </div>
                  </div>
-                  @foreach($aMessage as $oMessage)
+                 @php $num = 1; @endphp
+                 @foreach($aMessage as $oMessage)
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                       <form name="frm{{$oMessage->getUid()}}" id="frm{{$oMessage->getUid()}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
                       {{ csrf_field() }}
@@ -34,7 +35,8 @@
                         @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
 
                       
-                      <div class="row bg-info">&nbsp;</div>
+                      <div class="row bg-info"><div class="col-md-1 col-sm-1 form-control-static strong text-center">{{$num}}</div></div>
+                      @php $num++; @endphp
                       <div class="row ">
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Φάκελος</strong>

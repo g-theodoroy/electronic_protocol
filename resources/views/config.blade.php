@@ -343,7 +343,7 @@
                                   </div>
                                   <div class="row">
                                       <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
-                                          Κατέβασε email μόνο για τις τελευταίες ημέρες
+                                          Κατέβασε email μόνο για τις τελευταίες -> <strong>{{App\Config::getConfigValueOf('daysToCheckEmailBack')}}</strong> <- ημέρες
                                       </div>
                                       <div class="col-md-2 col-sm-2  " id="daysToCheckEmailBackdiv">
                                           <input id="daysToCheckEmailBack" type="text" class="form-control text-center" name="daysToCheckEmailBack" placeholder="daysToCheckEmailBack" value="{{App\Config::getConfigValueOf('daysToCheckEmailBack')}}" title=''>
@@ -355,6 +355,38 @@
                                       </div>
                                       <div class="col-md-2 col-sm-2  " id="emailNumFetchdiv">
                                           <input id="emailNumFetch" type="text" class="form-control text-center" name="emailNumFetch" placeholder="emailNumFetch" value="{{App\Config::getConfigValueOf('emailNumFetch')}}" title=''>
+                                      </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                          Eμφάνισε τα -> <strong>{{App\Config::getConfigValueOf('emailNumFetch')}}  {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'ΤΕΛΕΥΤΑΙΑ' : 'ΠΡΩΤΑ' }}</strong> <- email
+                                      </div>
+                                      <div class="col-md-3 col-sm-3  " id="emailFetchOrderDescdiv">
+                                        <select id='emailFetchOrderDesc' name='emailFetchOrderDesc' class="form-control"  title=''>
+                                        @if (App\Config::getConfigValueOf('emailFetchOrderDesc'))
+                                        <option value="0"  >ΠΡΩΤΑ</option>
+                                        <option value="1" selected >ΤΕΛΕΥΤΑΙΑ</option>
+                                        @else
+                                        <option value="0" selected >ΠΡΩΤΑ</option>
+                                        <option value="1"  >ΤΕΛΕΥΤΑΙΑ</option>
+                                        @endif
+                                        </select>
+                                      </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
+                                          Ταξινόμισε τα -> <strong>{{App\Config::getConfigValueOf('emailNumFetch')}}  {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'ΤΕΛΕΥΤΑΙΑ' : 'ΠΡΩΤΑ' }}</strong> <- email με -> <strong>{{App\Config::getConfigValueOf('emailShowOrderDesc') ? 'ΦΘΙΝΟΥΣΑ' : 'ΑΥΞΟΥΣΑ' }}</strong> <- σειρά
+                                      </div>
+                                      <div class="col-md-3 col-sm-3  " id="emailShowOrderDescdiv">
+                                        <select id='emailShowOrderDesc' name='emailShowOrderDesc' class="form-control"  title=''>
+                                        @if (App\Config::getConfigValueOf('emailShowOrderDesc'))
+                                        <option value="0"  >ΑΥΞΟΥΣΑ</option>
+                                        <option value="1" selected >ΦΘΙΝΟΥΣΑ</option>
+                                        @else
+                                        <option value="0" selected >ΑΥΞΟΥΣΑ</option>
+                                        <option value="1"  >ΦΘΙΝΟΥΣΑ</option>
+                                        @endif
+                                        </select>
                                       </div>
                                   </div>
                                   <div class="row">
