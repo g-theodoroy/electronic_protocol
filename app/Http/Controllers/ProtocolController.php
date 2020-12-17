@@ -1704,6 +1704,7 @@ class ProtocolController extends Controller
         $in_paraliptis = isset($data["in_paraliptis"]) ? $data["in_paraliptis"] : Auth::user()->name;
         $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('#\s+#', ' ', trim($oMessage->getTextBody())), 0, 250);
         $paratiriseis = 'παρελήφθη με email';
+        $diekperaiosi = isset($data["diekperaiosi"]) ? $data["diekperaiosi"] : "";
         $etos = Carbon::now()->format('Y');
 
         // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
@@ -1746,7 +1747,7 @@ class ProtocolController extends Controller
                 'in_topos_ekdosis' =>  null,
                 'in_arxi_ekdosis' => $in_arxi_ekdosis,
                 'in_paraliptis' => $in_paraliptis,
-                'diekperaiosi' => null,
+                'diekperaiosi' => $diekperaiosi,
                 'in_perilipsi' => $in_perilipsi,
                 'out_date' => null,
                 'diekp_date' => null,
