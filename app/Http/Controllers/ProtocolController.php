@@ -1478,6 +1478,8 @@ class ProtocolController extends Controller
         $alwaysShowFakelosInViewEmails = Config::getConfigValueOf('alwaysShowFakelosInViewEmails');
         $alwaysSendReceitForEmails = Config::getConfigValueOf('alwaysSendReceitForEmails');
         $forbidenChangeDiekperaiosiSelect = Config::getConfigValueOf('forbidenChangeDiekperaiosiSelect');
+        $allowListValuesMatchingInput = Config::getConfigValueOf('allowListValuesMatchingInput');
+
 
         // φορτώνω τον πελάτη (λογαριασμό)
         $oClient = Client::account($defaultImapEmail);
@@ -1548,7 +1550,7 @@ class ProtocolController extends Controller
             }
         }
         
-        return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails'));
+        return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput'));
     }
 
     // εμφάνιση του συνημμένου αρχείου
