@@ -139,6 +139,7 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                             <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 / ></a>
                             <a href="javascript:$('#keep').removeAttr('disabled');sendEmailTo(){{ $protocol->id ? ';document.forms[\'myProtocolForm\'].submit();' : ';var chk = receiptToEmail();if(chk) document.forms[\'myProtocolForm\'].submit();' }}" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:setDiekperaiomeno()" class="{{$readerVisible}}" role="button" title="Σήμανση ως Διεκπεραιωμένο" > <img src="{{ URL::to('/') }}/images/done.png" height=25 /></a>
                         </div>
                     </div>
 
@@ -595,6 +596,32 @@ function ValidateEmail(mail){
     return (true)
   }
     return (false)
+}
+
+function setDiekperaiomeno(){
+    var diekpDate = $('#diekp_date').val()
+    if(! diekpDate){
+        toastr.info("<center><h4>Ενημέρωση...</h4><hr>Συμπληρώστε την ημερομηνία Διεκπεραίωσης<br>&nbsp;</center>")
+        $('#diekp_date').select()
+        return
+    }
+    $.ajax({
+        type: "POST",
+        url: '{{ route('setDiekpDate') }}',
+        dataType: 'JSON',
+        data: {
+            '_token': '{{ csrf_token() }}',
+            'id': {{ $protocol->id | null 
+}},
+            'diekp_date': diekpDate
+        },
+        success: function(response) {
+            location.reload()
+        },
+         error: function (data) {
+            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Δεν κατέστη δυνατή η ενημέρωση<br>&nbsp;</center>")
+        }
+    });
 }
 
 </script>

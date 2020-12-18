@@ -84,6 +84,7 @@ Route::get('/receipt/{protocol}', 'ProtocolController@receipt');
 Route::post('receiptToEmail', 'ProtocolController@receiptToEmail')->name('receiptToEmail');
 Route::get('/about','ProtocolController@about');
 Route::get('/updated','ProtocolController@updated');
+Route::post('/setDiekpDate', 'ProtocolController@setDiekpDate')->name('setDiekpDate');
 
 Route::get('/viewEmails','ProtocolController@viewEmails');
 Route::get('/getEmailNum','ProtocolController@getEmailNum');
@@ -104,8 +105,3 @@ Route::get('/expired','ConfigController@expired');
 Route::get('/delExpired','ConfigController@delExpired');
 Route::get('/delDeleted','ConfigController@delDeleted');
 
-// για να τρέξει η εντολή php artisan storage:link
-// σε server που δεν έχουμε ssh access (termrinal)
-Route::get('/createStorageLink', function () {
-	Artisan::call('storage:link');
-});

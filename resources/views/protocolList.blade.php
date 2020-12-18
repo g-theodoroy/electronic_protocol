@@ -23,7 +23,6 @@
                         <div class="col-md-3 col-sm-3 form-control-static">
                           <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Ανανέωση τώρα" > <img src="{{ URL::to('/') }}/images/refresh.png" height=30 / ></a>
                           &nbsp;<span id='timer' style='color:#BFBFBF' title='Αυτόματη ανανέωση σε'></span>
-                          <a href="{{ URL::to('/') }}/viewEmails" id="emailNum" class="active" role="button" title="" style="display:none"> <img src="{{ URL::to('/') }}/images/email-in.png" height=30 / ></a>
                         </div>
                     @if ($protocols->links())
                         <div class="col-md-6 col-sm-6 small text-center">
@@ -32,10 +31,8 @@
                     @endif
                         <div class="col-md-3 col-sm-3 form-control-static text-right">
                           <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=30 / ></a>
-                          @if( Auth::user()->role_description() != "Αναγνώστης")
                           <a href="{{ URL::to('/') }}/home/list/d" class="active" role="button" title="προς Διεκπεραίωση" > <img src="{{ URL::to('/') }}/images/todo.png" height=30 / ></a>
                           <a href="{{ URL::to('/') }}/home/list/f" class="active" role="button" title="Διεκπεραιώθηκε" > <img src="{{ URL::to('/') }}/images/done.png" height=30 / ></a>
-                          @endif
                           <a href="{{ URL::to('/') }}/home/list" class="active" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height=30 / ></a>
                         </div>
                     </div>
@@ -317,7 +314,11 @@ window.onload = function () {
       url: '{{ URL::to('/') }}/getEmailNum',
       success: function(data){
         if(data > 0){
-          $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+            @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
+            $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+            @else
+            $('#emailNumDiv').html("<a href=\"#\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+            @endif
           $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
           $('#emailNum').show();
         }

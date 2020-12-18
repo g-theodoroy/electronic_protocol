@@ -77,6 +77,9 @@ class AppServiceProvider extends ServiceProvider
                 $defaultImapEmail = null;
             }
             View::share('defaultImapEmail', $defaultImapEmail);
+
+            $allowedEmailUsers =  $config->getConfigValueOf('allowedEmailUsers');
+            View::share('allowedEmailUsers', $allowedEmailUsers);
         } catch (\Throwable $e) {
             report($e);
             // καμία ενέργεια απλά πιάνει το λάθος

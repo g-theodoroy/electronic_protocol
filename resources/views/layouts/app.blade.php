@@ -134,8 +134,10 @@
                                           <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
                                           @if( Auth::user()->role_description() != "Αναγνώστης")
                                           @if(isset($defaultImapEmail))
+                                          @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
                                           <li class="divider"></li>
                                           <li><a  tabindex="-1" href="{{ url('/viewEmails') }}">Εισερχόμενα Email</a></li>
+                                          @endif
                                           @endif
                                           @endif
                                             <li class="divider"></li>
@@ -175,11 +177,10 @@
                                                     @endforeach
                                                 </ul>
                                               </li>
-                                            @elseif (Auth::user()->role_description() == "Συγγραφέας")
+                                            @endif
                                               <li class="divider"></li>
                                               <li><a  tabindex="-1" href="{{ url('/home/list/d') }}"> προς Διεκπ/ση</a></li>
                                               <li><a  tabindex="-1" href="{{ url('/home/list/f') }}">Διεκπεραιώθηκε</a></li>
-                                            @endif
 
                                         </ul>
                                     </li>

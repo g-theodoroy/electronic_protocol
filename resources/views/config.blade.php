@@ -258,7 +258,7 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1" >
-                                Δυνατότητα Επεξεργασίας Πρωτοκόλλου από Συγγραφέα
+                                Δυνατότητα Επεξεργασίας Πρωτοκόλλου
                             </div>
                             <div class="col-md-2 col-sm-2  " id="allowWriterUpdateProtocoldiv">
                                 <select id='allowWriterUpdateProtocol' name='allowWriterUpdateProtocol' class="form-control"  title=''>
@@ -280,7 +280,7 @@
                           </div>
                           <div class="row">
                                 <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1  " >
-                                    Χρόνος σε λεπτά δυνατότητας επεξεργασίας Πρωτ. από Συγγραφέα
+                                    Χρόνος σε λεπτά δυνατότητας επεξεργασίας Πρωτοκόλλου
                                 </div>
                                 <div class="col-md-2 col-sm-2  " id="allowWriterUpdateProtocolTimeInMinutesdiv">
                                     <input id="allowWriterUpdateProtocolTimeInMinutes" type="text" class="form-control text-center" name="allowWriterUpdateProtocolTimeInMinutes" placeholder="allowWriterUpdateProtocolTimeInMinutes" value="{{App\Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes')}}" title=''>
@@ -421,6 +421,19 @@
                                           </select>
                                       </div>
                                   </div>
+
+                                    <div class="row">
+                                        <div class="form-control-static col-md-7 col-sm-7  col-md-offset-1 col-sm-offset-1" >
+                                            Χρήστες που επιτρέπεται να πρωτοκολλούν email
+                                        </div>
+                                        <div class="col-md-4 col-sm-4  " id="diavgeiaUrldiv">
+                                            <input id="allowedEmailUsers" type="text" class="form-control text-center" name="allowedEmailUsers" placeholder="usernames" value="{{App\Config::getConfigValueOf('allowedEmailUsers')}}" title='Πληκτρολογείστε τα usernames των χρηστών χωρισμένα με " " κενό'>
+                                        </div>
+                                    </div>
+
+
+
+
                                   <div class="row bg-success">
                                       <div class="form-control-static h4 text-center">Ρυθμίσεις εξερχομένων email</div>
                                   </div>

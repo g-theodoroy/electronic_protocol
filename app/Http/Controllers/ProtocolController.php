@@ -79,7 +79,8 @@ class ProtocolController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('web');
-        $this->middleware('writer:home/list', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about']]);
+        $this->middleware('writer:home/list', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about', 'setDiekpDate']]);
+        $this->middleware('email', ['only' => ['viewEmails', 'setEmailRead', 'storeFromEmail']]);
     }
 
 
@@ -176,6 +177,7 @@ class ProtocolController extends Controller
         // έλεγχος των κουμπιών που θα φαίνονται ή θα κρύβονται
         // ανάλογα με το ρόλο του χρήστη
         $submitVisible = 'active';
+        $readerVisible = 'hidden';
 
         // ΔΙΚΑΙΩΜΑΤΑ ΑΠΟΘΗΚΕΥΣΗΣ
         // ΑΠΟΚΡΥΨΗ ΤΟΥ ΚΟΥΜΠΙΟΥ ΑΠΟΘΗΚΕΥΣΗ
@@ -184,6 +186,18 @@ class ProtocolController extends Controller
             $submitVisible = 'hidden';
             $class = 'bg-warning';
             $protocoltitle = 'Πρωτόκολλο';
+            if ($protocol->diekperaiosi && $protocol->diekperaiosi == Auth::user()->id){
+                $readerVisible = 'active';
+                if ($allowWriterUpdateProtocolTimeInMinutes && $protocol->user_id == Auth::user()->id) {
+                    if ($protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) {
+                        $readerVisible = 'hidden';
+                    }
+                }
+                if ($readerVisible == 'active' && $protocol->diekp_date) {
+                    $time2update = $allowWriterUpdateProtocolTimeInMinutes * 60 - (Carbon::now()->getTimestamp() - $protocol->updated_at->getTimestamp());
+                }
+            }
+
         }
         // 2 αν ο χρήστης είναι Συγγραφέας ή Αναθέτων
         if (in_array(Auth::user()->role_description(), ["Συγγραφέας",  "Αναθέτων"])) {
@@ -278,7 +292,7 @@ class ProtocolController extends Controller
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible', 'delVisible', 'readonly', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo', 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible', 'delVisible', 'readonly', 'readerVisible', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo', 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput'));
     }
 
     public function chkForUpdates()
@@ -1332,6 +1346,29 @@ class ProtocolController extends Controller
         }
     }
 
+    public function setDiekpDate(Request $request)
+    {
+        $diekp_date = Carbon::createFromFormat('d/m/Y', $request->diekp_date)->format('Ymd');
+        $now = Carbon::now()->format('d/m/Y H:m:s');
+        $paratiriseis = Protocol::whereId($request->id)->first()->paratiriseis;
+        $parMessage = $paratiriseis ? $paratiriseis . ', ' : '';
+        $parMessage .= "$now διεκπεραιώθηκε από " . Auth::user()->name;
+        $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+        $result = Protocol::whereId($request->id)->update([
+                'user_id' => Auth::user()->id,
+                'diekp_date' => $diekp_date,
+                'paratiriseis' => $parMessage,
+            ]);
+        // ενημερώνω το χρήστη
+        $notification = array(
+            'message' => "Επιτυχής ενημέρωση της ημερομηνίας Διεκπεραίωσης σε $request->diekp_date.",
+            'alert-type' => 'success'
+        );
+        session()->flash('notification', $notification);
+        // επιστρέφω 
+        return response()->json($result);
+    }
+
     public function about()
     {
         return view('about');
@@ -1441,14 +1478,7 @@ class ProtocolController extends Controller
         $alwaysShowFakelosInViewEmails = Config::getConfigValueOf('alwaysShowFakelosInViewEmails');
         $alwaysSendReceitForEmails = Config::getConfigValueOf('alwaysSendReceitForEmails');
         $forbidenChangeDiekperaiosiSelect = Config::getConfigValueOf('forbidenChangeDiekperaiosiSelect');
-        // αν ο λογαριασμός είναι κενός δεν προχωράω
-        if (!$defaultImapEmail) {
-            return back();
-        }
-        // αν η βιβλιοθήκη imap δεν είναι φορτωμένη δεν προχωράω
-        if (!extension_loaded('imap')) {
-            return back();
-        }
+
         // φορτώνω τον πελάτη (λογαριασμό)
         $oClient = Client::account($defaultImapEmail);
         try {
@@ -1604,7 +1634,7 @@ class ProtocolController extends Controller
         $oFolder = $oClient->getFolder('INBOX');
         $oMessage = $oFolder->getMessage($messageUid, null, null, false, false, false);
         // μεταφέρω το μήνυμα στα διαβασμένα
-        $oMessage->moveToFolder('INBOX.beenRead');
+        $oMessage->moveToFolder('INBOX.beenRead', true);
         // ενημερώνω τον χρήστη
         $notification = array(
             'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
@@ -1612,7 +1642,7 @@ class ProtocolController extends Controller
         );
         session()->flash('notification', $notification);
         // επιστρέφω
-        return back();
+        return redirect('/viewEmails');
     }
 
     public function storeFromEmail()
@@ -1633,6 +1663,7 @@ class ProtocolController extends Controller
         isset($data["fakelos$uid"]) ? $fakelos = $data["fakelos$uid"] : $fakelos = null;
         // χρόνος διατήρησης
         isset($data["keep$uid"]) ? $keep = $data["keep$uid"] : $keep = null;
+        
         // id περαιωτή. Αν υπάρχει θα στείλω email για ανάθεση Πρωτοκόλλου
         $sendEmailTo = $data["sendEmailTo"];
         // θα στείλω απόδειξη παραλαβής; ΝΑΙ(1) - ΟΧΙ(0)
@@ -1887,7 +1918,7 @@ class ProtocolController extends Controller
             }
         }
         // μεταφέρω το μήνυμα στα πρωτοκολλημένα
-        $oMessage->moveToFolder('INBOX.inProtocol');
+        $oMessage->moveToFolder('INBOX.inProtocol', true);
 
         $alertType = 'success';
         if ($numMissedAttachments) {

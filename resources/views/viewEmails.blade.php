@@ -245,7 +245,7 @@
                       @endif
                       @if($oMessage->hasTextBody())
                       <div class="row">
-                        <div class="col-md-12 col-sm-12  small">{{$oMessage->getTextBody()}}</div>
+                        <div class="col-md-12 col-sm-12  small" style="overflow: hidden">{{$oMessage->getTextBody()}}</div>
                       </div>
                       @endif
                       @if($oMessage->hasAttachments())

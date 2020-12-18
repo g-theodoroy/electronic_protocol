@@ -62,7 +62,7 @@ class ConfigController extends Controller
 
         $config = new Config;
         foreach($data as $key => $value){
-            $config->setConfigValueOf($key,$value);
+            $config->setConfigValueOf($key,trim($value));
             if ($key == 'updatesAutoCheck' and $value == 0)$config->setConfigValueOf('needsUpdate',0);
         }
 
