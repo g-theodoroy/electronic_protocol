@@ -248,16 +248,25 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Διεκπεραίωσης</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
+
+                        <div class= "col-md-5 col-sm-5">
+                            <div class="row">
+                        <div class="col-md-4 col-sm-4 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
                             <input id="diekp_date" type="text" class="form-control datepicker text-center" name="diekp_date" placeholder="diekp_date" value="{{ old('diekp_date') ? old('diekp_date') : $diekp_date }}" title='11. Ημερομηνία διεκπεραίωσης'>
                         </div>
-                        <div class="col-md-1 col-sm-1 small text-center">
+                        <div class="col-md-2 col-sm-2 small text-center">
                             <strong>Σχετικοί<br>αριθμοί</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('sxetiko') ? ' has-error' : '' }}">
-                            <input id="sxetiko" type="text" class="form-control text-center" name="sxetiko" placeholder="sxetiko" value="{{ old('sxetiko') ? old('sxetiko') : $protocol->sxetiko }}" title='12. Σχετικοί αριθμοί'>
+                        <div class="col-md-6 col-sm-6 {{ $errors->has('sxetiko') ? ' has-error' : '' }}">
+                            <div class="input-group">
+                            <input id="sxetiko" oninput="getValues(this.id, 'sxetiko', 'sxetikoList', 1)"type="text" class="form-control text-center" name="sxetiko" placeholder="sxetiko" value="{{ old('sxetiko') ? old('sxetiko') : $protocol->sxetiko }}" title='12. Σχετικοί αριθμοί'>
+                            <span class="input-group-addon" onclick="javascript:findSxetiko()" title="Μετάβαση στο σχετικό Πρωτόκολλο"><img src="{{ URL::to('/') }}/images/find.ico" height=15 / ></span>
+                            </div>
+                            <div id="sxetikoList" class="col-md-12 col-sm-12" ></div>
                         </div>
                     </div>
+                    </div>
+                </div>
 
                     <div class="row bg-info">
                         <div class="col-md-6 col-sm-6 ">
@@ -622,6 +631,32 @@ function setDiekperaiomeno(){
             toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Δεν κατέστη δυνατή η ενημέρωση<br>&nbsp;</center>")
         }
     });
+}
+
+function findSxetiko(){
+    var sxetiko = $('#sxetiko').val().trim()
+    if(! sxetiko){
+        return
+    }
+    var terms = split($('#sxetiko').val());
+    for(var i=0 ; i<terms.length ; i++){
+        if (! /^\d+[/]\d{4}$/.test(terms[i])){
+            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Το σχετικό πρέπει να έχει τη μορφή<br><br>Αριθμός&nbsp;&nbsp;<b>/</b>&nbsp;&nbsp;τετραψήφιο έτος<br>&nbsp;</center>")
+            return
+        }
+    }
+    if(terms.length == 1){
+        var data = terms[0].split( /\// );
+        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + data[1] + "/" + data[0])
+    }else{
+        var msg = '';
+        for(var i=0 ; i<terms.length ; i++){
+            var data = terms[i].split( /\// );
+            href = "{{ URL::to('/goto') }}" + "/" +   data[1] + "/" + data[0] + "?find=1"
+            msg += '<br><a href="' + href + '">Αρ. Πρωτ: ' + data[0] + ', έτος: '  + data[1] + '</a>'
+        }
+            toastr.info("<center><h4>Μετάβαση σε</h4><hr></center>" + msg + "<br>&nbsp;</center>")
+    }
 }
 
 </script>

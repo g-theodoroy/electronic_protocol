@@ -36,10 +36,10 @@ if (file_exists($file )){
 Route::post('register', 'Auth\RegisterController@register');
 
 // Password Reset Routes...
-Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
+Route::get('password/resetForm', 'Auth\ForgotPasswordController@showLinkRequestForm');
 Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
-Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
-Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+Route::get('password/reset', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.reset');
 // End Auth::routes();
 
 

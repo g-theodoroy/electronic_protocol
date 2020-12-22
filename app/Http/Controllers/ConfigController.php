@@ -60,10 +60,9 @@ class ConfigController extends Controller
         ]);
 
 
-        $config = new Config;
         foreach($data as $key => $value){
-            $config->setConfigValueOf($key,trim($value));
-            if ($key == 'updatesAutoCheck' and $value == 0)$config->setConfigValueOf('needsUpdate',0);
+            Config::setConfigValueOf($key,trim($value));
+            if ($key == 'updatesAutoCheck' and $value == 0)Config::setConfigValueOf('needsUpdate',0);
         }
 
         $notification = array(
@@ -89,8 +88,7 @@ class ConfigController extends Controller
         $database = config('database.connections.mysql.database');
         $username = config('database.connections.mysql.username');
         $password = config('database.connections.mysql.password');
-        $config = new Config;
-        $mysqldumpPath = $config->getConfigValueOf('mysqldumpPath');
+        $mysqldumpPath = Config::getConfigValueOf('mysqldumpPath');
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             $filename = storage_path('app\arxeio\backups') . "\\{$database}_back_" . date ( "YmdHms" ) . '.sql';

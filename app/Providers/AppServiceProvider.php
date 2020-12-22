@@ -63,22 +63,21 @@ class AppServiceProvider extends ServiceProvider
             View::share('myUsers', User::my_users());
             View::share('myUsers', User::my_users());
 
-            $config = new Config;
-            $ipiresiasName = $config->getConfigValueOf('ipiresiasName');
+            $ipiresiasName = Config::getConfigValueOf('ipiresiasName');
             View::share('ipiresiasName', $ipiresiasName);
-            $titleColor = $config->getConfigValueOf('titleColor');
+            $titleColor = Config::getConfigValueOf('titleColor');
             $titleColorStyle = '';
             if ($titleColor) {
                 $titleColorStyle = "style='background:" . $titleColor . "'" ;
             }
             View::share('titleColorStyle', $titleColorStyle);
-            $defaultImapEmail = $config->getConfigValueOf('defaultImapEmail');
+            $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
             if (! extension_loaded('imap')) {
                 $defaultImapEmail = null;
             }
             View::share('defaultImapEmail', $defaultImapEmail);
 
-            $allowedEmailUsers =  $config->getConfigValueOf('allowedEmailUsers');
+            $allowedEmailUsers =  Config::getConfigValueOf('allowedEmailUsers');
             View::share('allowedEmailUsers', $allowedEmailUsers);
         } catch (\Throwable $e) {
             report($e);

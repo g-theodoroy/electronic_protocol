@@ -201,7 +201,7 @@
                       </div>
                       <div class="row bg-warning ">
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
-                        <div class="form-control-static col-md-11 col-sm-11  "><strong>{{$oMessage->getSubject()}}</strong></div>
+                        <div class="form-control-static col-md-11 col-sm-11"  style="overflow:hidden"><strong>{{$oMessage->getSubject()}}</strong></div>
                       </div>
                       @if($oMessage->getTo())
                       <div class="row bg-warning ">
@@ -242,8 +242,7 @@
                           <iframe id="ifr{{$oMessage->getUid()}}" src="{{ asset( 'tmp/' .$emailFilePaths[$uid]) }}" width="100%" frameBorder="0" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
                         </div>
                       </div>
-                      @endif
-                      @if($oMessage->hasTextBody())
+                      @else
                       <div class="row">
                         <div class="col-md-12 col-sm-12  small" style="overflow: hidden">{{$oMessage->getTextBody()}}</div>
                       </div>

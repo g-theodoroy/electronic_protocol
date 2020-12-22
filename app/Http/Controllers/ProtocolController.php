@@ -565,6 +565,9 @@ class ProtocolController extends Controller
         if ($data['keywords']) {
             $keywords = rtrim($data['keywords'], ',');
         }
+        if ($data['sxetiko']) {
+            $sxetiko = rtrim($data['sxetiko'], ',');
+        }
         // αν υπάρχει καταχωρισμένο πρωτόκολλο με ίδια αρ.εισερχ+ημνια.εισερχ.
         // θα ρωτήσω τον χρήστη αν θα προχωρήσω η όχι
         // αν ο χρήστης πει ναι τότε το πεδίο in_chk θα γίνει false(0) με javascript και θα περάσει το validation
@@ -604,7 +607,7 @@ class ProtocolController extends Controller
                 'in_perilipsi' => $data['in_perilipsi'],
                 'out_date' => $out_date,
                 'diekp_date' => $diekp_date,
-                'sxetiko' => $data['sxetiko'],
+                'sxetiko' => $sxetiko,
                 'out_to' => $data['out_to'],
                 'out_perilipsi' => $data['out_perilipsi'],
                 'keywords' => $keywords,
@@ -808,6 +811,9 @@ class ProtocolController extends Controller
         if ($data['keywords']) {
             $keywords = rtrim($data['keywords'], ',');
         }
+        if ($data['sxetiko']) {
+            $sxetiko = rtrim($data['sxetiko'], ',');
+        }
 
         // ελέγχω τον αρ.Εισ. + Hμνια.Εισ
         // πρόκειται για update. αν είναι ίδια είναι ok 
@@ -856,7 +862,7 @@ class ProtocolController extends Controller
                 'in_perilipsi' => $data['in_perilipsi'],
                 'out_date' => $out_date,
                 'diekp_date' => $diekp_date,
-                'sxetiko' => $data['sxetiko'],
+                'sxetiko' => $sxetiko,
                 'out_to' => $data['out_to'],
                 'out_perilipsi' => $data['out_perilipsi'],
                 'keywords' => $keywords,

@@ -32,8 +32,7 @@ class KeepvalueController extends Controller
      */
     public function index(Keepvalue $keepvalue)
     {
-        $config = new Config;
-        $keepvalues = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->paginate($config->getConfigValueOf('showRowsInPage'));
+        $keepvalues = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->paginate(Config::getConfigValueOf('showRowsInPage'));
 
         $submitVisible = 'hidden';
         if (Auth::user()->role->role == 'Διαχειριστής') $submitVisible = 'active';

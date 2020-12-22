@@ -40,7 +40,7 @@ class LoginController extends Controller
     /**
     * παρακαπτω το AuthenticatesUsers.php να χρησιμοποιεί username αντί για email
     **/
-    protected function username()
+    public function username()
     {
         return 'username';
     }
