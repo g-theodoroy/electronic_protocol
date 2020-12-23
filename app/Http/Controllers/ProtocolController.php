@@ -431,6 +431,21 @@ class ProtocolController extends Controller
             if ($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) {
                 $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
             }
+            if ($protocol->sxetiko) {
+                $sxetiko = explode(', ', $protocol->sxetiko);
+                $pattern = "/^\d+\/\d{4}/i";
+                $links = array();
+                foreach ($sxetiko as $sxet){
+                    if( preg_match($pattern, $sxet)){
+                    $data = explode('/', $sxet);
+                    $href = URL::to('/goto') . "/" .  $data[1] . "/" . $data[0] . "?find=1";
+                    $links[] = '<a href="' . $href . '">' . $sxet . '</a>';    
+                }
+                    $protocol->sxetiko = join(', ', $links);
+               }
+                $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
+            }
+
         }
         return view('protocolList', compact('protocols', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'diavgeiaUrl', 'activeusers2show', 'writers_admins', 'protocoltitle'));
     }

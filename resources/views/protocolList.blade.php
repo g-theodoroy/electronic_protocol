@@ -206,7 +206,7 @@
                                     <hr>
                                     <span title='Σχετικοί αριθμοί'>
                                     @if($protocol->sxetiko)
-                                    &#x2727;{{$protocol->sxetiko}}
+                                    &#x2727;{!!$protocol->sxetiko!!}
                                     @else
                                     &nbsp;
                                     @endif
