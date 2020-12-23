@@ -313,7 +313,7 @@ class ProtocolController extends Controller
                     report($e);
                     $commits = null;
                 }
-                // εάν υπάρχουν commits 
+                // εάν υπάρχουν commits
                 if ($commits) {
                     if (Auth::user()->role_description() == "Διαχειριστής") {
                         $message = 'Έγιναν τροποποιήσεις στον κώδικα του Ηλ.Πρωτοκόλλου στο Github.<br><br>Αν επιθυμείτε <a href=\"https://github.com/g-theodoroy/electronic_protocol/commits/master\" target=\"_blank\"><u> εξετάστε τον κώδικα</u></a> και ενημερώστε την εγκατάστασή σας.<br><br>Για να μην εμφανίζεται το παρόν μήνυμα καντε κλικ στο menu Διαχείριση->Ενημερώθηκε.';
@@ -331,11 +331,11 @@ class ProtocolController extends Controller
                                 'alert-type' => 'info'
                             );
                             session()->flash('notification', $notification);
-                            // αλλάζω τη μετσβλητή needsUpdate σε true(1) 
+                            // αλλάζω τη μετσβλητή needsUpdate σε true(1)
                             Config::setConfigValueOf('needsUpdate', 1);
                         }
                     } else {
-                        // αν δεν υπάρχει το αρχείο .updateCheck το 
+                        // αν δεν υπάρχει το αρχείο .updateCheck το
                         // δημιουργώ και γράφω το id του τελευταίου commit
                         file_put_contents($file, $commits[0]['sha']);
                     }
@@ -372,7 +372,7 @@ class ProtocolController extends Controller
             }
         }
         // Παίρνω τα Πρωτόκολλα που θα εμφανίσω
-        // όλα ή του χρήστη 
+        // όλα ή του χρήστη
         // ή με βάση το φίλτρο
         //      d => προς Διεκπεραίωση
         //      f => Διεκπεραιώθηκαν
@@ -439,7 +439,9 @@ class ProtocolController extends Controller
                     if( preg_match($pattern, $sxet)){
                     $data = explode('/', $sxet);
                     $href = URL::to('/goto') . "/" .  $data[1] . "/" . $data[0] . "?find=1";
-                    $links[] = '<a href="' . $href . '">' . $sxet . '</a>';    
+                    $links[] = '<a href="' . $href . '">' . $sxet . '</a>';
+                }else{
+                    $links[] = $sxet;
                 }
                     $protocol->sxetiko = join(', ', $links);
                }
@@ -476,7 +478,7 @@ class ProtocolController extends Controller
     {
         // παίρνω τα δεδομένα της φορμας
         $data = request()->all();
-        // το id του Διεκπεραιωτή (άν έχει σταλεί) για αποστολή email 
+        // το id του Διεκπεραιωτή (άν έχει σταλεί) για αποστολή email
         $sendEmailTo = request('sendEmailTo');
         // το email (αν υπάρχει) στο οποίο θα σταλεί απόδειξη παραλαβής
         $reply_to_email = request('reply_to_email');
@@ -831,13 +833,13 @@ class ProtocolController extends Controller
         }
 
         // ελέγχω τον αρ.Εισ. + Hμνια.Εισ
-        // πρόκειται για update. αν είναι ίδια είναι ok 
+        // πρόκειται για update. αν είναι ίδια είναι ok
         $in_chkdata = $data['in_chk'];
         if ($data['in_num'] == $oldIn_num and $in_date == $oldIn_date) {
             $in_chkdata = '0';
         }
 
-        // αν η φόρμα μου στείλει ότι πρέπει να ελέγξω 
+        // αν η φόρμα μου στείλει ότι πρέπει να ελέγξω
         // γιατί έχουν αλλάξει τότε κάνω validate αν υπάρχουν σε άλλο πρωτόκολλο
         if ($in_chkdata == '1') {
             $validator = Validator::make(request()->all(), [
@@ -1386,7 +1388,7 @@ class ProtocolController extends Controller
             'alert-type' => 'success'
         );
         session()->flash('notification', $notification);
-        // επιστρέφω 
+        // επιστρέφω
         return response()->json($result);
     }
 
@@ -1570,7 +1572,7 @@ class ProtocolController extends Controller
                 $emailFilePaths[$Uid] = $savedPath;
             }
         }
-        
+
         return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput'));
     }
 
@@ -1604,7 +1606,7 @@ class ProtocolController extends Controller
             // επιστρέφω
             return back();
         }
-        // πηγαίνω στον φάκελο INBOX 
+        // πηγαίνω στον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
         // παίρνω το νήνυμα με το messageUid
         $oMessage = $oFolder->getMessage($messageUid, null, null, true, true, false);
@@ -1686,7 +1688,7 @@ class ProtocolController extends Controller
         isset($data["fakelos$uid"]) ? $fakelos = $data["fakelos$uid"] : $fakelos = null;
         // χρόνος διατήρησης
         isset($data["keep$uid"]) ? $keep = $data["keep$uid"] : $keep = null;
-        
+
         // id περαιωτή. Αν υπάρχει θα στείλω email για ανάθεση Πρωτοκόλλου
         $sendEmailTo = $data["sendEmailTo"];
         // θα στείλω απόδειξη παραλαβής; ΝΑΙ(1) - ΟΧΙ(0)
@@ -1725,7 +1727,7 @@ class ProtocolController extends Controller
         }
         // παίρνω τον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
-        // το μήνυμα με το uid για αποθήκευση 
+        // το μήνυμα με το uid για αποθήκευση
         $oMessage = $oFolder->getMessage($uid, null, null, true, true, false);
 
         // βάζω τα δεδομένα σε μεταβλητές
@@ -1908,7 +1910,7 @@ class ProtocolController extends Controller
             $message .= "<br><br>Παραλείφθηκαν $numMissedAttachments συνημμένα αρχεία.<br> Δοκιμαστε να τα εισάγετε στο Ηλ. Πρωτόκολλο χειροκίνητα αφού πρώτα τα αποθηκεύσετε στο δίσκο σας";
         }
 
-        // στέλνω mail στον Διεκπεραιωτή 
+        // στέλνω mail στον Διεκπεραιωτή
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
             $message .= $this->sendMailToDiekperaioti($sendEmailTo, $protocol);
         }
