@@ -90,7 +90,7 @@ $style = [
                                                 @if ($level == 'error')
                                                     Ωπα!
                                                 @else
-                                                    Γειά σας!
+                                                    Γεια σας!
                                                 @endif
                                             @endif
                                         </h1>
@@ -140,7 +140,7 @@ $style = [
 
                                         <!-- Salutation -->
                                         <p style="{{ $style['paragraph'] }}">
-                                            Μετά τιμής,<br>{{ config('app.name') }}
+                                            Μετά τιμής<br>{{ config('app.name') }}
                                         </p>
 
                                         <!-- Sub Copy -->

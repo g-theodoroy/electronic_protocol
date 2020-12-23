@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use App\Notifications\ResetPasswordNotification; 
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -59,6 +61,11 @@ class User extends Authenticatable
     public static function get_writers_and_admins(){
         // return User::where('role_id', '!=',    Role::whereRole('Αναγνώστης')->first()->id)->wherenotNull('active')->orderby('name')->get();
         return User::wherenotNull('active')->orderby('name')->get();
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     /**
