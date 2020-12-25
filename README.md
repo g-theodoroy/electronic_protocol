@@ -94,7 +94,7 @@ extension=pdo_mysql
 
 ```
 
-#### Ρύθμίση email
+#### Ρύθμίση email με το Gmail
 
 Για να ρυθμίσετε το email συμπληρώστε ανάλογα τα στοιχεία στο αρχείο ```.env```.
 
@@ -113,6 +113,27 @@ IMAP_ENCRYPTION=ssl
 IMAP_VALIDATE_CERT=false
 IMAP_USERNAME=gm@ilusern@me
 IMAP_PASSWORD=gm@ilp@ss
+IMAP_DEFAULT_ACCOUNT=default
+IMAP_PROTOCOL=imap
+```
+
+
+#### Ρύθμίση email με το ΠΣΔ Πανελλήνιο Σχολικό Δίκτυο
+
+```
+MAIL_DRIVER=smtp
+MAIL_HOST=mail.sch.gr
+MAIL_PORT=25
+MAIL_USERNAME=sch_usern@me
+MAIL_PASSWORD=sch_p@ss
+MAIL_ENCRYPTION=
+
+IMAP_HOST=mail.sch.gr
+IMAP_PORT=143
+IMAP_ENCRYPTION=tls
+IMAP_VALIDATE_CERT=true
+IMAP_USERNAME=sch_usern@me
+IMAP_PASSWORD=sch_p@ss
 IMAP_DEFAULT_ACCOUNT=default
 IMAP_PROTOCOL=imap
 ```
