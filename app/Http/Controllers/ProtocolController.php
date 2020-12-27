@@ -445,9 +445,7 @@ class ProtocolController extends Controller
                 }
                     $protocol->sxetiko = join(', ', $links);
                }
-                $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
             }
-
         }
         return view('protocolList', compact('protocols', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'diavgeiaUrl', 'activeusers2show', 'writers_admins', 'protocoltitle'));
     }
