@@ -57,7 +57,7 @@
           <hr>
           @if($oMessage->hasHTMLBody())
           <div class="row">
-            <div class="form-control-static col-md-12 col-sm-12  ">{!!$oMessage->getHTMLBody()!!}</div>
+            <div class="form-control-static col-md-12 col-sm-12  ">{!! str_replace("iso-8859-7", "utf-8", $oMessage->getHTMLBody()) !!}</div>
           </div>
           @endif
           @if($oMessage->hasHTMLBody() && $oMessage->hasTextBody())

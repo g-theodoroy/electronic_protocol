@@ -1559,7 +1559,7 @@ class ProtocolController extends Controller
                 // κωδικός
                 $Uid = $oMessage->getUid();
                 // περιεχόμενο HTML
-                $content = $oMessage->getHTMLBody();
+                $content = str_replace("iso-8859-7", "utf-8", $oMessage->getHTMLBody());
                 // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
                 $dir = '';
                 $filenameToStore = "$Uid.html";
