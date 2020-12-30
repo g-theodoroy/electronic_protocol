@@ -138,6 +138,21 @@ IMAP_DEFAULT_ACCOUNT=default
 IMAP_PROTOCOL=imap
 ```
 
+IMAP εναλλακτική ρύθμιση
+
+```
+IMAP_HOST=mail.sch.gr
+IMAP_PORT=993
+IMAP_ENCRYPTION=ssl
+IMAP_VALIDATE_CERT=false
+IMAP_USERNAME=username SCH
+IMAP_PASSWORD=pass SCH
+IMAP_DEFAULT_ACCOUNT=default
+IMAP_PROTOCOL=imap
+```
+
+
+
 **Για να εφαρμοστούν οι αλλαγές** που κάνατε πρέπει να καθαρίσετε τις ήδη αποθηκευμένες ρυθμίσεις **config** με:
 ``` php artisan config:clear```
 
