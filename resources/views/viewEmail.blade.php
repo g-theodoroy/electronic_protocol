@@ -22,7 +22,11 @@
           </div>
           <div class="row bg-warning ">
             <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
-            <div class="form-control-static col-md-11 col-sm-11  "><strong>{{$oMessage->getSubject()}}</strong></div>
+            @php
+              $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+              if(! $subject) $subject = $oMessage->getSubject();
+            @endphp
+            <div class="form-control-static col-md-11 col-sm-11  "><strong>{{ $subject }}</strong></div>
           </div>
           @if($oMessage->getTo())
           <div class="row bg-warning ">
@@ -74,7 +78,11 @@
             <div class="form-control-static col-md-2 col-sm-2"><strong>Συνημμένα:</strong></div>
             <div class="form-control-static col-md-10 col-sm-10 ">
               @foreach($oMessage->attachments as $key=>$attachment)
-              {{ $attachment->name }}
+                @php
+                  $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true), 'text'));
+                  if (! $filename) $filename = $attachment->getName();
+                @endphp
+              {{ $filename }}
               @if(! $loop->last), &nbsp; @endif
               @endforeach
             </div>

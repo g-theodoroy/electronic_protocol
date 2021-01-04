@@ -197,7 +197,6 @@ class ProtocolController extends Controller
                     $time2update = $allowWriterUpdateProtocolTimeInMinutes * 60 - (Carbon::now()->getTimestamp() - $protocol->updated_at->getTimestamp());
                 }
             }
-
         }
         // 2 αν ο χρήστης είναι Συγγραφέας ή Αναθέτων
         if (in_array(Auth::user()->role_description(), ["Συγγραφέας",  "Αναθέτων"])) {
@@ -997,7 +996,7 @@ class ProtocolController extends Controller
             $emaildate = Carbon::now()->format('d/m/Y H:m:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
             $parMessage .= "$emaildate email διεκπεραίωσης σε $diekperaiotis";
-            $parMessage = mb_strlen($parMessage)> 250 ? mb_substr($parMessage, 0 , 250) . ' ...' : $parMessage ;
+            $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
             $protocol->paratiriseis = $parMessage;
             $protocol->update();
             // ενημερώνω το χρήστη
@@ -1376,10 +1375,10 @@ class ProtocolController extends Controller
         $parMessage .= "$now διεκπεραιώθηκε από " . Auth::user()->name;
         $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
         $result = Protocol::whereId($request->id)->update([
-                'user_id' => Auth::user()->id,
-                'diekp_date' => $diekp_date,
-                'paratiriseis' => $parMessage,
-            ]);
+            'user_id' => Auth::user()->id,
+            'diekp_date' => $diekp_date,
+            'paratiriseis' => $parMessage,
+        ]);
         // ενημερώνω το χρήστη
         $notification = array(
             'message' => "Επιτυχής ενημέρωση της ημερομηνίας Διεκπεραίωσης σε $request->diekp_date.",
@@ -1531,7 +1530,6 @@ class ProtocolController extends Controller
         // emailFetchOrderDesc == 1 => ΤΕΛΕΥΤΑΙΑ
         if (Config::getConfigValueOf('emailFetchOrderDesc')){
             config(['imap.options.fetch_order' => 'desc']);
-
         }
         // παίρνω τον αριθμό των μηνυμάτων από sinceDate και μετά
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
@@ -1559,7 +1557,10 @@ class ProtocolController extends Controller
                 // κωδικός
                 $Uid = $oMessage->getUid();
                 // περιεχόμενο HTML
-                $content = str_replace("iso-8859-7", "utf-8", $oMessage->getHTMLBody());
+                $content = $oMessage->getHTMLBody();
+                foreach (["iso-8859-7", "windows-1253"] as $encoding) {
+                    $content = str_replace($encoding, "utf-8", $content);
+                }
                 // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
                 $dir = '';
                 $filenameToStore = "$Uid.html";
@@ -1615,9 +1616,11 @@ class ProtocolController extends Controller
         // παίρνω το περιεχόμενο
         $content = $oAttachment->getContent();
         // το στέλνω για εμφάνιση
+        $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oAttachment->getName())), true), 'text'));
+        if (!$filename) $filename = $oAttachment->getName();
         return response($content)
             ->header('Content-Type', $oAttachment->getMimeType())
-            ->header('Content-Disposition', "filename=" . $oAttachment->getName());
+            ->header('Content-Disposition', "filename=" . $filename);
     }
 
     public function setEmailRead($messageUid)
@@ -1867,7 +1870,8 @@ class ProtocolController extends Controller
                 }
                 $content = $oAttachment->getContent();
                 $mimeType = $oAttachment->getMimeType();
-                $filename = $oAttachment->getName();
+                $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oAttachment->getName())), true), 'text'));
+                if (!$filename) $filename = $oAttachment->getName();
 
                 // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                 $filename = $this->filter_filename($filename, false);

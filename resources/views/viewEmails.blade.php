@@ -52,8 +52,12 @@
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Θέμα</strong>
                         </div>
+                        @php
+                            $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+                            if(! $subject) $subject = $oMessage->getSubject();
+                        @endphp
                         <div class="col-md-6 col-sm-6 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
-                            <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control" name="thema" placeholder="thema" value="{{ $oMessage->getSubject() }}" title='Θέμα'>
+                            <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control" name="thema" placeholder="thema" value="{{ $subject }}" title='Θέμα'>
                             <div id="themaList" class="col-md-12 col-sm-12" ></div>
                         </div>
                         <div class="col-md-2 col-sm-2 text-right">
@@ -201,7 +205,7 @@
                       </div>
                       <div class="row bg-warning ">
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
-                        <div class="form-control-static col-md-11 col-sm-11"  style="overflow:hidden"><strong>{{$oMessage->getSubject()}}</strong></div>
+                        <div class="form-control-static col-md-11 col-sm-11"  style="overflow:hidden"><strong>{{ $subject }}</strong></div>
                       </div>
                       @if($oMessage->getTo())
                       <div class="row bg-warning ">
@@ -253,8 +257,12 @@
 
                         <div class="form-control-static col-md-10 col-sm-10 ">
                           @foreach($oMessage->attachments as $key=>$attachment)
-                          <a href='{{ URL::to('/') }}/viewEmailAttachment/{{$oMessage->getUid()}}/{{$key}}' target="_blank"  title='Λήψη {{ $attachment->name }}'>{{ $attachment->name }}</a>
-                          <input type="checkbox" class="" id="chk{{$oMessage->getUid()}}-{{$key}}" name="chk{{$oMessage->getUid()}}-{{$key}}" title="Αν είναι επιλεγμένο αποθηκεύεται το συνημμένο {{ $attachment->name }}" checked  >
+                          @php
+                            $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true), 'text'));
+                            if (! $filename) $filename = $attachment->getName();
+                           @endphp
+                          <a href='{{ URL::to('/') }}/viewEmailAttachment/{{$oMessage->getUid()}}/{{$key}}' target="_blank"  title='Λήψη {{ $filename }}'>{{ $filename }}</a>
+                          <input type="checkbox" class="" id="chk{{$oMessage->getUid()}}-{{$key}}" name="chk{{$oMessage->getUid()}}-{{$key}}" title="Αν είναι επιλεγμένο αποθηκεύεται το συνημμένο {{ $filename  }}" checked  >
                           @if(! $loop->last), &nbsp; @endif
                           @endforeach
                         </div>
