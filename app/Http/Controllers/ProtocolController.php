@@ -1538,12 +1538,12 @@ class ProtocolController extends Controller
 
         // ταξινόμηση των μηνυμάτων που πήρα ΦΘΙΝΟΥΣΑ ή ΑΥΞΟΥΣΑ
         if (Config::getConfigValueOf('emailShowOrderDesc')) {
-        $aMessage = $aMessage->sortByDesc(function($oMessage) {
-            return Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate());
+            $aMessage = $aMessage->sortByDesc(function ($oMessage) {
+                return Carbon::parse($oMessage->getDate());
             });
         }else{
             $aMessage = $aMessage->sortBy(function ($oMessage) {
-                return Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate());
+                return Carbon::parse($oMessage->getDate());
             });
         }
         // διαγραφή τυχόν προηγούμενα αποθηκευμένων email.html
@@ -1659,14 +1659,23 @@ class ProtocolController extends Controller
 
         $oFolder = $oClient->getFolder('INBOX');
         $oMessage = $oFolder->getMessage($messageUid, null, null, false, false, false);
-        // μεταφέρω το μήνυμα στα διαβασμένα
-        $oMessage->moveToFolder('INBOX.beenRead', true);
-        // ενημερώνω τον χρήστη
-        $notification = array(
-            'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
-            'alert-type' => 'success'
-        );
-        session()->flash('notification', $notification);
+        if ($oMessage) {
+            // μεταφέρω το μήνυμα στα διαβασμένα
+            $oMessage->moveToFolder('INBOX.beenRead', true);
+            // ενημερώνω τον χρήστη
+            $notification = array(
+                'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
+                'alert-type' => 'success'
+            );
+            session()->flash('notification', $notification);
+        } else {
+            // ενημερώνω τον χρήστη
+            $notification = array(
+                'message' => "Δεν βρέθηκε μήνυμα με τον κωδικό: " . $messageUid,
+                'alert-type' => 'error'
+            );
+            session()->flash('notification', $notification);
+        }
         // επιστρέφω
         return redirect('/viewEmails');
     }
@@ -1734,8 +1743,8 @@ class ProtocolController extends Controller
         // βάζω τα δεδομένα σε μεταβλητές
         $thema = isset($data["thema"]) ? $data["thema"] : $oMessage->getSubject();
         // αλλάζω τις ημνιες στην κατάλληλη μορφή για αποθήκευση
-        $in_num = isset($data["in_num"]) ? $data["in_num"] : Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('H:i:s');
-        $in_date = isset($data["in_date"]) ? Carbon::createFromFormat('d/m/Y', $data["in_date"])->format('Ymd') : Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Ymd');
+        $in_num = isset($data["in_num"]) ? $data["in_num"] : Carbon::parse($oMessage->getDate())->format('H:i:s');
+        $in_date = isset($data["in_date"]) ? Carbon::createFromFormat('d/m/Y', $data["in_date"])->format('Ymd') : Carbon::parse($oMessage->getDate())->format('Ymd');
         // αν πληκτρολογήθηκε αρχή έκδοσης
         if (isset($data["in_arxi_ekdosis"])) {
             $in_arxi_ekdosis = $data["in_arxi_ekdosis"];
@@ -1819,7 +1828,7 @@ class ProtocolController extends Controller
             report($e);
             // ειδοποιώ τον χρήστη
             $notification = array(
-                'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση του email στο Πρωτόκολλο<br>Παρακαλώ επαναλάβετε την καταχώριση.' . $e . mess,
+                'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση του email στο Πρωτόκολλο<br>Παρακαλώ επαναλάβετε την καταχώριση.' . $e->getMessage(),
                 'alert-type' => 'error'
             );
             session()->flash('notification', $notification);
@@ -1835,7 +1844,7 @@ class ProtocolController extends Controller
 
         // αποθηκεύω το email σαν συνημμένο html
         $html = view('viewEmail', compact('oMessage'))->render();
-        $filename = 'email_' . Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('Ymd_His') . '.html';
+        $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.html';
         $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
         $dir = $fakelos ? '/arxeio/' . $fakelos . '/' : '/arxeio/emails/';
         $savedPath = $dir . $filenameToStore;

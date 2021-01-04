@@ -77,13 +77,13 @@
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
-                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
+                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
-                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $oMessage->getDate())->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
+                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
