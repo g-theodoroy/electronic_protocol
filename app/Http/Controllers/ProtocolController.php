@@ -19,6 +19,8 @@ use DB;
 use Active;
 use Illuminate\Support\Facades\Mail;
 use Webklex\IMAP\Facades\Client;
+//use Illuminate\Support\Facades\Log;
+//Log::info('test');
 
 /*
 
@@ -1558,9 +1560,7 @@ class ProtocolController extends Controller
                 $Uid = $oMessage->getUid();
                 // περιεχόμενο HTML
                 $content = $oMessage->getHTMLBody();
-                foreach (["iso-8859-7", "windows-1253"] as $encoding) {
-                    $content = str_replace($encoding, "utf-8", $content);
-                }
+                $content = preg_replace('/charset=[\s\S]+?"/', 'charset=utf-8"', $content);
                 // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
                 $dir = '';
                 $filenameToStore = "$Uid.html";
@@ -1889,6 +1889,7 @@ class ProtocolController extends Controller
 
                 $dir = '/arxeio/' . $fakelos . '/';
                 $savedPath = $dir . $filenameToStore;
+
                 Storage::put($savedPath, $content);
 
                 $createdAttachment = Attachment::create([
@@ -2036,7 +2037,9 @@ class ProtocolController extends Controller
         }
         // maximize filename length to 255 bytes http://serverfault.com/a/9548/44086
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        $filename = mb_strcut(pathinfo($filename, PATHINFO_FILENAME), 0, 255 - ($ext ? strlen($ext) + 1 : 0), mb_detect_encoding($filename)) . ($ext ? '.' . $ext : '');
+        //$filename = mb_strcut(pathinfo($filename, PATHINFO_FILENAME), 0, 255 - ($ext ? strlen($ext) + 1 : 0), mb_detect_encoding($filename)) . ($ext ? '.' . $ext : '');
+        //εναλλακτική λύση αν το παραπάνω δεν δουλεύει όπως πρέπει (συναντήσαμε πρόβλημα στα ubuntu)
+        if (mb_strlen(pathinfo($filename, PATHINFO_FILENAME)) > 120) $filename =  mb_substr(pathinfo($filename, PATHINFO_FILENAME), 0, 120) . '.' . $ext;
         return $filename;
     }
 

@@ -9,8 +9,11 @@
                 <div class="panel-heading h1 text-center">Πρωτοκόλληση εισερχομένων email</div>
                 <div class="panel-body ">
                   <div class="panel panel-default col-md-12 col-sm-12  ">
-                      @if(count($aMessage))
-                      @if(count($aMessage)< $aMessageNum)
+                    @php
+                        $aMessageCount = $aMessage->count();
+                    @endphp
+                      @if($aMessageCount)
+                      @if($aMessageCount < $aMessageNum)
                       <div class="row bg-warning">
                       <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}}</strong> - Εμφανίζονται τα <strong>{{count($aMessage)}} {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'τελευταία' : 'πρώτα' }}</strong> από <strong>{{$aMessageNum}}</strong> εισερχόμενα emails - ταξινόμηση <strong>{{App\Config::getConfigValueOf('emailShowOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @else
@@ -31,12 +34,12 @@
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                       <form name="frm{{$oMessage->getUid()}}" id="frm{{$oMessage->getUid()}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
                       {{ csrf_field() }}
+                      <div class="row bg-primary"><div class="col-md-1 col-sm-1 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
+                      @php $num++; @endphp
 
                         @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
 
                       
-                      <div class="row bg-info"><div class="col-md-1 col-sm-1 form-control-static strong text-center">{{$num}}</div></div>
-                      @php $num++; @endphp
                       <div class="row ">
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Φάκελος</strong>
@@ -178,13 +181,13 @@
                                 </div>
                               </div>
                       </div>
-                      <div class="row bg-info">&nbsp;</div>
+                      <div class="row bg-info">
+                        <div class="col-md-3 col-sm-3 form-control-static ">Στοιχεία email</div>
+                      </div>
 
                       @else
-                        <div class="row">
-                          <div class="form-control-static col-md-9 col-sm-9 ">&nbsp;</div>
-
-                        <div class="col-md-3 col-sm-3 text-right">
+                      <div class="row">
+                        <div class="text-right">
                           <input id="uid" type="hidden" class="form-control" name="uid" value="{{$oMessage->getUid()}}">
                           <input id="sendReceipt{{$oMessage->getUid()}}" type="hidden" class="form-control" name="sendReceipt{{$oMessage->getUid()}}" value="0">
                           <a href="{{ URL::to('/') }}/setEmailRead/{{$oMessage->getUid()}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
@@ -193,8 +196,8 @@
                           @endif
                         <a href="javascript:$('#sendReceipt{{$oMessage->getUid()}}').val(1);chkSubmitForm({{$oMessage->getUid()}});" class="" role="button" title="Καταχώριση email και αποστολή Απόδειξης παραλαβής" tabindex=-1 > <img src="{{  URL::to('/') }}/images/{{ $alwaysSendReceitForEmails ? 'save.ico' : 'receipt.png'}}" height="25" /></a>
                         </div>
-
                       </div>
+                      <div class="row bg-info"><div class="col-md-3 col-sm-3 form-control-static ">Στοιχεία email</div></div>
                       @endif
                       
                       <div class="row bg-warning">
@@ -241,12 +244,22 @@
                       @php
                        $uid = $oMessage->getUid();
                        @endphp
+                      <div class="row bg-info">
+                        <div class="col-md-3 col-sm-3 form-control-static ">Σώμα email ως HTML</div>
+                        <div class="col-md-4 col-sm-4 col-md-offset-5 col-sm-offset-5 form-control-static text-right">
+                          <a href="{{ asset( 'tmp/' .$emailFilePaths[$uid]) }}" target="_blank">Προβολή εξωτερικά</a>
+                        </div>
+                      </div>
                       <div class="row">
                         <div class="col-md-12 col-sm-12  ">
                           <iframe id="ifr{{$oMessage->getUid()}}" src="{{ asset( 'tmp/' .$emailFilePaths[$uid]) }}" width="100%" frameBorder="0" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
                         </div>
                       </div>
-                      @else
+                      @endif
+                      @if($oMessage->hasTextBody())
+                      <div class="row bg-info">
+                        <div class="col-md-3 col-sm-3 form-control-static ">Σώμα email ως Text</div>
+                      </div>
                       <div class="row">
                         <div class="col-md-12 col-sm-12  small" style="overflow: hidden">{{$oMessage->getTextBody()}}</div>
                       </div>
