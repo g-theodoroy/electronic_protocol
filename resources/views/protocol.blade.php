@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
 
+<style>
 .asd {
     background:rgba(0,0,0,0);
     border:none;
@@ -14,68 +14,6 @@ input[readonly].asd {
     font-weight: bold;
 }
 </style>
-<script >
-
-function chkdelete(id, name){
-
-    var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
-    var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή συννημένου ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
-    var $toast = toastr.warning(html,msg);
-    $toast.delegate('#confirmationRevertYes', 'click', function () {
-            $('#show_arxeia').load("{{ URL::to('/') }}" + "/attach/del/" + id);
-            $toast.remove();
-    });
-    $toast.delegate('#confirmationRevertNo', 'click', function () {
-            $toast.remove();
-    });
-}
-
-function chkprotocoldelete(id, etos, num){
-
-    var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
-    var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή πρωτοκόλλου με αριθμό ' + num + ' για το έτος ' + etos + '. Είστε σίγουροι;<br>&nbsp;</center>'
-    var $toast = toastr.warning(html,msg);
-    $toast.delegate('#confirmationRevertYes', 'click', function () {
-            $(location).attr('href', "{{ URL::to('/') }}" + "/delprotocol/" + id);
-            $toast.remove();
-    });
-    $toast.delegate('#confirmationRevertNo', 'click', function () {
-            $toast.remove();
-    });
-}
-
-function chkfind(){
-    var protocolnum = $('#find').val()
-    var etos = $('#etos').val()
-    if (protocolnum){
-        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum  + "?find=1")
-    }else{
-        $(location).attr('href', "{{ URL::to('/find') }}")
-    }
-}
-
-function periigisi(id){
-    var protocolnum = parseInt($('#protocolnum').val())
-    var etos = $('#etos').val()
-    switch(id){
-        case 'bb':
-            protocolnum -= {{$protocolArrowStep}}
-            break;
-        case 'b':
-            protocolnum -= 1
-            break;
-        case 'f':
-            protocolnum += 1
-            break;
-        case 'ff':
-            protocolnum += {{$protocolArrowStep}}
-            break;
-            }
-        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum)
-
-}
-
-</script>
 
 <div class="container">
     <div class="row">
@@ -138,7 +76,7 @@ function periigisi(id){
                         </div>
                         <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                             <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 / ></a>
-                            <a href="javascript:$('#keep').removeAttr('disabled');sendEmailTo(){{ $protocol->id ? ';document.forms[\'myProtocolForm\'].submit();' : ';var chk = receiptToEmail();if(chk) document.forms[\'myProtocolForm\'].submit();' }}" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:formSubmit()" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
                             <a href="javascript:setDiekperaiomeno()" class="{{$readerVisible}}" role="button" title="Σήμανση ως Διεκπεραιωμένο" > <img src="{{ URL::to('/') }}/images/done.png" height=25 /></a>
                         </div>
                     </div>
@@ -162,7 +100,7 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Θέμα</strong>
                         </div>
-                        <div class="col-md-7 col-sm-7 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
+                        <div id="themaDiv" class="col-md-7 col-sm-7 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
                             <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control" name="thema" placeholder="thema" value="{{ old('thema') ? old('thema') : $protocol->thema }}" title='Θέμα'>
                             <div id="themaList" class="col-md-12 col-sm-12" ></div>
                         </div>
@@ -180,20 +118,19 @@ function periigisi(id){
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
-                            <input id="in_chk" type="hidden" name="in_chk"  value="1" >
+                        <div id="in_numDiv"  class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
                             <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ old('in_num') ? old('in_num') : $protocol->in_num }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
+                        <div id="in_dateDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
                             <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ old('in_date') ? old('in_date') : $in_date }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
                         </div>
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
+                        <div id="in_topos_ekdosisDiv"  class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
                             <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
                             <div id="in_topos_ekdosisList" class="col-md-12 col-sm-12" ></div>
                         </div>
@@ -205,7 +142,7 @@ function periigisi(id){
                                 <div class="col-md-2 col-sm-2 small text-center">
                                     <strong>Αρχή<br>Έκδοσης</strong>
                                 </div>
-                                <div class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
+                                <div id="in_arxi_ekdosisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
                                     <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ old('in_arxi_ekdosis') ? old('in_arxi_ekdosis') : $protocol->in_arxi_ekdosis }}" title='5. Αρχή που το έχει εκδώσει'>
                                     <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
@@ -214,7 +151,7 @@ function periigisi(id){
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
                                     <strong>Παραλήπτης</strong>
                                 </div>
-                                <div class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
+                                <div id="in_paraliptisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
                                     <input id="in_paraliptis" oninput="getValues(this.id, 'in_paraliptis', 'in_paraliptisList', 0)" type="text" class="form-control" name="in_paraliptis" placeholder="in_paraliptis" value="{{ old('in_paraliptis') ? old('in_paraliptis') : $protocol->in_paraliptis }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε'>
                                     <div id="in_paraliptisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
@@ -251,7 +188,7 @@ function periigisi(id){
 
                         <div class= "col-md-5 col-sm-5">
                             <div class="row">
-                        <div class="col-md-4 col-sm-4 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
+                        <div  id="diekp_dateDiv" class="col-md-4 col-sm-4 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
                             <input id="diekp_date" type="text" class="form-control datepicker text-center" name="diekp_date" placeholder="diekp_date" value="{{ old('diekp_date') ? old('diekp_date') : $diekp_date }}" title='11. Ημερομηνία διεκπεραίωσης'>
                         </div>
                         <div class="col-md-2 col-sm-2 small text-center">
@@ -274,7 +211,7 @@ function periigisi(id){
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
                                     <strong>Απευθύνεται</strong>
                                 </div>
-                                <div class="col-md-10 col-sm-10 {{ $errors->has('out_to') ? ' has-error' : '' }}">
+                                <div  id="out_toDiv" class="col-md-10 col-sm-10 {{ $errors->has('out_to') ? ' has-error' : '' }}">
                                     <input id="out_to" oninput="getValues(this.id, 'out_to', 'out_toList', 0)" type="text" class="form-control" name="out_to" placeholder="out_to" value="{{ old('out_to') ? old('out_to') : $protocol->out_to }}"  title='8. Αρχή στην οποία απευθύνεται'>
                                     <div id="out_toList" class="col-md-12 col-sm-12" ></div>
                                 </div>
@@ -283,7 +220,7 @@ function periigisi(id){
                                 <div class="col-md-2 col-sm-2 col-md-offset-3 col-sm-offset-3 small text-center ">
                                     <strong>Ημνία<br>Εξερχ.</strong>
                                 </div>
-                                <div class="col-md-4 col-sm-4 {{ $errors->has('out_date') ? ' has-error' : '' }}">
+                                <div id="out_dateDiv" class="col-md-4 col-sm-4 {{ $errors->has('out_date') ? ' has-error' : '' }}">
                                     <input id="out_date" type="text" class="form-control datepicker text-center" name="out_date" placeholder="out_date" value="{{ old('out_date') ? old('out_date') : $out_date }}" title='10. Χρονολογία εξερχομένου εγγράφου'>
                                 </div>
                             </div>
@@ -362,7 +299,7 @@ function periigisi(id){
                     </div>
                     <div id="keepdiv" class="row hidden">
                     <div class="col-md-4 col-sm-4 small form-control-static">
-                        <strong>Επιλέξτε αρχείο ή<br>πληκτρολογείστε ΑΔΑ</strong>
+                        <strong>Επιλέξτε αρχείο {!! ini_get('upload_max_filesize') ? '<span class="bg-primary padding-xs">έως ' . ini_get('upload_max_filesize') . '</span>' : '' !!}<br>ή πληκτρολογείστε ΑΔΑ</strong>
                     </div>
                         @if($allowUserChangeKeepSelect)
                             <div class="col-md-4 col-sm-4 small text-right form-control-static">
@@ -429,7 +366,64 @@ function periigisi(id){
         </div>
     </div>
 </div>
-<script>
+
+<script >
+
+function chkdelete(id, name){
+    var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
+    var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή συννημένου ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
+    var $toast = toastr.warning(html,msg);
+    $toast.delegate('#confirmationRevertYes', 'click', function () {
+            $('#show_arxeia').load("{{ URL::to('/') }}" + "/attach/del/" + id);
+            $toast.remove();
+    });
+    $toast.delegate('#confirmationRevertNo', 'click', function () {
+            $toast.remove();
+    });
+}
+
+function chkprotocoldelete(id, etos, num){
+    var html = "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
+    var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή πρωτοκόλλου με αριθμό ' + num + ' για το έτος ' + etos + '. Είστε σίγουροι;<br>&nbsp;</center>'
+    var $toast = toastr.warning(html,msg);
+    $toast.delegate('#confirmationRevertYes', 'click', function () {
+            $(location).attr('href', "{{ URL::to('/') }}" + "/delprotocol/" + id);
+            $toast.remove();
+    });
+    $toast.delegate('#confirmationRevertNo', 'click', function () {
+            $toast.remove();
+    });
+}
+
+function chkfind(){
+    var protocolnum = $('#find').val()
+    var etos = $('#etos').val()
+    if (protocolnum){
+        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum  + "?find=1")
+    }else{
+        $(location).attr('href', "{{ URL::to('/find') }}")
+    }
+}
+
+function periigisi(id){
+    var protocolnum = parseInt($('#protocolnum').val())
+    var etos = $('#etos').val()
+    switch(id){
+        case 'bb':
+            protocolnum -= {{$protocolArrowStep}}
+            break;
+        case 'b':
+            protocolnum -= 1
+            break;
+        case 'f':
+            protocolnum += 1
+            break;
+        case 'ff':
+            protocolnum += {{$protocolArrowStep}}
+            break;
+            }
+        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum)
+}
 
 function getFileInputs() {
     if (! $("#fakelos").val()){
@@ -442,6 +436,7 @@ function getFileInputs() {
     $("#file_inputs_count").val(parseInt(num)+1)
     $('#show_protocol_file_inputs').load("{{ URL::to('/') }}/getFileInputs/"+ num );
 }
+
 function getKeep4Fakelos(){
     var fak = $("#fakelos").val()
     $.get("{{ URL::to('/') }}/getKeep4Fakelos/" + fak, function(data){
@@ -470,7 +465,7 @@ function startTimer(duration, display) {
 @endif
 
 window.onload = function () {
-  @if ($time2update > 0)
+    @if ($time2update > 0)
     var duration =  {{$time2update}},
     display = document.querySelector('#timer')
     startTimer(duration, display);
@@ -485,14 +480,13 @@ window.onload = function () {
         }
       }
     })
-
 }
 
 function getValues(id, field, divId,  multi){
     @if (! $allowListValuesMatchingInput)
     return
     @endif
-  var searchStr = $('#' + id).val().trim()
+    var searchStr = $('#' + id).val().trim()
     if (searchStr == ''){
         clearDiv( divId )
         return
@@ -501,8 +495,7 @@ function getValues(id, field, divId,  multi){
     if (term == ''){
         clearDiv( divId )
         return
-     }
-
+    }
     $.ajax({
       url: '{{ URL::to('/') }}/getValues/' + term + '/' + field + '/' + id + '/' + divId + '/' + multi ,
       success: function(data){
@@ -520,15 +513,16 @@ function getValues(id, field, divId,  multi){
 }
 
 function clearDiv( divId ) {
-      $('#' + divId).empty()
-      $('#' + divId).hide()
+    $('#' + divId).empty()
+    $('#' + divId).hide()
 }
 
 function split( val ) {
-      return val.split( /\s*,\s*/ );
-    }
+    return val.split( /\s*,\s*/ );
+}
+
 function extractLast( term ) {
-  return split( term ).pop();
+    return split( term ).pop();
 }
 
 function appendValue(id, value, divId, multi){
@@ -536,13 +530,13 @@ function appendValue(id, value, divId, multi){
         $('#' + id).val(value)
     }
     if ( multi == 1) {
-      var terms = split($('#' + id).val());
-      terms.pop()
-      if (!terms.includes(value)){
-        terms.push(value)
-      }
-     terms.push('')
-      $('#' + id).val(terms.join( ', ' ))
+        var terms = split($('#' + id).val());
+        terms.pop()
+        if (!terms.includes(value)){
+            terms.push(value)
+        }
+        terms.push('')
+        $('#' + id).val(terms.join( ', ' ))
     }
   $('#' + id).focus()
   $('#' + divId).empty()
@@ -550,13 +544,13 @@ function appendValue(id, value, divId, multi){
 }
 
 function sendEmailTo(){
-  var oldId = $('#diekperaiosi').attr('data-value')
-  var newId = $('#diekperaiosi').val()
-  var userId = {{Auth::user()->id}}
-  if( ! newId  )return
-  if (newId == userId) return
-  if (newId == oldId) return
-  $('#sendEmailTo').val(newId)
+    var oldId = $('#diekperaiosi').attr('data-value')
+    var newId = $('#diekperaiosi').val()
+    var userId = {{Auth::user()->id}}
+    if( ! newId  )return
+    if (newId == userId) return
+    if (newId == oldId) return
+    $('#sendEmailTo').val(newId)
 }
 
 function receiptToEmail(){
@@ -600,11 +594,10 @@ function receiptToEmail(){
 }
 
 function ValidateEmail(mail){
- if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail))
-  {
-    return (true)
-  }
-    return (false)
+    if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail)){
+        return true
+    }
+    return false
 }
 
 function setDiekperaiomeno(){
@@ -620,8 +613,7 @@ function setDiekperaiomeno(){
         dataType: 'JSON',
         data: {
             '_token': '{{ csrf_token() }}',
-            'id': {{ $protocol->id | null 
-}},
+            'id': {{ $protocol->id | null }},
             'diekp_date': diekpDate
         },
         success: function(response) {
@@ -655,8 +647,141 @@ function findSxetiko(){
             href = "{{ URL::to('/goto') }}" + "/" +   data[1] + "/" + data[0] + "?find=1"
             msg += '<br><a href="' + href + '">Αρ. Πρωτ: ' + data[0] + ', έτος: '  + data[1] + '</a>'
         }
-            toastr.info("<center><h4>Μετάβαση σε</h4><hr></center>" + msg + "<br>&nbsp;</center>")
+        toastr.info("<center><h4>Μετάβαση σε</h4><hr></center>" + msg + "<br>&nbsp;</center>")
     }
+}
+
+function formSubmit(){
+    if(! formValidate()) return
+
+    $('#keep').removeAttr('disabled')
+    sendEmailTo()
+
+    var in_num = $('#in_num').val().trim()
+    var in_date = $('#in_date').val().trim()
+    if (in_num && in_date){
+        $.ajax({
+            type: "POST",
+            url: '{{ route('checkInNum') }}',
+            dataType: 'JSON',
+            data: {
+                '_token': '{{ csrf_token() }}',
+                'id': {{ $protocol->id | null }},
+                'in_num': in_num,
+                'in_date': in_date
+            },
+            success: function(response) {
+                if(response > 0){
+                    var html = "<center><button type='button' id='confirmRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
+                    var msg = "<center><h4>Ενημέρωση ...</h4><hr></center>Υπάρχει καταχωρημένο πρωτόκολλο με ίδιο<br><br>-> Αριθμό Εισερχομένου και<br>-> Ημ/νία Εισερχομένου<br><br>Θέλετε ωστόσο να προχωρήσετε;<br>&nbsp;"
+                    var toast = toastr.info(html,msg);
+                    toast.delegate('#confirmRevertYes', 'click', function () {
+                        @if($protocol->id)
+                            document.forms['myProtocolForm'].submit()
+                        @else
+                            var chk = receiptToEmail()
+                            if(chk) document.forms['myProtocolForm'].submit()
+                        @endif
+                        toast.remove();
+                    });
+                    toast.delegate('#confirmRevertNo', 'click', function () {
+                            toast.remove();
+                    });
+                }else{
+                    @if($protocol->id)
+                        document.forms['myProtocolForm'].submit()
+                    @else
+                        var chk = receiptToEmail()
+                        if(chk) document.forms['myProtocolForm'].submit()
+                    @endif
+                }
+            },
+            error: function (data) {
+                toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Κάποιο λάθος συνέβη!<br>&nbsp;</center>")
+            }
+        });
+    }else{
+        @if($protocol->id)
+            document.forms['myProtocolForm'].submit()
+        @else
+            var chk = receiptToEmail()
+            if(chk) document.forms['myProtocolForm'].submit()
+        @endif
+    }
+}
+
+function formValidate(){
+    var validate = {{ App\Config::getConfigValueOf('protocolValidate') ? 'true' : 'false'}}
+
+    var thema = $('#thema').val().trim()
+    var fakelos = $('#fakelos').val()
+    var in_num = $('#in_num').val().trim()
+    var in_date = $('#in_date').val().trim()
+    var in_topos_ekdosis = $('#in_topos_ekdosis').val().trim()
+    var in_arxi_ekdosis = $('#in_arxi_ekdosis').val().trim()
+    var in_paraliptis = $('#in_paraliptis').val().trim()
+    var in_perilipsi = $('#in_perilipsi').val().trim()
+    var diekperaiosi = $('#diekperaiosi').val().trim()
+    var diekp_date = $('#diekp_date').val().trim()
+    var sxetiko = $('#sxetiko').val().trim()
+    var out_to = $('#out_to').val().trim()
+    var out_date = $('#out_date').val().trim()
+    var out_perilipsi = $('#out_perilipsi').val().trim()
+    var keywords = $('#keywords').val().trim()
+    var paratiriseis = $('#paratiriseis').val().trim()
+
+    var msg = []
+
+    if(validate){
+        if(! thema && ( fakelos || in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis || in_paraliptis || in_perilipsi || diekperaiosi || out_date || diekp_date || sxetiko || out_to || out_perilipsi || keywords || paratiriseis)){
+            msg.push(  "Συμπληρώστε<br>το θέμα.")
+            $('#themaDiv').addClass('has-error')
+        }
+        if(! in_date && ( in_num || in_topos_ekdosis || in_arxi_ekdosis)){
+            msg.push(  "Συμπληρώστε<br>την Ημ/νια έκδοσης.")
+             $('#in_dateDiv').addClass('has-error')
+       }
+        if(! in_topos_ekdosis && ( in_num || in_date || in_arxi_ekdosis)){
+            msg.push(  "Συμπληρώστε<br>τον τόπο έκδοσης.")
+            $('#in_topos_ekdosisDiv').addClass('has-error')
+        }
+        if(! in_arxi_ekdosis && ( in_num || in_date || in_topos_ekdosis)){
+            msg.push(  "Συμπληρώστε<br>την Αρχή έκδοσης.")
+            $('#in_arxi_ekdosisDiv').addClass('has-error')
+        }
+        if(! in_paraliptis && ( in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis)){
+            msg.push( "Συμπληρώστε<br>τον Παραλήπτη.")
+            $('#in_paraliptisDiv').addClass('has-error')
+        }
+        if(! out_date && ( out_to || out_perilipsi)){
+            msg.push(  "Συμπληρώστε<br>την Ημ/νια έξερχομένου.")
+            $('#out_dateDiv').addClass('has-error')
+        }
+        if(! out_to && ( out_date || out_perilipsi )){
+            msg.push(  "Συμπληρώστε<br>το πεδίο Απευθύνεται σε.")
+            $('#out_toDiv').addClass('has-error')
+        }
+    }
+    
+    var chkerr = false
+    var terms = ['in_date', 'out_date', 'diekp_date']
+    terms.forEach(function(term){
+        if ($('#' + term ).val().trim() && ! /^\d{2}[/]\d{2}[/]\d{4}$/.test($('#' + term ).val().trim())){
+            chkerr = true
+            $('#' + term + 'Div').addClass('has-error')
+        }
+    })
+    if (chkerr) msg.push( 'Η ημερομηνία πρέπει να<br>έχει τη μορφή "ηη/μμ/εεεε".')
+
+    if (msg.length){
+        var show = ''
+        msg.forEach(function(error){
+            show += '<li>' + error + '</li>'
+        })
+        toastr.error("<center><h4>Λάθος !!!</h4></center><hr><ul>" + show +"</ul><br> &nbsp;")
+        return false
+    }
+    return true
 }
 
 </script>

@@ -285,23 +285,8 @@
             }
             @endif
 
-            @if($errors->any() and  ! $errors->has('in_num'))
-                toastr.error("<center><h4>Λάθος !!!</h4></center><hr>{!! $errors->first() !!}<br>&nbsp;");
-            @endif
-
-            @if($errors->has('in_num'))
-            var html = "<center><button type='button' id='confirmRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
-            var msg = '{!! $errors->first() !!}'
-            var $toast = toastr.info(html,msg);
-            $toast.delegate('#confirmRevertYes', 'click', function () {
-                    $('#in_chk').attr('value', '0')
-                    $('#myProtocolForm').submit()
-                    $toast.remove();
-            });
-            $toast.delegate('#confirmRevertNo', 'click', function () {
-                    $('#in_chk').attr('value', '1')
-                    $toast.remove();
-            });
+            @if($errors->any())
+                toastr.error("<center><h4>Λάθος !!!</h4></center><hr><ul>@foreach($errors->all() as $error)<li>{!! $error !!}</li>@endforeach</ul><br> &nbsp;");
             @endif
         </script>
 

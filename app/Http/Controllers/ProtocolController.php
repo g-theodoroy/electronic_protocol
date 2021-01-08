@@ -546,23 +546,24 @@ class ProtocolController extends Controller
                 'etos.in' => "Δεν μπορείτε να καταχωρίσετε Νέο Πρωτόκολλο στο παρελθόν έτος $etos.<br><br>Αλλάξτε στις ρυθμίσεις εφαρμογής το ''Ενεργό έτος πρωτοκόλλησης'' είτε σε:<br>-> <b>$currentEtos</b> για να ξεκινήσετε από το 1<br>-> <b>κενό</b> για τον επόμενο Αρ.Πρωτ.<br>&nbsp;",
             ])->validate();
 
-            // έλεγχος για το θέμα
+
             $validator = Validator::make(request()->all(), [
                 'thema' => 'nullable|required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
-            ], [
-                'thema.required_with' => "Συμπληρώστε το θέμα.<br>&nbsp;",
-            ])->validate();
-
-            // έλεγχος άλλων πεδίων
-            $notalwaysValidate = [
                 'in_date' => 'required_with:in_num,in_topos_ekdosis,in_arxi_ekdosis',
-                'in_topos_ekdosis' => 'required_with:in_date,in_arxi_ekdosis|max:255',
-                'in_arxi_ekdosis' => 'required_with:in_date,in_topos_ekdosis|max:255',
-                'in_paraliptis' => 'required_with:in_date|max:255',
+                'in_topos_ekdosis' => 'required_with:in_num,in_date,in_arxi_ekdosis|max:255',
+                'in_arxi_ekdosis' => 'required_with:in_num,in_date,in_topos_ekdosis|max:255',
+                'in_paraliptis' => 'required_with:in_num,in_date,in_arxi_ekdosis,in_topos_ekdosis|max:255',
                 'out_date' => 'required_with:out_to,out_perilipsi',
                 'out_to' => 'required_with:out_date,out_perilipsi|max:255',
-            ];
-            $this->validate(request(), $notalwaysValidate);
+            ], [
+                'thema.required_with' => "Συμπληρώστε<br>το θέμα.",
+                'in_topos_ekdosis.required_with' => "Συμπληρώστε<br>τον τόπο έκδοσης.",
+                'in_arxi_ekdosis.required_with' => "Συμπληρώστε<br>την Αρχή έκδοσης.",
+                'in_date.required_with' => "Συμπληρώστε<br>την Ημ/νια έκδοσης.",
+                'in_paraliptis.required_with' => "Συμπληρώστε<br>τον Παραλήπτη.",
+                'out_date.required_with' => "Συμπληρώστε<br>την Ημ/νια έξερχομένου.",
+                'out_to.required_with' => "Συμπληρώστε<br>το πεδίο Απευθύνεται σε",
+            ])->validate();
         }
 
         // αλλάζω τη μορφή ημερομηνίας για καταχώριση στη βάση
@@ -583,17 +584,6 @@ class ProtocolController extends Controller
         }
         if ($data['sxetiko']) {
             $sxetiko = rtrim($data['sxetiko'], ',');
-        }
-        // αν υπάρχει καταχωρισμένο πρωτόκολλο με ίδια αρ.εισερχ+ημνια.εισερχ.
-        // θα ρωτήσω τον χρήστη αν θα προχωρήσω η όχι
-        // αν ο χρήστης πει ναι τότε το πεδίο in_chk θα γίνει false(0) με javascript και θα περάσει το validation
-        $in_chkdata = $data['in_chk'];
-        if ($in_chkdata == '1') {
-            $validator = Validator::make(request()->all(), [
-                'in_num' => "unique:protocols,in_num,NULL,id,in_date,$in_date",
-            ], [
-                'in_num.unique' => "<center><h4>Ενημέρωση ...</h4><hr></center>Υπάρχει καταχωρημένο πρωτόκολλο με ίδιο<br><br>Αριθμό Εισερχομένου και<br>Ημ/νία Εισερχομένου<br><br>Θέλετε ωστόσο να προχωρήσετε;<br>&nbsp;",
-            ])->validate();
         }
 
         // αν η ρύθμιση Ασφαλής νέος Αρ.Πρ είναι ΝΑΙ
@@ -759,8 +749,6 @@ class ProtocolController extends Controller
         // από το παλιό πρωτόκολλο για ελέγχους
         $id = $protocol->id;
         $oldFakelos = $protocol->fakelos;
-        $oldIn_num = $protocol->in_num;
-        $oldIn_date = $protocol->in_date;
         // το έτος
         $etos = request('etos');
         // το id του Διεκπεραιωτή για email
@@ -770,35 +758,11 @@ class ProtocolController extends Controller
         $sendEmailOnDiekperaiosiChange = Config::getConfigValueOf('sendEmailOnDiekperaiosiChange');
 
         // πάντα validate
-        $mustValidate = [
+        // validation της μορφής ημνιων
+        $validator = Validator::make(request()->all(), [
             'protocolnum' => "required|integer|unique:protocols,protocolnum,$id,id,etos,$etos",
             'etos' => 'required|integer|digits:4',
             'protocoldate' => 'required',
-        ];
-        $this->validate(request(), $mustValidate);
-
-        // παίρνω τις ρυθμίσεις [Έλεγχοι & περιορισμοί κατά την καταχώριση]
-        // αν είναι true (1)
-        if ($protocolValidate) {
-            // θέμα
-            $validator = Validator::make(request()->all(), [
-                'thema' => 'nullable|required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
-            ], [
-                'thema.required_with' => "Συμπληρώστε το θέμα.<br>&nbsp;",
-            ])->validate();
-            // άλλα πεδία
-            $notalwaysValidate = [
-                'in_date' => 'required_with:in_num,in_topos_ekdosis,in_arxi_ekdosis',
-                'in_topos_ekdosis' => 'required_with:in_date,in_arxi_ekdosis|max:255',
-                'in_arxi_ekdosis' => 'required_with:in_date,in_topos_ekdosis|max:255',
-                'in_paraliptis' => 'required_with:in_date|max:255',
-                'out_date' => 'required_with:out_to,out_perilipsi',
-                'out_to' => 'required_with:out_date,out_perilipsi|max:255',
-            ];
-            $this->validate(request(), $notalwaysValidate);
-        }
-        // validation της μορφής ημνιων
-        $validator = Validator::make(request()->all(), [
             'protocoldate' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
             'in_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
             'out_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
@@ -809,6 +773,28 @@ class ProtocolController extends Controller
             'out_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
             'diekp_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         ])->validate();
+
+        // παίρνω τις ρυθμίσεις [Έλεγχοι & περιορισμοί κατά την καταχώριση]
+        // αν είναι true (1)
+        if ($protocolValidate) {
+            $validator = Validator::make(request()->all(), [
+                'thema' => 'nullable|required_with:fakelos,in_num,in_date,in_topos_ekdosis,in_arxi_ekdosis,in_paraliptis,in_perilipsi,diekperaiosi,out_date,diekp_date,sxetiko,out_to,out_perilipsi,keywords,paratiriseis|max:255',
+                'in_date' => 'required_with:in_num,in_topos_ekdosis,in_arxi_ekdosis',
+                'in_topos_ekdosis' => 'required_with:in_num,in_date,in_arxi_ekdosis|max:255',
+                'in_arxi_ekdosis' => 'required_with:in_num,in_date,in_topos_ekdosis|max:255',
+                'in_paraliptis' => 'required_with:in_num,in_date,in_arxi_ekdosis,in_topos_ekdosis|max:255',
+                'out_date' => 'required_with:out_to,out_perilipsi',
+                'out_to' => 'required_with:out_date,out_perilipsi|max:255',
+            ], [
+                'thema.required_with' => "Συμπληρώστε<br>το θέμα.",
+                'in_topos_ekdosis.required_with' => "Συμπληρώστε<br>τον τόπο έκδοσης.",
+                'in_arxi_ekdosis.required_with' => "Συμπληρώστε<br>την Αρχή έκδοσης.",
+                'in_date.required_with' => "Συμπληρώστε<br>την Ημ/νια έκδοσης.",
+                'in_paraliptis.required_with' => "Συμπληρώστε<br>τον Παραλήπτη.",
+                'out_date.required_with' => "Συμπληρώστε<br>την Ημ/νια έξερχομένου.",
+                'out_to.required_with' => "Συμπληρώστε<br>το πεδίο Απευθύνεται σε",
+            ])->validate();
+        }
 
         // αλλαγή μορφής ημνιων για αποθήκευση στη ΒΔ
         $in_date = null;
@@ -829,23 +815,6 @@ class ProtocolController extends Controller
         }
         if ($data['sxetiko']) {
             $sxetiko = rtrim($data['sxetiko'], ',');
-        }
-
-        // ελέγχω τον αρ.Εισ. + Hμνια.Εισ
-        // πρόκειται για update. αν είναι ίδια είναι ok
-        $in_chkdata = $data['in_chk'];
-        if ($data['in_num'] == $oldIn_num and $in_date == $oldIn_date) {
-            $in_chkdata = '0';
-        }
-
-        // αν η φόρμα μου στείλει ότι πρέπει να ελέγξω
-        // γιατί έχουν αλλάξει τότε κάνω validate αν υπάρχουν σε άλλο πρωτόκολλο
-        if ($in_chkdata == '1') {
-            $validator = Validator::make(request()->all(), [
-                'in_num' => "unique:protocols,in_num,NULL,id,in_date,$in_date",
-            ], [
-                'in_num.unique' => "<center><h4>Ενημέρωση ...</h4><hr></center>Υπάρχει καταχωρημένο πρωτόκολλο με ίδιο<br><br>-> Αριθμό Εισερχομένου και<br>-> Ημ/νία Εισερχομένου<br><br>Θέλετε ωστόσο να προχωρήσετε;<br>&nbsp;",
-            ])->validate();
         }
 
         // αν άλλαξε ο Φακελλος και υπάρχουν συνημμένα αρχεία
@@ -2065,5 +2034,16 @@ class ProtocolController extends Controller
         // ".file-name.-" becomes "file-name"
         $filename = trim($filename, '.-');
         return $filename;
+    }
+
+    public function checkInNum(Request $request)
+    {
+        $in_date = Carbon::createFromFormat('d/m/Y', $request->in_date)->format('Ymd');
+        $protocols = Protocol::where('in_date', $in_date)->where('in_num', $request->in_num);
+        if ($request->id) {
+            $protocols =  $protocols->where('id', '!=', $request->id);
+        }
+        $count =  $protocols->count();
+        return response()->json($count);
     }
 }

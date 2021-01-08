@@ -34,7 +34,7 @@
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                       <form name="frm{{$oMessage->getUid()}}" id="frm{{$oMessage->getUid()}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
                       {{ csrf_field() }}
-                      <div class="row bg-primary"><div class="col-md-1 col-sm-1 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
+                      <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
                       @php $num++; @endphp
 
                         @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
