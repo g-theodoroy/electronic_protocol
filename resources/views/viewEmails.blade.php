@@ -35,7 +35,11 @@
                       <form name="frm{{$oMessage->getUid()}}" id="frm{{$oMessage->getUid()}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
                       {{ csrf_field() }}
                       <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
-                      @php $num++; @endphp
+                      @php 
+                          $num++; 
+                          $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+                          if(! $subject) $subject = $oMessage->getSubject();
+                      @endphp
 
                         @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
 
@@ -44,7 +48,7 @@
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Φάκελος</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
+                        <div id="fakelos{{$oMessage->getUid()}}Div" class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
                             <select id="fakelos{{$oMessage->getUid()}}" onchange='getKeep4Fakelos({{$oMessage->getUid()}})' class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos{{$oMessage->getUid()}}"  title='13. Φάκελος αρχείου' autofocus >
                                 <option value=''></option>
                                 @foreach($fakeloi as $fakelos)
@@ -55,11 +59,7 @@
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Θέμα</strong>
                         </div>
-                        @php
-                            $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
-                            if(! $subject) $subject = $oMessage->getSubject();
-                        @endphp
-                        <div class="col-md-6 col-sm-6 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
+                        <div id="themaDiv" class="col-md-6 col-sm-6 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
                             <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control" name="thema" placeholder="thema" value="{{ $subject }}" title='Θέμα'>
                             <div id="themaList" class="col-md-12 col-sm-12" ></div>
                         </div>
@@ -79,19 +79,19 @@
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
+                        <div id="in_numDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
                             <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
-                        <div class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
+                        <div id="in_dateDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
                             <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
                         </div>
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
+                        <div id="in_topos_ekdosisDiv" class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
                             <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
                             <div id="in_topos_ekdosisList" class="col-md-12 col-sm-12" ></div>
                         </div>
@@ -103,7 +103,7 @@
                                 <div class="col-md-2 col-sm-2 small text-center">
                                     <strong>Αρχή<br>Έκδοσης</strong>
                                 </div>
-                                <div class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
+                                <div id="in_arxi_ekdosisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
                                 <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ mb_detect_encoding($oMessage->getFrom()[0]->personal, 'UTF-8, ISO-8859-7', true)== 'ISO-8859-7' ? iconv("ISO-8859-7", "UTF-8//IGNORE", $oMessage->getFrom()[0]->personal) : $oMessage->getFrom()[0]->personal }} {{ $oMessage->getFrom()[0]->personal ? "<" : "" }}{{ $oMessage->getFrom()[0]->mail  }}{{ $oMessage->getFrom()[0]->personal ? ">" : "" }}" title='5. Αρχή που το έχει εκδώσει'>
                                     <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
@@ -112,7 +112,7 @@
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
                                     <strong>Παραλήπτης</strong>
                                 </div>
-                                <div class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
+                                <div id="in_paraliptisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
                                     <input id="in_paraliptis" oninput="getValues(this.id, 'in_paraliptis', 'in_paraliptisList', 0)" type="text" class="form-control" name="in_paraliptis" placeholder="in_paraliptis" value="{{ Auth::user()->name }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε'>
                                     <div id="in_paraliptisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
@@ -123,7 +123,7 @@
                                 <div class="col-md-2 col-sm-2 small text-center form-control-static">
                                     <strong>Περίληψη</strong>
                                 </div>
-                                <div class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
+                                <div id="in_perilipsiDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
                                     <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('#\s+#',' ',trim($oMessage->getTextBody())), 0, 250) }}</textarea>
                                 </div>
                             </div>
@@ -135,7 +135,7 @@
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Διεκπεραίωση</strong>
                         </div>
-                        <div class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                        <div id="diekperaiosi{{$oMessage->getUid()}}Div"  class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
                           <select id="diekperaiosi{{$oMessage->getUid()}}" class="form-control small selectpicker" name="diekperaiosi" title='Διεκπεραίωση' data-value="" @if($forbidenChangeDiekperaiosiSelect) onchange="this.value = this.getAttribute('data-value');" @endif>
                           <option value=''></option>
                           @foreach($writers_admins as $writer_admin)
@@ -190,6 +190,9 @@
                         <div class="text-right">
                           <input id="uid" type="hidden" class="form-control" name="uid" value="{{$oMessage->getUid()}}">
                           <input id="sendReceipt{{$oMessage->getUid()}}" type="hidden" class="form-control" name="sendReceipt{{$oMessage->getUid()}}" value="0">
+                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('H:i:s') }}" >
+                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('d/m/Y') }}" >
+                          <input id="thema" type="hidden" class="form-control" name="thema" placeholder="thema" value="{{ $subject }}" >
                           <a href="{{ URL::to('/') }}/setEmailRead/{{$oMessage->getUid()}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
                           @if(! $alwaysSendReceitForEmails)
                             <a href="javascript:$('#sendReceipt{{$oMessage->getUid()}}').val(0);chkSubmitForm({{$oMessage->getUid()}});" class="" role="button" title="Καταχώριση email χωρίς αποστολή Απόδειξης παραλαβής" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
@@ -313,7 +316,46 @@ function chkSubmitForm(uid) {
         toastr.info("<center><h4>Ενημέρωση...</h4><hr>Για να καταχωρίσετε ένα email είναι απαραίτητο να επιλέξετε Φάκελο<br>&nbsp;</center>")
         return
     }
-    $("#frm" + uid).submit()
+    @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
+      if(! formValidate(uid)) return
+    @endif
+      var thema = $("#frm" + uid ).find('input[name="thema"]').val().trim()
+      var in_num = $("#frm" + uid ).find('input[name="in_num"]').val().trim()
+      var in_date = $("#frm" + uid ).find('input[name="in_date"]').val().trim()
+
+        $.ajax({
+            type: "POST",
+            url: '{{ route('checkSameEmail') }}',
+            dataType: 'JSON',
+            data: {
+                '_token': '{{ csrf_token() }}',
+                'thema': thema,
+                'in_num': in_num,
+                'in_date': in_date
+            },
+            success: function(response) {
+                msgStr = ''
+                if(response['thema'] > 0) msgStr += '<li>Θέμα</li>'
+                if(response['in_num'] > 0) msgStr += '<li>Αρ. & Ημνια Εισερχομένου</li>'
+                if(msgStr){
+                    var html = "<center><button type='button' id='confirmRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmRevertNo' class='btn btn-primary'>Όχι</button></center></p>"
+                    msg = "<center><h4>Ενημέρωση ...</h4><hr></center>Υπάρχει καταχωρισμένο πρωτόκολλο με ίδιο<ul>" + msgStr + "</ul>Θέλετε ωστόσο να προχωρήσετε;<br>&nbsp;"
+                    var toast = toastr.info(html,msg);
+                    toast.delegate('#confirmRevertYes', 'click', function () {
+                        $("#frm" + uid).submit()
+                        toast.remove();
+                    });
+                    toast.delegate('#confirmRevertNo', 'click', function () {
+                        toast.remove();
+                    });
+                }else{
+                    $("#frm" + uid).submit()
+                }
+            },
+            error: function (data) {
+                toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Κάποιο λάθος συνέβη!<br>&nbsp;</center>")
+            }
+        });
 }
 
 function getValues(id, field, divId,  multi){
@@ -386,6 +428,66 @@ function sendEmailTo(id){
   if (newId == oldId) return
   $('#sendEmailTo' + id).val(newId)
 }
+
+function formValidate(uid){
+    var validate = {{ App\Config::getConfigValueOf('protocolValidate') ? 'true' : 'false'}}
+
+    var thema = $("#frm" + uid ).find('input[name="thema"]').val().trim()
+    var fakelos = $('#fakelos'+ uid).val()
+    var in_num = $("#frm" + uid ).find('input[name="in_num"]').val().trim()
+    var in_date = $("#frm" + uid ).find('input[name="in_date"]').val().trim()
+    var in_topos_ekdosis = $("#frm" + uid ).find('input[name="in_topos_ekdosis"]').val().trim()
+    var in_arxi_ekdosis = $("#frm" + uid ).find('input[name="in_arxi_ekdosis"]').val().trim()
+    var in_paraliptis = $("#frm" + uid ).find('input[name="in_paraliptis"]').val().trim()
+    var in_perilipsi = $("#frm" + uid ).find('textarea[name="in_perilipsi"]').val().trim()
+    var diekperaiosi = $('#diekperaiosi' + uid).val().trim()
+
+    var msg = []
+
+    if(validate){
+        msgStr = ''
+        if(! thema && ( fakelos || in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis || in_paraliptis || in_perilipsi || diekperaiosi )){
+            msgStr +=  "<li>το θέμα</li>"
+            $("#frm" + uid + ' div#themaDiv').addClass('has-error')
+        }
+        if(! in_date && ( in_num || in_topos_ekdosis || in_arxi_ekdosis)){
+            msgStr +=  "<li>την ημ/νια έκδοσης</li>"
+             $("#frm" + uid + ' div#in_dateDiv').addClass('has-error')
+       }
+        if(! in_topos_ekdosis && ( in_num || in_date || in_arxi_ekdosis)){
+            msgStr +=  "<li>τον τόπο έκδοσης</li>"
+            $("#frm" + uid + ' div#in_topos_ekdosisDiv').addClass('has-error')
+        }
+        if(! in_arxi_ekdosis && ( in_num || in_date || in_topos_ekdosis)){
+            msgStr +=  "<li>την αρχή έκδοσης</li>"
+            $("#frm" + uid + ' div#in_arxi_ekdosisDiv').addClass('has-error')
+        }
+        if(! in_paraliptis && ( in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis)){
+            msgStr +=  "<li>τον παραλήπτη</li>"
+            $("#frm" + uid + ' div#in_paraliptisDiv').addClass('has-error')
+        }
+        if(msgStr) msg.push("Συμπληρώστε<ul>" + msgStr + "</ul>")
+    }
+
+    var chkerr = false
+    if (in_date && ! /^\d{2}[/]\d{2}[/]\d{4}$/.test(in_date)){
+            chkerr = true
+            $("#frm" + uid + ' div#in_dateDiv').addClass('has-error')
+        }
+    if (chkerr) msg.push( 'Η ημερομηνία πρέπει να<br>έχει τη μορφή "ηη/μμ/εεεε".')
+
+    if (msg.length){
+        var show = ''
+        msg.forEach(function(error){
+            show += '<li>' + error + '</li>'
+        })
+        toastr.error("<center><h4>Λάθος !!!</h4></center><hr><ul>" + show +"</ul><br> &nbsp;")
+        return false
+    }
+    return true
+}
+
+
 
 
 </script>

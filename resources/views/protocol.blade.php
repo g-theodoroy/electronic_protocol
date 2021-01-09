@@ -733,34 +733,36 @@ function formValidate(){
     var msg = []
 
     if(validate){
+        msgStr = ''
         if(! thema && ( fakelos || in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis || in_paraliptis || in_perilipsi || diekperaiosi || out_date || diekp_date || sxetiko || out_to || out_perilipsi || keywords || paratiriseis)){
-            msg.push(  "Συμπληρώστε<br>το θέμα.")
+            msgStr +=  "<li>το θέμα</li>"
             $('#themaDiv').addClass('has-error')
         }
         if(! in_date && ( in_num || in_topos_ekdosis || in_arxi_ekdosis)){
-            msg.push(  "Συμπληρώστε<br>την Ημ/νια έκδοσης.")
+            msgStr +=  "<li>την ημ/νια έκδοσης</li>"
              $('#in_dateDiv').addClass('has-error')
        }
         if(! in_topos_ekdosis && ( in_num || in_date || in_arxi_ekdosis)){
-            msg.push(  "Συμπληρώστε<br>τον τόπο έκδοσης.")
+            msgStr +=  "<li>τον τόπο έκδοσης</li>"
             $('#in_topos_ekdosisDiv').addClass('has-error')
         }
         if(! in_arxi_ekdosis && ( in_num || in_date || in_topos_ekdosis)){
-            msg.push(  "Συμπληρώστε<br>την Αρχή έκδοσης.")
+            msgStr +=  "<li>την αρχή έκδοσης</li>"
             $('#in_arxi_ekdosisDiv').addClass('has-error')
         }
         if(! in_paraliptis && ( in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis)){
-            msg.push( "Συμπληρώστε<br>τον Παραλήπτη.")
+            msgStr +=  "<li>τον παραλήπτη</li>"
             $('#in_paraliptisDiv').addClass('has-error')
         }
         if(! out_date && ( out_to || out_perilipsi)){
-            msg.push(  "Συμπληρώστε<br>την Ημ/νια έξερχομένου.")
+            msgStr +=  "<li>την ημ/νια έξερχομένου</li>"
             $('#out_dateDiv').addClass('has-error')
         }
         if(! out_to && ( out_date || out_perilipsi )){
-            msg.push(  "Συμπληρώστε<br>το πεδίο Απευθύνεται σε.")
+            msgStr +=  "<li>σε ποιον απευθύνεται</li>"
             $('#out_toDiv').addClass('has-error')
         }
+        if(msgStr) msg.push("Συμπληρώστε<ul>" + msgStr + "</ul>")
     }
     
     var chkerr = false

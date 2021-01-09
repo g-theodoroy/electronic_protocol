@@ -67,6 +67,7 @@ Route::post('/home', 'ProtocolController@store');
 Route::post('/home/{protocol}', 'ProtocolController@update');
 Route::get('/delprotocol/{protocol}', 'ProtocolController@delprotocol');
 Route::post('/checkInNum', 'ProtocolController@checkInNum')->name('checkInNum');
+Route::post('/checkSameEmail', 'ProtocolController@checkSameEmail')->name('checkSameEmail');
 
 Route::get('/attach/del/{attachment}', 'ProtocolController@attachDelete');
 Route::get('/goto/{etos}/{protocolnum}', 'ProtocolController@gotonum');

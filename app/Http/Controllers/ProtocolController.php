@@ -1710,7 +1710,12 @@ class ProtocolController extends Controller
         $oMessage = $oFolder->getMessage($uid, null, null, true, true, false);
 
         // βάζω τα δεδομένα σε μεταβλητές
-        $thema = isset($data["thema"]) ? $data["thema"] : $oMessage->getSubject();
+        if (isset($data["thema"])) {
+            $thema = $data["thema"];
+        } else {
+            $thema = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+            if (!$thema) $thema = $oMessage->getSubject();
+        }
         // αλλάζω τις ημνιες στην κατάλληλη μορφή για αποθήκευση
         $in_num = isset($data["in_num"]) ? $data["in_num"] : Carbon::parse($oMessage->getDate())->format('H:i:s');
         $in_date = isset($data["in_date"]) ? Carbon::createFromFormat('d/m/Y', $data["in_date"])->format('Ymd') : Carbon::parse($oMessage->getDate())->format('Ymd');
@@ -1757,17 +1762,7 @@ class ProtocolController extends Controller
                 $newprotocolnum = 1;
             }
         }
-        // αν υπάρχει καταχωρισμένο Πρωτόκολλο με ίδια στοιχεία ειδοποιώ και γυρίζω πίσω
-        if (Protocol::whereIn_num($in_num)->whereThema($thema)->count()) {
-            $protocolExists = Protocol::whereIn_num($in_num)->whereThema($thema)->first(['protocolnum', 'etos', 'protocoldate']);
-            $message = 'Υπάρχει ήδη καταχωρισμένο Πρωτόκολλο από ληφθέν email με ίδιο <strong>Θέμα</strong> και <strong>Ημνία αποστολής</strong> με τα παρακάτω στοιχεία: <br>Αρ Πρωτ: ' . $protocolExists->protocolnum . '<br>Ημνία: ' . Carbon::createFromFormat('Ymd', $protocolExists->protocoldate)->format('d/m/Y') . '<br>Έτος: ' . $protocolExists->etos . '.';
-            $notification = array(
-                'message' =>  $message,
-                'alert-type' => 'warning'
-            );
-            session()->flash('notification', $notification);
-            return back();
-        }
+
         // αποθηκεύω το Πρωτόκολλο
         try {
             $protocolCreated = Protocol::create([
@@ -2044,6 +2039,15 @@ class ProtocolController extends Controller
             $protocols =  $protocols->where('id', '!=', $request->id);
         }
         $count =  $protocols->count();
+        return response()->json($count);
+    }
+
+    public function checkSameEmail(Request $request)
+    {
+        $count = [];
+        $in_date = Carbon::createFromFormat('d/m/Y', $request->in_date)->format('Ymd');
+        $count['thema'] =  Protocol::where('thema', $thema)->count();
+        $count['in_num'] =  Protocol::where('in_date', $in_date)->where('in_num', $request->in_num)->count();
         return response()->json($count);
     }
 }
