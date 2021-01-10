@@ -14,7 +14,6 @@
         "joshrainwater/active-users": "dev-master",
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
-        "laravel/passport": "^9.3.2",
         "laravel/ui": "^2.4",
         "webklex/laravel-imap": "^1.4"
     },

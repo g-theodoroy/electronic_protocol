@@ -56,7 +56,7 @@
                         </div>
                       <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1  " >
-                                Ξεκίνα νέα σελίδα πάνω από αριθμό γραμμών
+                                Να εμφανίζονται στη σελίδα -> <strong>{{ App\Config::getConfigValueOf('showRowsInPage') }}</strong> <- γραμμές </div>
                             </div>
                             <div class="col-md-2 col-sm-2  " id="showRowsInPagediv">
                                 <input id="showRowsInPage" type="text" class="form-control text-center" name="showRowsInPage" placeholder="showRowsInPage" value="{{App\Config::getConfigValueOf('showRowsInPage')}}" title=''>
@@ -64,7 +64,7 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1" >
-                                Ανανέωση Πρωτοκόλλου κάθε τόσα λεπτά
+                                Ανανέωση Πρωτοκόλλου κάθε -> <strong>{{ App\Config::getConfigValueOf('minutesRefreshInterval') }}</strong> <- λεπτά </div>
                             </div>
                             <div class="col-md-2 col-sm-2  " id="minutesRefreshIntervaldiv">
                                 <input id="minutesRefreshInterval" type="text" class="form-control text-center" name="minutesRefreshInterval" placeholder="minutesRefreshInterval" value="{{App\Config::getConfigValueOf('minutesRefreshInterval')}}" title=''>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="row">
                             <div class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1 ">
-                                Η  Λίστα Πρωτοκόλλου απλώνεται σε όλο τον διαθέσιμο χώρο
+                                Να απλώνεται σε όλο τον διαθέσιμο χώρο
                             </div>
                             <div class="col-md-2 col-sm-2  " id="wideListProtocoldiv">
                                 <select id='wideListProtocol' name='wideListProtocol' class="form-control"  title=''>

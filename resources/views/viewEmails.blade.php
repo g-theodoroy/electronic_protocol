@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+<div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
     <div class="row">
         <div class="col-md-12 col-sm-12 ">
            <div class="panel panel-default">

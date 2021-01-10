@@ -87,7 +87,7 @@
     <body>
         <div id="app">
             <nav class="navbar navbar-default navbar-static-top">
-                <div class="container">
+                <div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
                     <div class="navbar-header">
 
                         <!-- Collapsed Hamburger -->
