@@ -357,8 +357,6 @@ class ProtocolController extends Controller
         if (strpos(request()->headers->get('referer'), 'login')) {
             $needsUpdate = Config::getConfigValueOf('needsUpdate');
         }
-        // άλλες ρυθμίσεις
-        $wideListProtocol = Config::getConfigValueOf('wideListProtocol');
         $diavgeiaUrl = Config::getConfigValueOf('diavgeiaUrl');
         $showUserInfo = Config::getConfigValueOf('showUserInfo');
 
@@ -436,19 +434,19 @@ class ProtocolController extends Controller
                 $sxetiko = explode(', ', $protocol->sxetiko);
                 $pattern = "/^\d+\/\d{4}/i";
                 $links = array();
-                foreach ($sxetiko as $sxet){
-                    if( preg_match($pattern, $sxet)){
-                    $data = explode('/', $sxet);
-                    $href = URL::to('/goto') . "/" .  $data[1] . "/" . $data[0] . "?find=1";
-                    $links[] = '<a href="' . $href . '">' . $sxet . '</a>';
-                }else{
-                    $links[] = $sxet;
-                }
+                foreach ($sxetiko as $sxet) {
+                    if (preg_match($pattern, $sxet)) {
+                        $data = explode('/', $sxet);
+                        $href = URL::to('/goto') . "/" .  $data[1] . "/" . $data[0] . "?find=1";
+                        $links[] = '<a href="' . $href . '">' . $sxet . '</a>';
+                    } else {
+                        $links[] = $sxet;
+                    }
                     $protocol->sxetiko = join(', ', $links);
                }
             }
         }
-        return view('protocolList', compact('protocols', 'refreshInterval', 'needsUpdate', 'wideListProtocol', 'diavgeiaUrl', 'activeusers2show', 'writers_admins', 'protocoltitle'));
+        return view('protocolList', compact('protocols', 'refreshInterval', 'needsUpdate', 'diavgeiaUrl', 'activeusers2show', 'writers_admins', 'protocoltitle'));
     }
 
 

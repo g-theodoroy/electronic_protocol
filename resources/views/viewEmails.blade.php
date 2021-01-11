@@ -316,9 +316,15 @@ function chkSubmitForm(uid) {
         toastr.info("<center><h4>Ενημέρωση...</h4><hr>Για να καταχωρίσετε ένα email είναι απαραίτητο να επιλέξετε Φάκελο<br>&nbsp;</center>")
         return
     }
-    @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
+    var alwaysShowFakelosInViewEmails = {{$alwaysShowFakelosInViewEmails ? 'true' : 'false'}}
+    var emailHasAttachments = []
+    @foreach ($aMessage as $oMessage)
+      emailHasAttachments[{{$oMessage->getUid()}}] = {{$oMessage->hasAttachments() ? 'true' : 'false'}}
+    @endforeach
+
+    if( emailHasAttachments[uid] || alwaysShowFakelosInViewEmails){
       if(! formValidate(uid)) return
-    @endif
+    }
       var thema = $("#frm" + uid ).find('input[name="thema"]').val().trim()
       var in_num = $("#frm" + uid ).find('input[name="in_num"]').val().trim()
       var in_date = $("#frm" + uid ).find('input[name="in_date"]').val().trim()
