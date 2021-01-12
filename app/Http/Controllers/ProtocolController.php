@@ -2044,7 +2044,7 @@ class ProtocolController extends Controller
     {
         $count = [];
         $in_date = Carbon::createFromFormat('d/m/Y', $request->in_date)->format('Ymd');
-        $count['thema'] =  Protocol::where('thema', $thema)->count();
+        $count['thema'] =  Protocol::where('thema', $request->thema)->count();
         $count['in_num'] =  Protocol::where('in_date', $in_date)->where('in_num', $request->in_num)->count();
         return response()->json($count);
     }
