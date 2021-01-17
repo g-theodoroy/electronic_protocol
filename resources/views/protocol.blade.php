@@ -12,7 +12,17 @@ input[readonly].asd {
     background:rgba(0,0,0,0);
     border:none;
     font-weight: bold;
+    cursor: not-allowed;
 }
+input[readonly].inout{
+    background:rgba(255,255,255,255);
+    cursor: not-allowed;
+}
+textarea[readonly].inout{
+    background:rgba(255,255,255,255);
+    cursor: not-allowed;
+}
+
 </style>
 
 <div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
@@ -77,7 +87,6 @@ input[readonly].asd {
                         <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                             <a href="{{ URL::to('/') }}/home" class="active" role="button" title="Νέο" > <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 / ></a>
                             <a href="javascript:formSubmit()" class="{{$submitVisible}}" role="button" title="Αποθήκευση" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
-                            <a href="javascript:setDiekperaiomeno()" class="{{$readerVisible}}" role="button" title="Σήμανση ως Διεκπεραιωμένο" > <img src="{{ URL::to('/') }}/images/done.png" height=25 /></a>
                         </div>
                     </div>
 
@@ -86,14 +95,14 @@ input[readonly].asd {
                             <strong>Φάκελος</strong>
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
-                            <select id="fakelos" onchange='getKeep4Fakelos()' class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos"  title='13. Φάκελος αρχείου' autofocus >
-                                <option value=''></option>
-                                @foreach($fakeloi as $fakelos)
+                            <select id="fakelos" class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos"  autofocus data-value="{{$protocol->fakelos}}" @if($headReadonly) onchange="this.value = this.getAttribute('data-value');" disabled="disabled"  @else onchange='getKeep4Fakelos()' @endif>
+                                 <option value=''></option>
+                               @foreach($fakeloi as $fakelos)
                                 @if ($fakelos['fakelos'] == $protocol->fakelos)
                                     <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @else
-                                    <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
-                                @endif
+                                     <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
@@ -101,7 +110,7 @@ input[readonly].asd {
                             <strong>Θέμα</strong>
                         </div>
                         <div id="themaDiv" class="col-md-7 col-sm-7 middle {{ $errors->has('thema') ? ' has-error' : '' }}">
-                            <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control" name="thema" placeholder="thema" value="{{ old('thema') ? old('thema') : $protocol->thema }}" title='Θέμα'>
+                            <input id="thema" oninput="getValues(this.id, 'thema', 'themaList', 0)" type="text" class="form-control inout" name="thema" placeholder="thema" value="{{ old('thema') ? old('thema') : $protocol->thema }}" title='Θέμα' {{$headReadonly}}>
                             <div id="themaList" class="col-md-12 col-sm-12" ></div>
                         </div>
                         <div class="col-md-1 col-sm-1 text-center">
@@ -119,19 +128,19 @@ input[readonly].asd {
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
                         <div id="in_numDiv"  class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
-                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ old('in_num') ? old('in_num') : $protocol->in_num }}" title='3. Αριθμός εισερχομένου εγγράφου' >
+                            <input id="in_num" type="text" class="form-control text-center inout" name="in_num" placeholder="in_num" value="{{ old('in_num') ? old('in_num') : $protocol->in_num }}" title='3. Αριθμός εισερχομένου εγγράφου' {{$inReadonly}}>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
                         <div id="in_dateDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
-                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ old('in_date') ? old('in_date') : $in_date }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
+                            <input id="in_date" type="text" class="form-control @if(! $inReadonly) datepicker @endif text-center inout" name="in_date" placeholder="in_date" value="{{ old('in_date') ? old('in_date') : $in_date }}" title='5. Χρονολογία εισερχομένου εγγράφου' {{$inReadonly}}>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
                         </div>
                         <div id="in_topos_ekdosisDiv"  class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
-                            <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
+                            <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control inout" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε' {{$inReadonly}}>
                             <div id="in_topos_ekdosisList" class="col-md-12 col-sm-12" ></div>
                         </div>
                     </div>
@@ -143,7 +152,7 @@ input[readonly].asd {
                                     <strong>Αρχή<br>Έκδοσης</strong>
                                 </div>
                                 <div id="in_arxi_ekdosisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
-                                    <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ old('in_arxi_ekdosis') ? old('in_arxi_ekdosis') : $protocol->in_arxi_ekdosis }}" title='5. Αρχή που το έχει εκδώσει'>
+                                    <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control inout" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ old('in_arxi_ekdosis') ? old('in_arxi_ekdosis') : $protocol->in_arxi_ekdosis }}" title='5. Αρχή που το έχει εκδώσει' {{$inReadonly}}>
                                     <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                                 </div>
@@ -152,7 +161,7 @@ input[readonly].asd {
                                     <strong>Παραλήπτης</strong>
                                 </div>
                                 <div id="in_paraliptisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_paraliptis') ? ' has-error' : '' }}">
-                                    <input id="in_paraliptis" oninput="getValues(this.id, 'in_paraliptis', 'in_paraliptisList', 0)" type="text" class="form-control" name="in_paraliptis" placeholder="in_paraliptis" value="{{ old('in_paraliptis') ? old('in_paraliptis') : $protocol->in_paraliptis }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε'>
+                                    <input id="in_paraliptis" oninput="getValues(this.id, 'in_paraliptis', 'in_paraliptisList', 0)" type="text" class="form-control inout" name="in_paraliptis" placeholder="in_paraliptis" value="{{ old('in_paraliptis') ? old('in_paraliptis') : $protocol->in_paraliptis }}" title='7. Διεύθυνση, τμήμα, γραφείο ή πρόσωπο στο οποίο δόθηκε' {{$inReadonly}}>
                                     <div id="in_paraliptisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                             </div>
@@ -163,7 +172,7 @@ input[readonly].asd {
                                     <strong>Περίληψη</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
-                                    <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ old('in_perilipsi') ? old('in_perilipsi') : $protocol->in_perilipsi }}</textarea>
+                                    <textarea id="in_perilipsi" type="text" class="form-control inout" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'  {{$inReadonly}}>{{ old('in_perilipsi') ? old('in_perilipsi') : $protocol->in_perilipsi }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -173,31 +182,63 @@ input[readonly].asd {
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Διεκπεραίωση</strong>
                         </div>
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                          <select id="diekperaiosi" class="form-control small selectpicker" name="diekperaiosi" title='Διεκπεραίωση' data-value="{{$protocol->diekperaiosi}}" @if($forbidenChangeDiekperaiosiSelect) onchange="this.value = this.getAttribute('data-value');" @endif>
-                          <option value=''></option>
-                          @foreach($writers_admins as $writer_admin)
-                                  <option value='{{$writer_admin->id}}' @if($writer_admin->id == $protocol->diekperaiosi) selected @endif>{{$writer_admin->name}}</option>
-                              @endforeach
-                            </select>
                             <input id="sendEmailTo" name="sendEmailTo" type="hidden" />
+                            @if($forbidenChangeDiekperaiosiSelect)
+                        <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                                <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}} disabled="disabled" >
+                                    <optgroup label="Διεκπεραίωση" >
+                                        @foreach($writers_admins as $writer_admin)
+                                            <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Ενημέρωση" >
+                                        @foreach($writers_admins as $writer_admin)
+                                            <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                </select>
+                            </div>
+                            @else
+                        <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                            <div class="row">
+                                <div class="col=md-11 col-sm-11">
+                                 <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" >
+                                    <optgroup label="Διεκπεραίωση" >
+                                        @foreach($writers_admins as $writer_admin)
+                                            <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Ενημέρωση" >
+                                        @foreach($writers_admins as $writer_admin)
+                                            <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                </select>
+                                </div>
+                                <div class="col=md-1 col-sm-1 form-control-static"  style="padding-left: 5px;padding-right: 5px;" onclick="javascript:anathesiSe()" title="Ανάθεση πρωτοκόλλου"><img src="{{ URL::to('/') }}/images/todo.png" height=20 / ></div>
+                                </div>
                         </div>
+                            @endif
+
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Διεκπεραίωσης</strong>
                         </div>
 
                         <div class= "col-md-5 col-sm-5">
                             <div class="row">
-                        <div  id="diekp_dateDiv" class="col-md-4 col-sm-4 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
-                            <input id="diekp_date" type="text" class="form-control datepicker text-center" name="diekp_date" placeholder="diekp_date" value="{{ old('diekp_date') ? old('diekp_date') : $diekp_date }}" title='11. Ημερομηνία διεκπεραίωσης'>
+                            <div  id="diekp_dateDiv" class="col-md-4 col-sm-4 {{ $errors->has('diekp_date') ? ' has-error' : '' }}">
+                            <div class="input-group">
+                            <input id="diekp_date" type="text" class="form-control  @if(! $diekpDateReadonly) datepicker @endif  text-center inout" name="diekp_date" placeholder="diekp_date" value="{{ old('diekp_date') ? old('diekp_date') : $diekp_date }}" title='11. Ημερομηνία διεκπεραίωσης'  {{$diekpDateReadonly}}>
+                            <div class="input-group-btn {{$readerVisible}}"  style="padding-left: 5px;padding-right: 5px;"  onclick="javascript:setDiekperaiomeno()" title="Σήμανση ως Διεκπεραιωμένο"><img src="{{ URL::to('/') }}/images/done.png" height=20 /></div>
+                            </div>
                         </div>
                         <div class="col-md-2 col-sm-2 small text-center">
                             <strong>Σχετικοί<br>αριθμοί</strong>
                         </div>
                         <div class="col-md-6 col-sm-6 {{ $errors->has('sxetiko') ? ' has-error' : '' }}">
                             <div class="input-group">
-                            <input id="sxetiko" oninput="getValues(this.id, 'sxetiko', 'sxetikoList', 1)"type="text" class="form-control text-center" name="sxetiko" placeholder="sxetiko" value="{{ old('sxetiko') ? old('sxetiko') : $protocol->sxetiko }}" title='12. Σχετικοί αριθμοί'>
-                            <span class="input-group-addon" onclick="javascript:findSxetiko()" title="Μετάβαση στο σχετικό Πρωτόκολλο"><img src="{{ URL::to('/') }}/images/find.ico" height=15 / ></span>
+                            <input id="sxetiko" oninput="getValues(this.id, 'sxetiko', 'sxetikoList', 1)"type="text" class="form-control text-center inout" name="sxetiko" placeholder="sxetiko" value="{{ old('sxetiko') ? old('sxetiko') : $protocol->sxetiko }}" title='12. Σχετικοί αριθμοί'  {{$outReadonly}}>
+                            <div class="input-group-btn" style="padding-left: 5px;padding-right: 5px;" onclick="javascript:findSxetiko()" title="Μετάβαση στο σχετικό Πρωτόκολλο"><img src="{{ URL::to('/') }}/images/find.ico" height=20 / ></div>
                             </div>
                             <div id="sxetikoList" class="col-md-12 col-sm-12" ></div>
                         </div>
@@ -212,7 +253,7 @@ input[readonly].asd {
                                     <strong>Απευθύνεται</strong>
                                 </div>
                                 <div  id="out_toDiv" class="col-md-10 col-sm-10 {{ $errors->has('out_to') ? ' has-error' : '' }}">
-                                    <input id="out_to" oninput="getValues(this.id, 'out_to', 'out_toList', 0)" type="text" class="form-control" name="out_to" placeholder="out_to" value="{{ old('out_to') ? old('out_to') : $protocol->out_to }}"  title='8. Αρχή στην οποία απευθύνεται'>
+                                    <input id="out_to" oninput="getValues(this.id, 'out_to', 'out_toList', 0)" type="text" class="form-control inout" name="out_to" placeholder="out_to" value="{{ old('out_to') ? old('out_to') : $protocol->out_to }}"  title='8. Αρχή στην οποία απευθύνεται' {{$outReadonly}}>
                                     <div id="out_toList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                                 </div>
@@ -221,7 +262,7 @@ input[readonly].asd {
                                     <strong>Ημνία<br>Εξερχ.</strong>
                                 </div>
                                 <div id="out_dateDiv" class="col-md-4 col-sm-4 {{ $errors->has('out_date') ? ' has-error' : '' }}">
-                                    <input id="out_date" type="text" class="form-control datepicker text-center" name="out_date" placeholder="out_date" value="{{ old('out_date') ? old('out_date') : $out_date }}" title='10. Χρονολογία εξερχομένου εγγράφου'>
+                                    <input id="out_date" type="text" class="form-control  @if(! $outReadonly) datepicker @endif  text-center inout" name="out_date" placeholder="out_date" value="{{ old('out_date') ? old('out_date') : $out_date }}" title='10. Χρονολογία εξερχομένου εγγράφου' {{$outReadonly}}>
                                 </div>
                             </div>
                         </div>
@@ -231,7 +272,7 @@ input[readonly].asd {
                                     <strong>Περίληψη</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('out_perilipsi') ? ' has-error' : '' }}">
-                                    <textarea id="out_perilipsi" type="text" class="form-control" name="out_perilipsi"  placeholder="out_perilipsi" value=""  title='9. Περίληψη εξερχομένου εγγράφου'>{{ old('out_perilipsi') ? old('out_perilipsi') : $protocol->out_perilipsi }}</textarea>
+                                    <textarea id="out_perilipsi" type="text" class="form-control inout" name="out_perilipsi"  placeholder="out_perilipsi" value=""  title='9. Περίληψη εξερχομένου εγγράφου' {{$outReadonly}}>{{ old('out_perilipsi') ? old('out_perilipsi') : $protocol->out_perilipsi }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -245,7 +286,7 @@ input[readonly].asd {
                                     <strong>Παρατηρήσεις</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('paratiriseis') ? ' has-error' : '' }}">
-                                    <textarea id="paratiriseis" type="text" class="form-control" name="paratiriseis"  placeholder="paratiriseis" title='Παρατηρήσεις' >{{ old('paratiriseis') ? old('paratiriseis') : $protocol->paratiriseis }}</textarea>
+                                    <textarea id="paratiriseis" type="text" class="form-control inout" name="paratiriseis"  placeholder="paratiriseis" title='Παρατηρήσεις' {{$outReadonly}} >{{ old('paratiriseis') ? old('paratiriseis') : $protocol->paratiriseis }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -255,7 +296,7 @@ input[readonly].asd {
                                     <strong>Λέξεις<br>κλειδιά</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('keywords') ? ' has-error' : '' }}">
-                                    <input id="keywords" oninput="getValues(this.id, 'keywords', 'keywordsList', 1)" type="text" class="form-control" name="keywords"  placeholder="keywords" value="{{ old('keywords') ? old('keywords') : $protocol->keywords }}" title='Παρατηρήσεις'>
+                                    <input id="keywords" oninput="getValues(this.id, 'keywords', 'keywordsList', 1)" type="text" class="form-control inout" name="keywords"  placeholder="keywords" value="{{ old('keywords') ? old('keywords') : $protocol->keywords }}" title='Παρατηρήσεις' {{$outReadonly}}>
                                     <div id="keywordsList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                             </div>
@@ -264,7 +305,7 @@ input[readonly].asd {
                                     <strong>Απ.Παραλ.<br>στο email</strong>
                                 </div>
                                 <div class="col-md-10 col-sm-10 {{ $errors->has('reply_to_email') ? ' has-error' : '' }}">
-                                    <input id="reply_to_email"  type="text" class="form-control" name="reply_to_email"  placeholder="reply_to_email" value="{{ old('reply_to_email') ? old('reply_to_email') : '' }}" title='Συμπληρώστε το email στο οποίο θέλετε να στείλετε Απόδειξη παραλαβής' >
+                                    <input id="reply_to_email"  type="text" class="form-control inout" name="reply_to_email"  placeholder="reply_to_email" value="{{ old('reply_to_email') ? old('reply_to_email') : '' }}" title='Συμπληρώστε το email στο οποίο θέλετε να στείλετε Απόδειξη παραλαβής'  {{$outReadonly}}>
                                     <div id="reply_toList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                             </div>
@@ -545,7 +586,7 @@ function appendValue(id, value, divId, multi){
 
 function sendEmailTo(){
     var oldId = $('#diekperaiosi').attr('data-value')
-    var newId = $('#diekperaiosi').val()
+    var newId = $('#diekperaiosi').val() ? $('#diekperaiosi').val().join(',') : ''
     var userId = {{Auth::user()->id}}
     if( ! newId  )return
     if (newId == userId) return
@@ -652,9 +693,13 @@ function findSxetiko(){
 }
 
 function formSubmit(){
+    
     if(! formValidate()) return
 
-    $('#keep').removeAttr('disabled')
+    // ενεργοποιώ τα disabled πεδία
+    for(let field of document.forms['myProtocolForm'].elements) {
+        if (field.name) field.removeAttribute("disabled")       
+    }
     sendEmailTo()
 
     var in_num = $('#in_num').val().trim()
@@ -712,6 +757,7 @@ function formSubmit(){
 
 function formValidate(){
     var validate = {{ App\Config::getConfigValueOf('protocolValidate') ? 'true' : 'false'}}
+    var allowEmptyProtocol = {{ App\Config::getConfigValueOf('allowEmptyProtocol') ? 'true' : 'false'}}
 
     var thema = $('#thema').val().trim()
     var fakelos = $('#fakelos').val()
@@ -721,7 +767,7 @@ function formValidate(){
     var in_arxi_ekdosis = $('#in_arxi_ekdosis').val().trim()
     var in_paraliptis = $('#in_paraliptis').val().trim()
     var in_perilipsi = $('#in_perilipsi').val().trim()
-    var diekperaiosi = $('#diekperaiosi').val().trim()
+    var diekperaiosi = $('#diekperaiosi').val() ? $('#diekperaiosi').val().join().trim() : ''
     var diekp_date = $('#diekp_date').val().trim()
     var sxetiko = $('#sxetiko').val().trim()
     var out_to = $('#out_to').val().trim()
@@ -734,28 +780,38 @@ function formValidate(){
 
     if(validate){
         msgStr = ''
+        if(! allowEmptyProtocol){
+            if(! thema ){
+                msgStr +=  "<li>θέμα</li>"
+                $('#themaDiv').addClass('has-error')
+            }
+        }
         if(! thema && ( fakelos || in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis || in_paraliptis || in_perilipsi || diekperaiosi || out_date || diekp_date || sxetiko || out_to || out_perilipsi || keywords || paratiriseis)){
-            msgStr +=  "<li>το θέμα</li>"
+            msgStr +=  "<li>θέμα</li>"
             $('#themaDiv').addClass('has-error')
         }
         if(! in_date && ( in_num || in_topos_ekdosis || in_arxi_ekdosis)){
-            msgStr +=  "<li>την ημ/νια έκδοσης</li>"
+            msgStr +=  "<li>ημ/νια έκδοσης</li>"
              $('#in_dateDiv').addClass('has-error')
        }
         if(! in_topos_ekdosis && ( in_num || in_date || in_arxi_ekdosis)){
-            msgStr +=  "<li>τον τόπο έκδοσης</li>"
+            msgStr +=  "<li>τόπο έκδοσης</li>"
             $('#in_topos_ekdosisDiv').addClass('has-error')
         }
         if(! in_arxi_ekdosis && ( in_num || in_date || in_topos_ekdosis)){
-            msgStr +=  "<li>την αρχή έκδοσης</li>"
+            msgStr +=  "<li>αρχή έκδοσης</li>"
             $('#in_arxi_ekdosisDiv').addClass('has-error')
         }
         if(! in_paraliptis && ( in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis)){
-            msgStr +=  "<li>τον παραλήπτη</li>"
+            msgStr +=  "<li>παραλήπτη</li>"
             $('#in_paraliptisDiv').addClass('has-error')
         }
+        if(! diekp_date && diekperaiosi && ( out_to || out_date || out_perilipsi)){
+            msgStr +=  "<li>ημ/νια διεκπεραίωσης</li>"
+            $('#diekp_dateDiv').addClass('has-error')
+        }
         if(! out_date && ( out_to || out_perilipsi)){
-            msgStr +=  "<li>την ημ/νια έξερχομένου</li>"
+            msgStr +=  "<li>ημ/νια έξερχομένου</li>"
             $('#out_dateDiv').addClass('has-error')
         }
         if(! out_to && ( out_date || out_perilipsi )){
@@ -786,6 +842,34 @@ function formValidate(){
     return true
 }
 
+function anathesiSe(){
+    var oldId = $('#diekperaiosi').attr('data-value')
+    var newId = $('#diekperaiosi').val() ? $('#diekperaiosi').val().join(',') : ''
+    if( ! newId ) {
+        toastr.error("<center><h4>Λάθος !!!</h4></center><hr>Επιλέξτε σε ποιον θα ανατεθεί το πρωτόκολλο<br> &nbsp;")
+        return
+    }else if( newId == oldId){
+        toastr.error("<center><h4>Λάθος !!!</h4></center><hr>Το παρόν πρωτόκολλο έχει ήδη ανατεθεί και έχουν ήδη ενημερωθεί οι επιλεγμένοι χρήστες<br> &nbsp;")
+        return
+    }
+        $.ajax({
+        type: "POST",
+        url: '{{ route('anathesiSe') }}',
+        dataType: 'JSON',
+        data: {
+            '_token': '{{ csrf_token() }}',
+            'id': {{ $protocol->id | null }},
+            'diekperaiosi': newId
+        },
+        success: function(response) {
+            location.reload()
+        },
+         error: function (data) {
+            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Δεν κατέστη δυνατή η ανάθεση του πρωτοκόλλου<br>" + data.responseText +"&nbsp;</center>")
+        }
+    });
+
+}
 </script>
 
 @endsection

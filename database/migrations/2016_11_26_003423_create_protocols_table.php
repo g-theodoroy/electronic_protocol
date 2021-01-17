@@ -34,7 +34,7 @@ class CreateProtocolsTable extends Migration
             $table->string('out_to')->nullable();
             $table->string('out_perilipsi')->nullable();
             $table->string('keywords')->nullable();
-            $table->string('paratiriseis')->nullable();
+            $table->text('paratiriseis')->nullable();
             $table->timestamps();
             $table->unique(array('protocolnum', 'etos'));
         });

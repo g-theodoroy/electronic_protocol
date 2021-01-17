@@ -29,6 +29,8 @@
                       </div>
                    </div>
                  </div>
+
+                 @if($aMessageCount)
                  @php $num = 1; @endphp
                  @foreach($aMessage as $oMessage)
                     <div class="panel panel-default col-md-12 col-sm-12  ">
@@ -136,16 +138,21 @@
                             <strong>Διεκπεραίωση</strong>
                         </div>
                         <div id="diekperaiosi{{$oMessage->getUid()}}Div"  class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                          <select id="diekperaiosi{{$oMessage->getUid()}}" class="form-control small selectpicker" name="diekperaiosi" title='Διεκπεραίωση' data-value="" @if($forbidenChangeDiekperaiosiSelect) onchange="this.value = this.getAttribute('data-value');" @endif>
-                          <option value=''></option>
-                          @foreach($writers_admins as $writer_admin)
-                                  <option value='{{$writer_admin->id}}' >{{$writer_admin->name}}</option>
-                              @endforeach
-                            </select>
-                            <input id="sendEmailTo{{$oMessage->getUid()}}" name="sendEmailTo" type="hidden" />
+
+                            <select id="diekperaiosi{{$oMessage->getUid()}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
+                              <optgroup label="Διεκπεραίωση" >
+                                        @foreach($writers_admins as $writer_admin)
+                                            <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Ενημέρωση" >
+                                        @foreach($writers_admins as $writer_admin)
+                                            <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                </select>
+                           <input id="sendEmailTo{{$oMessage->getUid()}}" name="sendEmailTo" type="hidden" />
                         </div>
-
-
 
                           @if($allowUserChangeKeepSelect)
                               <div class="col-md-1 col-sm-1 small text-center form-control-static">
@@ -285,8 +292,9 @@
                       </div>
                       @endif
                     </form>
-                </div>
+                    </div>
                 @endforeach
+                @endif
                </div>
             </div>
         </div>
@@ -426,11 +434,12 @@ function appendValue(id, value, divId, multi){
 }
 
 function sendEmailTo(id){
+
   var oldId = $('#diekperaiosi' + id).attr('data-value')
-  var newId = $('#diekperaiosi' + id).val()
-  var userId = {{Auth::user()->id}}
+  if($('#diekperaiosi' + id).val()){
+    var newId = $('#diekperaiosi' + id).val().join(',')
+  }
   if( ! newId  )return
-  if (newId == userId) return
   if (newId == oldId) return
   $('#sendEmailTo' + id).val(newId)
 }
@@ -446,13 +455,14 @@ function formValidate(uid){
     var in_arxi_ekdosis = $("#frm" + uid ).find('input[name="in_arxi_ekdosis"]').val().trim()
     var in_paraliptis = $("#frm" + uid ).find('input[name="in_paraliptis"]').val().trim()
     var in_perilipsi = $("#frm" + uid ).find('textarea[name="in_perilipsi"]').val().trim()
-    var diekperaiosi = $('#diekperaiosi' + uid).val().trim()
-
+    if($('#diekperaiosi' + uid).val()){
+      var diekperaiosi = $('#diekperaiosi' + uid).val().join(',').trim()
+    }
     var msg = []
 
     if(validate){
         msgStr = ''
-        if(! thema && ( fakelos || in_num || in_date || in_topos_ekdosis || in_arxi_ekdosis || in_paraliptis || in_perilipsi || diekperaiosi )){
+        if(! thema ){
             msgStr +=  "<li>το θέμα</li>"
             $("#frm" + uid + ' div#themaDiv').addClass('has-error')
         }

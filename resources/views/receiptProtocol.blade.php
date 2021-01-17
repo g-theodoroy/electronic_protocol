@@ -5,14 +5,17 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-       <title>Αποστολή αποδεικτικού </title>
+       <title>Αποστολή αποδεικτικού καταχώρισης</title>
 
     </head>
     <body>
       <h4>{{$ipiresiasName}}</h4>
       <h4>Ηλεκτρονικό Πρωτόκολλο</h4>
-      <h3>Αποστολή βεβαίωσης καταχώρισης στο Ηλ. Πρωτόκολλο με Email</h3>
-      <h4>{{date('d/m/Y H:i:s')}}</h4>
+      <p>&nbsp;</p>
+      <p>{{date('d/m/Y H:i:s')}}</p>
+      <p>Αποστολέας: <b>{{Auth::user()->name}}</b></p>
+      <p>&nbsp;</p>
+      <h3>Αποστολή αποδεικτικού καταχώρισης στο Ηλ. Πρωτόκολλο με Email</h3>
       <p>Σας ενημερώνουμε ότι η υποβολή σας καταχωρίστηκε στο Ηλεκτρονικό Πρωτόκολλο με τα παρακάτω στοιχεία:</p>
         @php
             $fields = [

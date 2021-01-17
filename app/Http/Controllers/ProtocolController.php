@@ -99,7 +99,7 @@ class ProtocolController extends Controller
         $firstProtocolNum = Config::getConfigValueOf('firstProtocolNum');
         $protocolArrowStep = Config::getConfigValueOf('protocolArrowStep');
         $allowWriterUpdateProtocol = Config::getConfigValueOf('allowWriterUpdateProtocol');
-        $allowWriterUpdateProtocolTimeInMinutes = Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes');
+        $allowWriterUpdateProtocolTimeInMinutes = Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes') ? Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes'): 0 ;
         $protocolValidate = Config::getConfigValueOf('protocolValidate');
         $diavgeiaUrl = Config::getConfigValueOf('diavgeiaUrl');
         $allowUserChangeKeepSelect = Config::getConfigValueOf('allowUserChangeKeepSelect');
@@ -176,23 +176,56 @@ class ProtocolController extends Controller
         // ένα πρωτόκολλο ο χρήστης. Το 0 σημαίνει χωρίς περιορισμό
         // αρχικοποίηση μεταβλητής για απεριόριστο χρόνο
         $time2update = 0;
-        // έλεγχος των κουμπιών που θα φαίνονται ή θα κρύβονται
-        // ανάλογα με το ρόλο του χρήστη
+        // έλεγχος τί έχει συμπληρωθεί
+        //$headWithData = false;
+        //if($protocol->fakelos || $protocol->thema) $headWithData = true;
+        // εισερχόμενο πρωτόκολλο
+        $inWithData = false;
+        if($protocol->in_num || $protocol->in_date || $protocol->in_topos_ekdosis || $protocol->in_arxi_ekdosis || $protocol->in_paraliptis || $protocol->in_perilipsi) $inWithData = true;
+        // εξερχόμενο πρωτόκολλο
+        $outWithData = false;
+        if ($protocol->out_to || $protocol->out_date || $protocol->out_perilipsi) $outWithData = true;
+        // έλεγχος αν επιτρέπεται η ενημέρωση
+        // αν δεν έχει περάσει ο χρόνος που ορίζεται στις ρυθμίσεις
+        // η μεταβλητή γίνεται true = επεξεργασία
+        // μόνο σε ενημέρωση και όχι σε νέο πρωτόκολλο 
+        if ($protocol->id){
+            // αν ο χρόνος που πέρασε από την πρώτη καταχώριση είναι μέσα στα όρια επιτρέπεται η επεξεργασία
+            $inTimeFirstCommit = false;
+            if ($protocol->created_at->getTimestamp() > Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) $inTimeFirstCommit = true;
+            // αν ο χρόνος που πέρασε από την την τελευταία ενημέρωση είναι μέσα στα όρια επιτρέπεται η επεξεργασία
+            $inTimeLastEdit = false;
+            if ($protocol->updated_at->getTimestamp() > Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) $inTimeLastEdit = true;
+        }
+
+        // έλεγχος των κουμπιών που θα φαίνονται ή θα κρύβονται ανάλογα με το ρόλο του χρήστη
+        // αρχικές ρυθμίσεις -> όλα επιτρέπονται
         $submitVisible = 'active';
         $readerVisible = 'hidden';
+        $headReadonly = '';
+        $inReadonly = '';
+        $outReadonly = '';
+        $diekpDateReadonly = '';
 
         // ΔΙΚΑΙΩΜΑΤΑ ΑΠΟΘΗΚΕΥΣΗΣ
         // ΑΠΟΚΡΥΨΗ ΤΟΥ ΚΟΥΜΠΙΟΥ ΑΠΟΘΗΚΕΥΣΗ
-        // 1 αν ο χρήστης είναι Αναγνώστης
+        // 1 αν ο χρήστης είναι Αναγνώστης μπορεί μόνο να ενημερώσει την ημνια διεκπεραίωσης και τίποτε άλλο
         if (Auth::user()->role->role == 'Αναγνώστης') {
             $submitVisible = 'hidden';
+            $headReadonly = 'readonly';
+            $inReadonly = 'readonly';
+            $outReadonly = 'readonly';
+            $diekpDateReadonly = 'readonly';
             $class = 'bg-warning';
             $protocoltitle = 'Πρωτόκολλο';
-            if ($protocol->diekperaiosi && $protocol->diekperaiosi == Auth::user()->id){
+            if ($protocol->diekperaiosi && strpos($protocol->diekperaiosi, 'd' . Auth::user()->id) !== false) {
                 $readerVisible = 'active';
+                $diekpDateReadonly = '';
                 if ($allowWriterUpdateProtocolTimeInMinutes && $protocol->user_id == Auth::user()->id) {
-                    if ($protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) {
+                    // αν έχει περάσει ο χρόνος κρύβεται
+                    if (! $inTimeLastEdit) {
                         $readerVisible = 'hidden';
+                        $diekpDateReadonly = 'readonly';
                     }
                 }
                 if ($readerVisible == 'active' && $protocol->diekp_date) {
@@ -207,24 +240,68 @@ class ProtocolController extends Controller
                 // αν η μεταβλητή είναι 0 ή null δηλαδή δεν επιτρέπεται τροποποίηση από Συγγραφείς
                 if (!$allowWriterUpdateProtocol) {
                     $submitVisible = 'hidden';
+                    $headReadonly = 'readonly';
+                    $inReadonly = 'readonly';
+                    $outReadonly = 'readonly';
+                    $diekpDateReadonly = 'readonly';
                     // αν η μεταβλητή είναι 1 δηλαδή επιτρέπεται μόνο στον Συγγραφέα που καταχώρισε το Πρ.
                 } elseif ($allowWriterUpdateProtocol == 1) {
-                    // αν ο Συγγραφέας ΔΕΝ είναι ο ίδιος
+                    // αν ο Συγγραφέας ΔΕΝ είναι ο ίδιος ΚΡΥΒΕΤΑΙ
                     if ($protocol->user_id <> Auth::user()->id) {
                         $submitVisible = 'hidden';
+                        $headReadonly = 'readonly';
+                        $inReadonly = 'readonly';
+                        $outReadonly = 'readonly';
+                        $diekpDateReadonly = 'readonly';
                     } else {
                         // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
                         if ($allowWriterUpdateProtocolTimeInMinutes) {
-                            if ($protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) {
+                            // εκτός ορίων Κλειστα όλα
+                            if (! $inTimeFirstCommit && ! $inTimeLastEdit) {
                                 $submitVisible = 'hidden';
+                                $headReadonly = 'readonly';
+                                $inReadonly = 'readonly';
+                                $outReadonly = 'readonly';
+                                $diekpDateReadonly = 'readonly';
+                            }
+                            // εκτός από την αρχική καταχώριση - εντός από τελευταία ενημέρωση
+                            // ανοιχτά σε επεξεργασία μόνο τα εξερχόμενα
+                            if(!$inTimeFirstCommit && $inTimeLastEdit){
+                                // έχει δεδομένα εισερχόμενα και εξερχόμενα -> ανοιχτά μόνο εξερχόμενα
+                                if ($inWithData && $outWithData) {
+                                    $headReadonly = 'readonly';
+                                    $inReadonly = 'readonly';
+                                }
+                                // έχει δεδομένα εξερχόμενα -> ανοιχτά φάκελος-θέμα και εξερχόμενα
+                                if (!$inWithData && $outWithData) {
+                                    $inReadonly = 'readonly';
+                                }
                             }
                         }
                     }
                     // αν η μεταβλητή είναι 2 δηλαδή επιτρέπεται σε κάθε Συγγραφέα να τροποποιήσει
                 } else {
                     // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
-                    if ($allowWriterUpdateProtocolTimeInMinutes and $protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) {
-                        $submitVisible = 'hidden';
+                     if ($allowWriterUpdateProtocolTimeInMinutes) {
+                            // εκτός ορίων Κλειστα όλα
+                        if (!$inTimeFirstCommit && !$inTimeLastEdit) {
+                            $submitVisible = 'hidden';
+                            $headReadonly = 'readonly';
+                            $inReadonly = 'readonly';
+                            $outReadonly = 'readonly';
+                            $diekpDateReadonly = 'readonly';
+                        }
+                        if (!$inTimeFirstCommit && $inTimeLastEdit) {
+                            // έχει δεδομένα εισερχόμενα και εξερχόμενα -> ανοιχτά μόνο εξερχόμενα
+                            if ( $inWithData && $outWithData) {
+                                $headReadonly = 'readonly';
+                                $inReadonly = 'readonly';
+                            }
+                            // έχει δεδομένα εξερχόμενα -> ανοιχτά φάκελος-θέμα και εξερχόμενα
+                            if (! $inWithData && $outWithData) {
+                                $inReadonly = 'readonly';
+                            }
+                        }
                     }
                 }
                 // Αν περνώντας τα παραπάνω τεστ μπορεί να τροποιήσει αρχίζω αντίστροφη μέτρηση
@@ -238,26 +315,43 @@ class ProtocolController extends Controller
                 // Αν το πρωτόκολλο δεν έχει θέμα (είναι δηλαδή κενό) ακυρώνονται όλα τα παραπάνω
                 if (!$protocol->thema) {
                     $submitVisible = 'active';
+                    $headReadonly = '';
+                    $inReadonly = '';
+                    $outReadonly = '';
+                    $diekpDateReadonly = '';
                     $class = 'bg-success';
                     $time2update = 0;
                 }
-                // Αν είναι προς διεκπεραίωση από το χρήστη => επιτρέπεται η επεξεργασία
-                if ($protocol->diekperaiosi == Auth::user()->id and !$protocol->diekp_date) {
+                // Αν είναι προς διεκπεραίωση από το χρήστη => επιτρέπεται η επεξεργασία μόνο εξερχομένου
+                if (strpos($protocol->diekperaiosi, 'd' . Auth::user()->id) !== false and !$protocol->diekp_date) {
                     $class = 'bg-success';
                     $submitVisible = 'active';
-                } elseif ($protocol->diekperaiosi == Auth::user()->id and $protocol->diekp_date) {
+                    $headReadonly = 'readonly';
+                    $inReadonly = 'readonly';
+                    $outReadonly = '';
+                    $diekpDateReadonly = '';
+                    $time2update = 0;
+                } elseif (strpos($protocol->diekperaiosi, 'd' . Auth::user()->id) !== false and $protocol->diekp_date) {
                     // Αν έχει διεκπεραιωθεί αρχίζω αντίστροφη μέτρηση
                     // αν τα λεπτά είναι μεγαλύτερα του 0 τότε ελέγχεται ο χρόνος που πέρασε και μετά κρύβεται το κουμπί
-                    if ($allowWriterUpdateProtocolTimeInMinutes and $protocol->updated_at->getTimestamp() < Carbon::now()->subMinutes($allowWriterUpdateProtocolTimeInMinutes)->getTimestamp()) {
+                    if ($allowWriterUpdateProtocolTimeInMinutes and ! $inTimeLastEdit) {
                         $submitVisible = 'hidden';
+                        $headReadonly = 'readonly';
+                        $inReadonly = 'readonly';
+                        $outReadonly = 'readonly';
+                        $diekpDateReadonly = 'readonly';
                     }
                 }
-                // Αν ο χρήστης είναι Αναθέτων και το Πρωτόκολλο δεν έχει ανάτεθεί σε διεκπεραιωτή επιτρέπω τροποποίηση
-                if (Auth::user()->role_description() ==  "Αναθέτων") {
-                    if (!$protocol->diekperaiosi) {
-                        $class = 'bg-success';
-                        $submitVisible = 'active';
-                    }
+                 // αν δεν έχει οριστεί χρόνος που μπορεί ο συγγραφέας να επεξεργαστεί
+                // τότε η επεξεργασία επιτρέπεται και ανοίγουν όλα
+                if(! $allowWriterUpdateProtocolTimeInMinutes){
+                    $class = 'bg-success';
+                    $submitVisible = 'active';
+                    $headReadonly = '';
+                    $inReadonly = '';
+                    $outReadonly = '';
+                    $diekpDateReadonly = '';
+                    $time2update = 0;
                 }
             }
         }
@@ -293,7 +387,7 @@ class ProtocolController extends Controller
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible', 'delVisible', 'readonly', 'readerVisible', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo', 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible', 'delVisible', 'readonly', 'readerVisible', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo', 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput','headReadonly', 'inReadonly', 'outReadonly', 'diekpDateReadonly'));
     }
 
     public function chkForUpdates()
@@ -380,10 +474,10 @@ class ProtocolController extends Controller
         $protocols = Protocol::orderby('etos', 'desc')->orderby('protocolnum', 'desc');
         if (!$userId) {
             if ($filter == 'd') {
-                $protocols = $protocols->where('diekperaiosi', Auth::user()->id)->whereNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%" )->whereNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο προς Διεκπεραίωση';
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where('diekperaiosi', Auth::user()->id)->wherenotNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%" )->wherenotNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο Διεκπεραιώθηκε';
             }
         } elseif (User::whereId($userId)->count() and $filter) {
@@ -393,10 +487,10 @@ class ProtocolController extends Controller
                 $user2show = User::whereId($userId)->first('name')->name;
             }
             if ($filter == 'd') {
-                $protocols = $protocols->where('diekperaiosi', $userId)->whereNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . $userId . "%")->whereNull('diekp_date');
                 $protocoltitle = "$user2show, προς Διεκπεραίωση";
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where('diekperaiosi', $userId)->wherenotNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . $userId . "%")->wherenotNull('diekp_date');
                 $protocoltitle = "$user2show, Διεκπεραιώθηκε";
             } else {
                 $protocols = $protocols->where('user_id', $userId);
@@ -404,10 +498,10 @@ class ProtocolController extends Controller
             }
         } else {
             if ($filter == 'd') {
-                $protocols = $protocols->where('diekperaiosi', '!=', '')->whereNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . "%" )->whereNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, προς Διεκπεραίωση";
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where('diekperaiosi', '!=', '')->wherenotNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . "%" )->wherenotNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
             }
         }
@@ -443,7 +537,7 @@ class ProtocolController extends Controller
                         $links[] = $sxet;
                     }
                     $protocol->sxetiko = join(', ', $links);
-               }
+                }
             }
         }
         return view('protocolList', compact('protocols', 'refreshInterval', 'needsUpdate', 'diavgeiaUrl', 'activeusers2show', 'writers_admins', 'protocoltitle'));
@@ -475,6 +569,7 @@ class ProtocolController extends Controller
     {
         // παίρνω τα δεδομένα της φορμας
         $data = request()->all();
+
         // το id του Διεκπεραιωτή (άν έχει σταλεί) για αποστολή email
         $sendEmailTo = request('sendEmailTo');
         // το email (αν υπάρχει) στο οποίο θα σταλεί απόδειξη παραλαβής
@@ -607,7 +702,7 @@ class ProtocolController extends Controller
                 'in_topos_ekdosis' =>  $data['in_topos_ekdosis'],
                 'in_arxi_ekdosis' => $data['in_arxi_ekdosis'],
                 'in_paraliptis' => $data['in_paraliptis'],
-                'diekperaiosi' => $data['diekperaiosi'],
+                'diekperaiosi' => isset($data['diekperaiosi']) ? implode(',',$data['diekperaiosi']) : '',
                 'in_perilipsi' => $data['in_perilipsi'],
                 'out_date' => $out_date,
                 'diekp_date' => $diekp_date,
@@ -693,7 +788,16 @@ class ProtocolController extends Controller
         // και οι ρυθμίσεις λένα να στέλνω email σε ανάθεση
         // στέλνω email
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
-            $message .= $this->sendMailToDiekperaioti($sendEmailTo, $protocol);
+            $sendEmailToArray = explode(',', $sendEmailTo);
+            $message = '';
+            foreach ($sendEmailToArray as $smt) {
+                if (substr($smt, 0, 1) == 'd') {
+                    $message .= $this->sendMailToDiekperaioti(ltrim($smt, 'd'), $protocol);
+                }
+                if (substr($smt, 0, 1) == 'e') {
+                    $message .= $this->diekpInformMail(ltrim($smt, 'e'), $protocol);
+                }
+            }
         }
 
         // αν έχει συμπληρωθεί email για αποστολή απόδειξης παραλαβής
@@ -715,10 +819,10 @@ class ProtocolController extends Controller
                 // προσθέτω στις παρατηρήσεις ότι στάλθηκε απόδειξη παραλαβής με email
                 $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
                 $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
-                $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+                //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
                 $protocol->paratiriseis = $parMessage;
                 $protocol->update();
-                $message .= "<br><br>" . $parMessage;
+                $message .= "<li>" . $parMessage . "</li";
             } else {
                 // αν υπάρχουν λάθη ενημερώνω
                 $notification = array(
@@ -730,7 +834,7 @@ class ProtocolController extends Controller
         }
         // ενημέρωση για την επιτυχία της καταχώρισης
         $notification = array(
-            'message' => 'Επιτυχημένη ενημέρωση.' . $message,
+            'message' => 'Επιτυχημένη ενημέρωση.' . "<ul>$message</ul>",
             'alert-type' => 'success'
         );
         session()->flash('notification', $notification);
@@ -841,7 +945,7 @@ class ProtocolController extends Controller
                 'in_topos_ekdosis' =>  $data['in_topos_ekdosis'],
                 'in_arxi_ekdosis' => $data['in_arxi_ekdosis'],
                 'in_paraliptis' => $data['in_paraliptis'],
-                'diekperaiosi' => $data['diekperaiosi'],
+                'diekperaiosi' => isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : '',
                 'in_perilipsi' => $data['in_perilipsi'],
                 'out_date' => $out_date,
                 'diekp_date' => $diekp_date,
@@ -922,11 +1026,20 @@ class ProtocolController extends Controller
         }
         // αν έχω id του Διεκπεραιωτή και επιτρέπεται από τις ρυθμίσεις στέλνω email στον Διεκπεραιωτή
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
-            $message .= $this->sendMailToDiekperaioti($sendEmailTo, $protocol);
+            $sendEmailToArray = explode(',', $sendEmailTo);
+            $message = '';
+            foreach ($sendEmailToArray as $smt) {
+                if (substr($smt, 0, 1) == 'd') {
+                    $message .= $this->sendMailToDiekperaioti(ltrim($smt, 'd'), $protocol);
+                }
+                if (substr($smt, 0, 1) == 'e') {
+                    $message .= $this->diekpInformMail(ltrim($smt, 'e'), $protocol);
+                }
+            }
         }
         // ενημέρωση όλα ok
         $notification = array(
-            'message' => 'Επιτυχημένη ενημέρωση.' . $message,
+            'message' => 'Επιτυχημένη ενημέρωση.' . "<ul>$message</ul>",
             'alert-type' => 'success'
         );
         session()->flash('notification', $notification);
@@ -965,14 +1078,55 @@ class ProtocolController extends Controller
             $emaildate = Carbon::now()->format('d/m/Y H:m:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
             $parMessage .= "$emaildate email διεκπεραίωσης σε $diekperaiotis";
-            $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+            //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
             $protocol->paratiriseis = $parMessage;
             $protocol->update();
             // ενημερώνω το χρήστη
-            $message = "<br><br>Στάλθηκε email στον Διεκπεραιωτή για την ανάθεση του Πρωτοκόλλου.";
+            $message = "<li>Στάλθηκε email ανάθεσης στον $diekperaiotis.</li>";
         }
         return $message;
     }
+
+    public function diekpInformMail($sendEmailTo, $protocol)
+    {
+        // βρίσκω τα δεδομένα
+        $diekperaiotis = User::find($sendEmailTo)->name;
+        $emailTo = User::find($sendEmailTo)->email;
+        $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
+        // παίρνω το περιεχόμενο του μηνύματος
+        $html = view('diekpInformMail', compact('protocol', 'diekperaiotis', 'date'))->render();
+        // ρυθμίσεις για τον 2ο (εναλλακτικό) mailer
+        $configuration = [
+            'smtp_host'    => config('intra-mail.host'),
+            'smtp_port'    => config('intra-mail.port'),
+            'smtp_username'  => config('intra-mail.username'),
+            'smtp_password'  => config('intra-mail.password'),
+            'smtp_encryption'  => config('intra-mail.encryption'),
+
+            'from_email'    => config('intra-mail.from.address'),
+            'from_name'    => config('intra-mail.from.name'),
+        ];
+        // φτιάχνω τον mailer και στέλνω το mail
+        $mailer = app()->makeWith('user.mailer', $configuration);
+        $mailer->send([], [], function ($message) use ($emailTo, $html) {
+            $message->subject("Ενημέρωση για Πρωτόκολλο");
+            $message->setBody($html, 'text/html');
+            $message->to($emailTo);
+        });
+        if (!count($mailer->failures())) {
+            // προσθέτω στις παρατηρήσεις ότι στάλθηκε email στον διεκπεραιωτή
+            $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+            $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
+            $parMessage .= "$emaildate email ενημέρωσης σε $diekperaiotis";
+            //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+            $protocol->paratiriseis = $parMessage;
+            $protocol->update();
+            // ενημερώνω το χρήστη
+            $message = "<li>Στάλθηκε email ενημέρωσης στον $diekperaiotis.</li>";
+        }
+        return $message;
+    }
+
 
     public function delprotocol(Protocol $protocol)
     {
@@ -1096,6 +1250,7 @@ class ProtocolController extends Controller
     {
 
         $maxRowsInFindPage = Config::getConfigValueOf('maxRowsInFindPage');
+        $diekpStr = 'd';
 
         $fields = array_merge($this->protocolfields, $this->attachmentfields);
         $attachmentfields = $this->attachmentfields;
@@ -1145,7 +1300,7 @@ class ProtocolController extends Controller
                     $whereAttachmentvalues[] = [request('searchField1'), 'LIKE', '%' . request('searchData1') . '%'];
                 } else {
                     if (request('searchField1') == 'diekperaiosi') {
-                        $searchData = User::where('name', 'LIKE', '%' . request('searchData1') . '%')->first('id')->id;
+                        $searchData = $diekpStr . User::where('name', 'LIKE', '%' . request('searchData1') . '%')->first('id')->id;
                         if ($searchData) {
                             $wherevalues[] = [request('searchField1'), $searchData];
                         }
@@ -1167,7 +1322,7 @@ class ProtocolController extends Controller
                     $whereAttachmentvalues[] = [request('searchField2'), 'LIKE', '%' . request('searchData2') . '%'];
                 } else {
                     if (request('searchField2') == 'diekperaiosi') {
-                        $searchData = User::where('name', 'LIKE', '%' . request('searchData2') . '%')->first('id')->id;
+                        $searchData = $diekpStr . User::where('name', 'LIKE', '%' . request('searchData2') . '%')->first('id')->id;
                         if ($searchData) {
                             $wherevalues[] = [request('searchField2'), $searchData];
                         }
@@ -1189,7 +1344,7 @@ class ProtocolController extends Controller
                     $whereAttachmentvalues[] =  [request('searchField3'), 'LIKE', '%' . request('searchData3')  . '%'];
                 } else {
                     if (request('searchField3') == 'diekperaiosi') {
-                        $searchData = User::where('name', 'LIKE', '%' . request('searchData3') . '%')->first('id')->id;
+                        $searchData = $diekpStr . User::where('name', 'LIKE', '%' . request('searchData3') . '%')->first('id')->id;
                         if ($searchData) {
                             $wherevalues[] = [request('searchField3'), $searchData];
                         }
@@ -1231,7 +1386,7 @@ class ProtocolController extends Controller
                 $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
             }
             if ($protocol->diekperaiosi) {
-                $protocol->diekperaiosi = User::where('id', $protocol->diekperaiosi)->first('name')->name;
+                $protocol->diekperaiosi = User::where('id', ltrim($protocol->diekperaiosi, $diekpStr))->first('name')->name;
             }
         }
 
@@ -1326,7 +1481,7 @@ class ProtocolController extends Controller
         if (!count(Mail::failures())) {
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
             $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
-            $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+            //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
             $protocol->paratiriseis = $parMessage;
             $protocol->update();
             return response()->json($parMessage);
@@ -1342,7 +1497,7 @@ class ProtocolController extends Controller
         $paratiriseis = Protocol::whereId($request->id)->first()->paratiriseis;
         $parMessage = $paratiriseis ? $paratiriseis . ', ' : '';
         $parMessage .= "$now διεκπεραιώθηκε από " . Auth::user()->name;
-        $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+        //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
         $result = Protocol::whereId($request->id)->update([
             'user_id' => Auth::user()->id,
             'diekp_date' => $diekp_date,
@@ -1466,9 +1621,12 @@ class ProtocolController extends Controller
         $sinceDate = Carbon::now()->subDays($daysToCheckEmailBack)->format('d-m-Y');
         $alwaysShowFakelosInViewEmails = Config::getConfigValueOf('alwaysShowFakelosInViewEmails');
         $alwaysSendReceitForEmails = Config::getConfigValueOf('alwaysSendReceitForEmails');
-        $forbidenChangeDiekperaiosiSelect = Config::getConfigValueOf('forbidenChangeDiekperaiosiSelect');
         $allowListValuesMatchingInput = Config::getConfigValueOf('allowListValuesMatchingInput');
-
+        // Μόνο Διαχειριστής και Αναθέτων μπορούν να αναθέσουν Διεκπεραίωση σε χρήστη
+        $forbidenChangeDiekperaiosiSelect = 1;
+        if (in_array(Auth::user()->role_description(), ["Διαχειριστής",  "Αναθέτων"])) {
+            $forbidenChangeDiekperaiosiSelect = null;
+        }
 
         // φορτώνω τον πελάτη (λογαριασμό)
         $oClient = Client::account($defaultImapEmail);
@@ -1497,7 +1655,7 @@ class ProtocolController extends Controller
         // σειρά ταξινόμησης μηνυμάτων στον imap server πριν τα κατεβάσω
         // παίρνω τα ΠΡΩΤΑ ή ΤΕΛΕΥΤΑΙΑ μηνύματα  με βάση τις ρυθμίσεις
         // emailFetchOrderDesc == 1 => ΤΕΛΕΥΤΑΙΑ
-        if (Config::getConfigValueOf('emailFetchOrderDesc')){
+        if (Config::getConfigValueOf('emailFetchOrderDesc')) {
             config(['imap.options.fetch_order' => 'desc']);
         }
         // παίρνω τον αριθμό των μηνυμάτων από sinceDate και μετά
@@ -1510,7 +1668,7 @@ class ProtocolController extends Controller
             $aMessage = $aMessage->sortByDesc(function ($oMessage) {
                 return Carbon::parse($oMessage->getDate());
             });
-        }else{
+        } else {
             $aMessage = $aMessage->sortBy(function ($oMessage) {
                 return Carbon::parse($oMessage->getDate());
             });
@@ -1538,7 +1696,6 @@ class ProtocolController extends Controller
                 $emailFilePaths[$Uid] = $savedPath;
             }
         }
-
         return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput'));
     }
 
@@ -1738,11 +1895,11 @@ class ProtocolController extends Controller
             }
         }
         // άλλα πεδία
-        $in_arxi_ekdosis = isset($data["in_arxi_ekdosis"]) ? $data["in_arxi_ekdosis"] : "";
+        $in_topos_ekdosis = isset($data["in_topos_ekdosis"]) ? $data["in_topos_ekdosis"] : "";
         $in_paraliptis = isset($data["in_paraliptis"]) ? $data["in_paraliptis"] : Auth::user()->name;
         $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('#\s+#', ' ', trim($oMessage->getTextBody())), 0, 250);
         $paratiriseis = 'παρελήφθη με email';
-        $diekperaiosi = isset($data["diekperaiosi"]) ? $data["diekperaiosi"] : "";
+        $diekperaiosi = isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : "";
         $etos = Carbon::now()->format('Y');
 
         // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
@@ -1772,7 +1929,7 @@ class ProtocolController extends Controller
                 'thema' => $thema,
                 'in_num' => $in_num,
                 'in_date' => $in_date,
-                'in_topos_ekdosis' =>  null,
+                'in_topos_ekdosis' =>  $in_topos_ekdosis,
                 'in_arxi_ekdosis' => $in_arxi_ekdosis,
                 'in_paraliptis' => $in_paraliptis,
                 'diekperaiosi' => $diekperaiosi,
@@ -1878,15 +2035,25 @@ class ProtocolController extends Controller
         }
 
         if ($numCreatedAttachments) {
-            $message .= "<br><br>Εισήχθηκαν $numCreatedAttachments συνημμένα αρχεία.";
+            $message .= "<li>Εισήχθηκαν $numCreatedAttachments συνημμένα αρχεία.</li>";
         }
         if ($numMissedAttachments) {
-            $message .= "<br><br>Παραλείφθηκαν $numMissedAttachments συνημμένα αρχεία.<br> Δοκιμαστε να τα εισάγετε στο Ηλ. Πρωτόκολλο χειροκίνητα αφού πρώτα τα αποθηκεύσετε στο δίσκο σας";
+            $message .= "<li>Παραλείφθηκαν $numMissedAttachments συνημμένα αρχεία.<br> Δοκιμαστε να τα εισάγετε στο Ηλ. Πρωτόκολλο χειροκίνητα αφού πρώτα τα αποθηκεύσετε στο δίσκο σας</li>
+            ";
         }
 
         // στέλνω mail στον Διεκπεραιωτή
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
-            $message .= $this->sendMailToDiekperaioti($sendEmailTo, $protocol);
+            $sendEmailToArray = explode(',', $sendEmailTo);
+            $message = '';
+            foreach ($sendEmailToArray as $smt) {
+                if (substr($smt, 0, 1) == 'd') {
+                    $message .= $this->sendMailToDiekperaioti(ltrim($smt, 'd'), $protocol);
+                }
+                if (substr($smt, 0, 1) == 'e') {
+                    $message .= $this->diekpInformMail(ltrim($smt, 'e'), $protocol);
+                }
+            }
         }
         // στέλνω mail απόδειξης παραλαβής στον αποστολέα
         if ($sendReceipt) {
@@ -1910,10 +2077,10 @@ class ProtocolController extends Controller
                 $emaildate = Carbon::now()->format('d/m/Y H:m:s');
                 $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
                 $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
-                $parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
+                //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
                 $protocol->paratiriseis = $parMessage;
                 $protocol->update();
-                $message .= "<br><br>Στάλθηκε με email αποδεικτικό καταχώρισης.";
+                $message .= "<li>Στάλθηκε με email αποδεικτικό καταχώρισης.</li>";
             }
         }
         // μεταφέρω το μήνυμα στα πρωτοκολλημένα
@@ -1925,7 +2092,7 @@ class ProtocolController extends Controller
         }
 
         $notification = array(
-            'message' => $message,
+            'message' => "<ul>$message</ul>",
             'alert-type' => $alertType
         );
         session()->flash('notification', $notification);
@@ -2047,5 +2214,35 @@ class ProtocolController extends Controller
         $count['thema'] =  Protocol::where('thema', $request->thema)->count();
         $count['in_num'] =  Protocol::where('in_date', $in_date)->where('in_num', $request->in_num)->count();
         return response()->json($count);
+    }
+
+    public function anathesiSe(Request $request)
+    {
+        $sendEmailTo = $request->diekperaiosi;
+        $protocol = Protocol::whereId($request->id)->first();
+        $protocol->diekperaiosi = $sendEmailTo;
+        $protocol->diekp_date = null;
+        $protocol->update();
+
+        // στέλνω mail στον Διεκπεραιωτή
+        if ($sendEmailTo) {
+            $sendEmailToArray = explode(',',$sendEmailTo);
+            $message = '';
+            foreach($sendEmailToArray as $smt){
+                if( substr($smt,0,1) == 'd'){
+                    $message .= $this->sendMailToDiekperaioti(ltrim($smt, 'd'), $protocol);
+                }
+                if (substr($smt, 0, 1) == 'e') {
+                    $message .= $this->diekpInformMail(ltrim($smt, 'e'), $protocol);
+                }
+            }
+            $notification = array(
+                'message' =>  "<ul>$message</ul>",
+                'alert-type' => 'success'
+            );
+            session()->flash('notification', $notification);
+
+        }
+        return response()->json($message);
     }
 }

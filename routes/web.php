@@ -87,6 +87,7 @@ Route::post('receiptToEmail', 'ProtocolController@receiptToEmail')->name('receip
 Route::get('/about', 'ProtocolController@about');
 Route::get('/updated', 'ProtocolController@updated');
 Route::post('/setDiekpDate', 'ProtocolController@setDiekpDate')->name('setDiekpDate');
+Route::post('/anathesiSe', 'ProtocolController@anathesiSe')->name('anathesiSe');
 
 Route::get('/viewEmails', 'ProtocolController@viewEmails');
 Route::get('/getEmailNum', 'ProtocolController@getEmailNum');

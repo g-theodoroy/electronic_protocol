@@ -181,15 +181,20 @@
                                 </div>
                                 <div class='col-md-3 col-sm-3 small'>
                                     <br>
-                                    @if($myUsers->where('id', '==', $protocol->diekperaiosi)->count())
                                     <span title='Διεκπεραίωση'>
-                                    {{$protocol->diekperaiosi ? $myUsers->where('id', '==', $protocol->diekperaiosi)->first()->name : ''}}
+                                        @if($protocol->diekperaiosi)
+                                            @php($str ='d')
+                                            @foreach(explode(',',$protocol->diekperaiosi) as $d)
+                                                @if(strpos($str,substr($d,0,1))!==false)
+                                                    @if($myUsers->where('id', '==', ltrim($d,$str))->count())
+                                                        {{$myUsers->where('id', '==', ltrim($d,$str))->first()->name}}
+                                                    @else
+                                                        {{ltrim($d,$str)}}
+                                                    @endif
+                                                @endif
+                                            @endforeach
+                                        @endif
                                     </span>
-                                    @else
-                                    <span title='Ανύπαρκτος χρήστης ή διεγραμμένος'>
-                                    {{$protocol->diekperaiosi}}
-                                    </span>
-                                    @endif
                                     <hr>
                                     <span title='Ημνία Διεκπεραίωσης'>
                                     @if($protocol->diekp_date)

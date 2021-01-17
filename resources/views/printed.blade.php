@@ -120,11 +120,16 @@
                 <td class="small middle"><span class='small'>{{$protocol->out_perilipsi}}</span></td>
                 <td class="small middle"><span class='small'>
                     @if($protocol->diekperaiosi)
-                    @if($myUsers->where('id', '==', $protocol->diekperaiosi)->count())
-                    {{$myUsers->where('id', '==', $protocol->diekperaiosi)->first()->name}}
-                    @else
-                    {{$protocol->diekperaiosi}}
-                    @endif
+                        @php($str ='d')
+                        @foreach(explode(',',$protocol->diekperaiosi) as $d)
+                            @if(strpos($str,substr($d,0,1))!==false)
+                                @if($myUsers->where('id', '==', ltrim($d,$str))->count())
+                                    {{$myUsers->where('id', '==', ltrim($d,$str))->first()->name}}
+                                @else
+                                    {{ltrim($d,$str)}}
+                                @endif
+                            @endif
+                        @endforeach
                     @endif
                     @if($protocol->diekp_date)
                     <br>&#x2727;{{$protocol->diekp_date}}
