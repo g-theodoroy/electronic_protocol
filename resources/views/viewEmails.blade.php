@@ -140,7 +140,7 @@
                         <div id="diekperaiosi{{$oMessage->getUid()}}Div"  class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
 
                             <select id="diekperaiosi{{$oMessage->getUid()}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
-                              <optgroup label="Διεκπεραίωση" >
+                              <optgroup label="Διεκπεραίωση" data-max-options="1">
                                         @foreach($writers_admins as $writer_admin)
                                             <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
                                         @endforeach
