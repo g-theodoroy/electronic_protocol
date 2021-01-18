@@ -185,7 +185,7 @@ textarea[readonly].inout{
                             <input id="sendEmailTo" name="sendEmailTo" type="hidden" />
                             @if($forbidenChangeDiekperaiosiSelect)
                         <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                                <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}} disabled="disabled" >
+                                <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" disabled="disabled" >
                                     <optgroup label="Διεκπεραίωση" data-max-options="1">
                                         @foreach($writers_admins as $writer_admin)
                                             <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
@@ -693,12 +693,12 @@ function findSxetiko(){
 }
 
 function formSubmit(){
-    
+
     if(! formValidate()) return
 
     // ενεργοποιώ τα disabled πεδία
     for(let field of document.forms['myProtocolForm'].elements) {
-        if (field.name) field.removeAttribute("disabled")       
+        if (field.name) field.removeAttribute("disabled")
     }
     sendEmailTo()
 
@@ -820,7 +820,7 @@ function formValidate(){
         }
         if(msgStr) msg.push("Συμπληρώστε<ul>" + msgStr + "</ul>")
     }
-    
+
     var chkerr = false
     var terms = ['in_date', 'out_date', 'diekp_date']
     terms.forEach(function(term){
