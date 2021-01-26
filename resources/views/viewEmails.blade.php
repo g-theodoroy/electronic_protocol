@@ -142,16 +142,16 @@
                             <select id="diekperaiosi{{$oMessage->getUid()}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
                               <optgroup label="Διεκπεραίωση" data-max-options="1">
                                         @foreach($writers_admins as $writer_admin)
-                                            <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                            <option value='d{{$writer_admin->id}}'>{{$writer_admin->name}}</option>
                                         @endforeach
                                     </optgroup>
                                     <optgroup label="Ενημέρωση" >
                                         @foreach($writers_admins as $writer_admin)
-                                            <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                            <option value='e{{$writer_admin->id}}'>{{$writer_admin->name}}</option>
                                         @endforeach
                                     </optgroup>
                                 </select>
-                           <input id="sendEmailTo{{$oMessage->getUid()}}" name="sendEmailTo" type="hidden" />
+                           <input id="sendEmailTo{{$oMessage->getUid()}}" name="sendEmailTo" type="hidden" value="" />
                         </div>
 
                           @if($allowUserChangeKeepSelect)
@@ -439,8 +439,14 @@ function sendEmailTo(id){
   if($('#diekperaiosi' + id).val()){
     var newId = $('#diekperaiosi' + id).val().join(',')
   }
-  if( ! newId  )return
-  if (newId == oldId) return
+  if( ! newId  ){
+    $('#sendEmailTo' + id).val('')
+    return
+  }
+  if (newId == oldId){
+    $('#sendEmailTo' + id).val('')
+    return
+  }
   $('#sendEmailTo' + id).val(newId)
 }
 
