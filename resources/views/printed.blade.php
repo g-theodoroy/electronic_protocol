@@ -19,13 +19,10 @@
                 tfoot { display:table-footer-group }
             }
             .table thead>tr>th.middle{
-                vertical-align: middle;
-            }
-            .table thead>tr>th.middle{
-                vertical-align: middle;
+                vertical-align: top;
             }
             .table tbody>tr>td.middle{
-                vertical-align: middle;
+                vertical-align: top;
             }
             .table tfoot>tr>td.middle{
                 vertical-align: middle;
@@ -60,18 +57,18 @@
                     <th  class="small middle"><span class='small'>Θέμα<br>&#x2727;Περίληψη Εισερχομένου</span></th>
                     <th  class="small middle"><span class='small'>Παραλήπτης</span></th>
                     <th  class="small middle"><span class='small'>Ημνια Εξερχ.<br>&#x2727;Απευθύνεται</span></th>
-                    <th  class="small middle"><span class='small'>Περίληψη<br>Εξερχόμενου</span></th>
+                    <th  class="small middle"><span class='small'>Περίληψη Εξερχόμενου</span></th>
                     <th  class="small middle"><span class='small'>Διεκπεραίωση<br>&#x2727;Ημνια Διεκπ.</span></th>
                 </tr>
                 <tr>
-                    <th  class="small text-center"><span class='small'>1,2</span></th>
-                    <th  class="small text-center"><span class='small'>3,4,5</span></th>
+                    <th  class="small text-center"><span class='small'>1, 2</span></th>
+                    <th  class="small text-center"><span class='small'>3, 4, 5</span></th>
                     <th  class="small text-center"><span class='small'>6</span></th>
                     <th  class="small text-center"><span class='small'>7</span></th>
-                    <th  class="small text-center"><span class='small'>10,8</span></span></th>
+                    <th  class="small text-center"><span class='small'>10, 8</span></span></th>
                     <th  class="small text-center"><span class='small'>9</span></th>
                     <th  class="small text-center"><span class='small'>11</span></th>
-                    <th  class="small text-center"><span class='small'>13,12</span></th>
+                    <th  class="small text-center"><span class='small'>13, 12</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -158,7 +155,7 @@
                 @endforeach
                 @if(! count($protocols))
                  <tr>
-                     <td class="small" colspan=12 >Δεν υπάρχουν Πρωτόκολλα τα οποία ικανοποιούν τα κριτήρια που θέσατε.</td>
+                     <td class="small" colspan=8 >Δεν υπάρχουν Πρωτόκολλα τα οποία ικανοποιούν τα κριτήρια που θέσατε.</td>
                  </tr>
                 @endif
             </tbody>

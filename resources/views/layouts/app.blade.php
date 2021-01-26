@@ -142,13 +142,15 @@
                                           @endif
                                             <li class="divider"></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
+                                            @if(! in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) || (in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) && ! App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
                                             <li class="dropdown-submenu">
-                                            <a class="test" tabindex="-1" href="#">Εκτύπωση</a>
+                                            <a class="test" tabindex="-1" href="{{ url('/print') }}">Εκτύπωση</a>
                                                 <ul class="dropdown-menu">
                                                     <li><a  tabindex="-1" href="{{ url('/print') }}">Πρωτόκολλο</a></li>
                                                     <li><a  tabindex="-1" href="{{ url('/printAttachments') }}">Συνημμένα</a></li>
                                                 </ul>
                                             </li>
+                                            @endif
                                             <li><a  tabindex="-1" href="{{ url('/keep') }}">Διατήρηση</a></li>
                                             @if(in_array ( Auth::user()->role_description(), [ "Διαχειριστής",  "Αναθέτων"]))
                                               <li class="divider"></li>

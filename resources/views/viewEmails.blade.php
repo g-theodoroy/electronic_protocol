@@ -126,7 +126,7 @@
                                     <strong>Περίληψη</strong>
                                 </div>
                                 <div id="in_perilipsiDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
-                                    <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('#\s+#',' ',trim($oMessage->getTextBody())), 0, 250) }}</textarea>
+                                    <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($oMessage->getTextBody())), 0, 250) }}</textarea>
                                 </div>
                             </div>
                         </div>

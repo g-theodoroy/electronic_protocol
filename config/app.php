@@ -162,12 +162,13 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
-        Rainwater\Active\ActiveServiceProvider::class,
-        Webklex\IMAP\Providers\LaravelServiceProvider::class,
-
         /*
          * Package Service Providers...
          */
+        
+        Rainwater\Active\ActiveServiceProvider::class,
+        Webklex\IMAP\Providers\LaravelServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -231,6 +232,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Active' => Rainwater\Active\ActiveFacade::class,
         'Client' => Webklex\IMAP\Facades\Client::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];

@@ -66,5 +66,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\MustBeAdmin::class,
         'writer' => \App\Http\Middleware\ΜustBeWriterOrAdmin::class,
         'email' => \App\Http\Middleware\ProtocolEmail::class,
+        'limitList' => \App\Http\Middleware\LimitProtocolAccessList::class,
     ];
 }

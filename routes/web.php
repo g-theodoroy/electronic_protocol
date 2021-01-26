@@ -70,7 +70,7 @@ Route::post('/checkInNum', 'ProtocolController@checkInNum')->name('checkInNum');
 Route::post('/checkSameEmail', 'ProtocolController@checkSameEmail')->name('checkSameEmail');
 
 Route::get('/attach/del/{attachment}', 'ProtocolController@attachDelete');
-Route::get('/goto/{etos}/{protocolnum}', 'ProtocolController@gotonum');
+Route::get('/goto/{etos}/{protocolnum}/{step?}', 'ProtocolController@gotonum');
 Route::get('/download/{attachment}', 'ProtocolController@download');
 
 Route::get('/find', 'ProtocolController@find');

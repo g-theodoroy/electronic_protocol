@@ -12,6 +12,7 @@
                     <!-- ________________________________form______________________________________________________ -->
                     <form id='printform' name="printform" class="form-horizontal" role="form" method="POST" action="{{ url('/printed') }}" target='_blank'>
                         {{ csrf_field() }}
+                        <input id="target" name="target" type="hidden" value=""/>
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-info">
                             <div class="form-control-static h4 text-center">Ο Αριθμός Πρωτοκόλλου από - έως - έτος</div>
@@ -44,13 +45,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-2 col-md-offset-4 col-sm-offset-4 text-center">
+                    <div class="col-md-2 col-sm-2 col-md-offset-3 col-sm-offset-3 text-center">
                         <a href="" onclick="document.forms['printform'].reset();"  role="button" title="Καθαρισμός" > <img src="{{ URL::to('/') }}/images/clear.ico" height="30" /></a>
                     </div>
                     <div class="col-md-2 col-sm-2 text-center ">
                         <a href="#" onclick="getPrintData()"  class="" role="button" title="Εκτύπωση" > <img src="{{ URL::to('/') }}/images/print.png" height="30" /></a>
                     </div>
-                    <div class="col-md-2 col-sm-2 col-md-offset-2 col-sm-offset-2 text-right ">
+                    <div class="col-md-2 col-sm-2 text-center ">
+                        <a href="#" onclick="getPrintData('xls')"  class="" role="button" title="Εξαγωγή xls" > <img src="{{ URL::to('/') }}/images/xls.png" height="30" /></a>
+                    </div>
+                    <div class="col-md-2 col-sm-2 col-md-offset-1 col-sm-offset-1 text-right ">
                         <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
                     </div>
 
@@ -67,7 +71,7 @@
 
 <script>
 
-function chkNum (id ,notnull){
+function chkNum (id, notnull){
     var value = $('#' + id ).val()
     if(notnull){
         if (! value){
@@ -142,10 +146,13 @@ function chkDate (id ,notnull){
 }
 
 
-function getPrintData() {
+function getPrintData(target = null) {
 
     var chk_novalue = $("#aponum").val() +  $("#eosnum").val() +  $("#etosForMany").val() +  $("#apoProtocolDate").val() +  $("#eosProtocolDate").val()
-    if(! chk_novalue) return false;
+    if(! chk_novalue){
+        toastr.info("<center><h4>Ενημέρωση...</h4><hr>Συμπληρώστε τουλάχιστον ένα πεδίο<br>&nbsp;</center>")
+        return false;
+    } 
 
     var chk_ok = 1
     var aponum = chkNum('aponum',false)
@@ -170,6 +177,12 @@ function getPrintData() {
     }
     if(chk_ok == 0){
         return false
+    }
+    $("#target").val(target)
+    if(target){
+        $("#printform").prop("target", '')
+    }else{
+        $("#printform").prop("target", '_blank')
     }
     $("#printform").submit()
     return true

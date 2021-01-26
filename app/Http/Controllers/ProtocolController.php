@@ -19,6 +19,8 @@ use DB;
 use Active;
 use Illuminate\Support\Facades\Mail;
 use Webklex\IMAP\Facades\Client;
+use App\Exports\ProtocolExport;
+use Maatwebsite\Excel\Facades\Excel;
 //use Illuminate\Support\Facades\Log;
 //Log::info('test');
 
@@ -83,12 +85,20 @@ class ProtocolController extends Controller
         $this->middleware('web');
         $this->middleware('writer:home/list', ['except' => ['index', 'indexList', 'getFileInputs', 'gotonum', 'download', 'find', 'getFindData', 'printprotocols', 'printed', 'about', 'setDiekpDate']]);
         $this->middleware('email', ['only' => ['viewEmails', 'setEmailRead', 'storeFromEmail']]);
+        $this->middleware('limitList', ['only' => ['printprotocols', 'printAttachments']]);
     }
 
 
     public function index(Protocol $protocol)
     {
-        // βρίσκω τους Συγγραφείς, Αναθέτοντες και Διαχειριστές
+        // αν δεν είναι νέο πρωτόκολλο και οι συγγραφείς περιορίζονται στη λίστα διεκπεραιωσης
+        if ($this->limitProtocolAccessList()) {
+            // αν δεν είναι νέο πρωτόκολλο και οι συγγραφείς περιορίζονται στη λίστα διεκπεραιωσης και δεν έχει καταχωριστεί από το χρήστη
+            if ($protocol->id && strpos($protocol->diekperaiosi, 'd' . Auth::user()->id) === false && strpos($protocol->diekperaiosi, 'e' . Auth::user()->id) === false && $protocol->user_id !== Auth::user()->id){
+                return abort(404);
+            } 
+        }
+         // βρίσκω τους Συγγραφείς, Αναθέτοντες και Διαχειριστές
         $writers_admins = User::get_writers_and_admins();
         // παίρνω τους Φακέλους με συγκεκριμμένη ταξινόμηση
         $fakeloi = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-3)+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->select('fakelos', 'describe')->get();
@@ -473,11 +483,17 @@ class ProtocolController extends Controller
         $user2show = '';
         $protocols = Protocol::orderby('etos', 'desc')->orderby('protocolnum', 'desc');
         if (!$userId) {
+            // φιλτραρω τα πρωτόκολλα για το χρήστη
+            if ($this->limitProtocolAccessList()) {
+                $protocols = $protocols->where(function ($query) {
+                    $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                });
+            }
             if ($filter == 'd') {
-                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%" )->whereNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->whereNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο προς Διεκπεραίωση';
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%" )->wherenotNull('diekp_date');
+                $protocols = $protocols->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->wherenotNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο Διεκπεραιώθηκε';
             }
         } elseif (User::whereId($userId)->count() and $filter) {
@@ -505,6 +521,8 @@ class ProtocolController extends Controller
                 $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
             }
         }
+
+
         // παίρνω τα πρωτόκολλα σε σελίδες με αριθμό πρωτοκόλλων σύμφωνα με τις ρυθμίσεις
         $protocols = $protocols->paginate(Config::getConfigValueOf('showRowsInPage'));
         // αλλάζω τη μορφή στις ημερομηνίες και παίρνω την περιγραφή του φακέλου Φ.
@@ -1171,48 +1189,133 @@ class ProtocolController extends Controller
         return view('getArxeia', compact('protocol'));
     }
 
-    public function gotonum($etos, $protocolnum)
+    public function gotonum($etos, $protocolnum, $step=null)
     {
-        if (request('find')) {
-            if (Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->count()) {
-                $protocol_id = Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->first()->id;
-                return redirect("home/$protocol_id");
-            }
-        } else {
-            if ($protocolnum <= 0) {
-                $etos--;
-                if (Protocol::whereEtos($etos)->count()) {
-                    $protocol_id = Protocol::whereEtos($etos)->get()->last()->id;
+        $limitProtocolAccessList = $this->limitProtocolAccessList();
+         if (request('find')) {
+            // φιλτραρω τα πρωτόκολλα για το χρήστη
+            if ($limitProtocolAccessList) {
+                $count = Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->where(function ($query) {
+                    $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id );
+                })->count();
+                if ($count) {
+                    $protocol_id = Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->where(function ($query) {
+                        $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                    })->first()->id;
                     return redirect("home/$protocol_id");
                 }
-                $etos++;
-            } else {
+            }else{
                 if (Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->count()) {
                     $protocol_id = Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->first()->id;
                     return redirect("home/$protocol_id");
                 }
-            }
 
-            if ($protocolnum > Protocol::whereEtos($etos)->max('protocolnum')) {
-                if ($etos == Protocol::max('etos')) {
-                    return redirect("home");
-                } else {
-                    $etos++;
-                    if (Protocol::whereEtos($etos)->count()) {
-                        $protocol_id = Protocol::whereEtos($etos)->get()->first()->id;
-                        return redirect("home/$protocol_id");
+
+            }
+         } else {
+            if ($step == 'b') {
+                if($limitProtocolAccessList){
+                    $protocol_id = Protocol::where(function ($query) {
+                        $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id );
+                    })->where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->take(1)->get('id');
+                    if (count($protocol_id)){
+                        return redirect("home/" . $protocol_id[0]->id);
+                    }else{
+                        $protocol_id = Protocol::where(function ($query) {
+                            $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id );
+                        })->where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->take(1)->get('id');
+                             return redirect("home/" . $protocol_id[0]->id);
                     }
-                    $etos--;
+                }else{
+                    $protocol_id = Protocol::where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        $protocol_id = Protocol::where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->take(1)->get('id');
+                        return redirect("home/" . $protocol_id[0]->id);
+                    }
+                }
+            } elseif($step == 'f') {
+                if ($limitProtocolAccessList) {
+                    $protocol_id = Protocol::where(function ($query) {
+                        $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id );
+                    })->where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        if($year < Carbon::now()->year){
+                                $protocol_id = Protocol::where(function ($query) {
+                                $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id );
+                                })->where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->take(1)->get('id');
+                                return redirect("home/" . $protocol_id[0]->id);
+                        }
+                    }
+                } else {
+                    $protocol_id = Protocol::where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        if ($year < Carbon::now()->year) {
+                            $protocol_id = Protocol::where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->take(1)->get('id');
+                            return redirect("home/" . $protocol_id[0]->id);
+                        }
+                    }
+                }
+            } elseif($step == 'bb') {
+                if ($limitProtocolAccessList) {
+                    $protocol_id = Protocol::where(function ($query) {
+                        $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                    })->where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep')-1)->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        $protocol_id = Protocol::where(function ($query) {
+                            $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                        })->where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                        return redirect("home/" . $protocol_id[0]->id);
+                    }
+                } else {
+                    $protocol_id = Protocol::where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        $protocol_id = Protocol::where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                        return redirect("home/" . $protocol_id[0]->id);
+                    }
+                }
+            } elseif( $step == 'ff') {
+                if ($limitProtocolAccessList) {
+                    $protocol_id = Protocol::where(function ($query) {
+                        $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                    })->where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        if ($year < Carbon::now()->year) {
+                            $protocol_id = Protocol::where(function ($query) {
+                                $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                            })->where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                            return redirect("home/" . $protocol_id[0]->id);
+                        }
+                    }
+                } else {
+                    $protocol_id = Protocol::where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                    if (count($protocol_id)) {
+                        return redirect("home/" . $protocol_id[0]->id);
+                    } else {
+                        if ($year < Carbon::now()->year) {
+                            $protocol_id = Protocol::where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                            return redirect("home/" . $protocol_id[0]->id);
+                        }
+                    }
                 }
             }
         }
-
         $notification = array(
-            'message' => "Δεν βρέθηκε Πρωτόκολλο με Αριθμό $protocolnum για το έτος $etos.",
+            'message' => 'Δεν βρέθηκε Πρωτόκολλο να ικανοποιεί τα στοιχεία που δώσατε.',
             'alert-type' => 'warning'
         );
         session()->flash('notification', $notification);
-
         return back();
     }
 
@@ -1357,14 +1460,19 @@ class ProtocolController extends Controller
         if (!$wherevalues and !$whereAttachmentvalues and !$whereNullFields and !$whereNullAttachmentvalues) {
             return;
         }
-
         $foundProtocolsCount = null;
-
         $protocols = Protocol::with('attachments');
         foreach ($whereNullFields as $whereNullField) {
             $protocols = $protocols->whereNull($whereNullField);
         }
         if ($wherevalues) {
+            // αν η ρύθμιση για Συγγραφείς και Αναγνώστες είναι ΝΑΙ περιορισμός στη λίστα 
+            // φιλτράρω τα μηνύματα. Επιτρέπονται μόνο όσα είναι για διεκπεραίωση - ενημέρωση - δημιουργήθηκαν από αυτούς
+            if ($this->limitProtocolAccessList()) {
+                $protocols = $protocols->where(function ($query) {
+                    $query->where('diekperaiosi', 'like', "%" . 'd' . Auth::user()->id . "%")->orWhere('diekperaiosi', 'like', "%" . 'e' . Auth::user()->id . "%")->orWhere('user_id', Auth::user()->id);
+                });
+            }
             $protocols = $protocols->where($wherevalues);
         }
         foreach ($whereNullAttachmentvalues as $whereNullAttachmentvalue) {
@@ -1410,6 +1518,7 @@ class ProtocolController extends Controller
 
         $etos = Config::getConfigValueOf('yearInUse');
         $datetime = Carbon::now()->format('d/m/Y H:m:s');
+        $target = request('target');
 
         $wherevalues = [];
 
@@ -1434,7 +1543,7 @@ class ProtocolController extends Controller
             return back();
         } else {
             $foundProtocolsCount = Protocol::where($wherevalues)->count();
-            $protocols = Protocol::where($wherevalues)->orderby('protocolnum', 'asc')->get();
+            $protocols = Protocol::where($wherevalues)->orderby('etos', 'asc')->orderby('protocolnum', 'asc')->get();
         }
         foreach ($protocols as $protocol) {
             if ($protocol->protocoldate) {
@@ -1451,6 +1560,10 @@ class ProtocolController extends Controller
             }
         }
 
+        if($target == 'xls'){
+            $filename = $this->filter_filename( Config::getConfigValueOf('ipiresiasName') . " - εξαγωγή πρωτοκόλλου σε xls - " . Carbon::now()->format('Ymd-Hms') . '.xlsx', false);
+            return Excel::download(new ProtocolExport("printedXls", compact('protocols', 'etos', 'datetime')), $filename );  
+        }
         return view('printed', compact('protocols', 'etos', 'datetime'));
     }
 
@@ -1685,6 +1798,7 @@ class ProtocolController extends Controller
                 $Uid = $oMessage->getUid();
                 // περιεχόμενο HTML
                 $content = $oMessage->getHTMLBody();
+                // αντικαθιστώ οτιδήποτε μετά το charset= με utf-8
                 $content = preg_replace('/charset=[\s\S]+?"/', 'charset=utf-8"', $content);
                 // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
                 $dir = '';
@@ -1897,7 +2011,7 @@ class ProtocolController extends Controller
         // άλλα πεδία
         $in_topos_ekdosis = isset($data["in_topos_ekdosis"]) ? $data["in_topos_ekdosis"] : "";
         $in_paraliptis = isset($data["in_paraliptis"]) ? $data["in_paraliptis"] : Auth::user()->name;
-        $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('#\s+#', ' ', trim($oMessage->getTextBody())), 0, 250);
+        $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($oMessage->getTextBody())), 0, 250);
         $paratiriseis = 'παρελήφθη με email';
         $diekperaiosi = isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : "";
         $etos = Carbon::now()->format('Y');
@@ -2245,4 +2359,13 @@ class ProtocolController extends Controller
         }
         return response()->json($message);
     }
+
+    public static function limitProtocolAccessList(){
+        $limitProtocolAccessList = 0;
+        if (Config::getConfigValueOf('limitProtocolAccessList') && in_array(Auth::user()->role_description(), ["Συγγραφέας",  "Αναγνώστης"])) {
+            $limitProtocolAccessList = 1;
+        }
+        return $limitProtocolAccessList;
+    }
+
 }

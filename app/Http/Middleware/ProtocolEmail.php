@@ -19,17 +19,17 @@ class ProtocolEmail
     {
         // αν η βιβλιοθήκη imap δεν είναι φορτωμένη δεν προχωράω
         if (!extension_loaded('imap')) {
-            return back();
+            return redirect()->back();
         }
         // αν ο λογαριασμός είναι κενός δεν προχωράω
         $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
         if (!$defaultImapEmail) {
-            return back();
+            return redirect()->back();
         }
         // αν οι χρήστες δεν επιτρέπεται να πρωτοκολλήσουν email
         $allowedEmailUsers = Config::getConfigValueOf('allowedEmailUsers');
         if ($allowedEmailUsers && strpos($allowedEmailUsers, Auth::user()->username) === false) {
-            return back();
+            return redirect()->back();
         }
         return $next($request);
     }

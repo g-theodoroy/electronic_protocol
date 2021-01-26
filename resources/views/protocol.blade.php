@@ -53,7 +53,9 @@ textarea[readonly].inout{
                         </div>
                         <div class="col-md-1 col-sm-1  form-control-static  text-center">
                             <a href="javascript:chkfind()" class="active" role="button" title="Αναζήτηση" > <img src="{{ URL::to('/') }}/images/find.ico" height=25 / ></a></td>
+                            @if(! in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) || (in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) && ! App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
                             <a href="{{ URL::to('/print') }}" class="" role="button" title="Εκτύπωση" > <img src="{{ URL::to('/') }}/images/print.png" height=25 /></a>
+                            @endif
                         </div>
 
                         <div class="col-md-7 col-sm-7 ">
@@ -184,40 +186,40 @@ textarea[readonly].inout{
                         </div>
                             <input id="sendEmailTo" name="sendEmailTo" type="hidden" />
                             @if($forbidenChangeDiekperaiosiSelect)
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                                <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" disabled="disabled" >
-                                    <optgroup label="Διεκπεραίωση" data-max-options="1">
-                                        @foreach($writers_admins as $writer_admin)
-                                            <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
-                                        @endforeach
-                                    </optgroup>
-                                    <optgroup label="Ενημέρωση" >
-                                        @foreach($writers_admins as $writer_admin)
-                                            <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
-                                        @endforeach
-                                    </optgroup>
-                                </select>
-                            </div>
+                                <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                                    <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" disabled="disabled" >
+                                        <optgroup label="Διεκπεραίωση" data-max-options="1">
+                                            @foreach($writers_admins as $writer_admin)
+                                                <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Ενημέρωση" >
+                                            @foreach($writers_admins as $writer_admin)
+                                                <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    </select>
+                                </div>
                             @else
-                        <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
-                            <div class="row">
-                                <div class="col=md-11 col-sm-11">
-                                 <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" >
-                                    <optgroup label="Διεκπεραίωση" data-max-options="1">
-                                        @foreach($writers_admins as $writer_admin)
-                                            <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
-                                        @endforeach
-                                    </optgroup>
-                                    <optgroup label="Ενημέρωση" >
-                                        @foreach($writers_admins as $writer_admin)
-                                            <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
-                                        @endforeach
-                                    </optgroup>
-                                </select>
+                                <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                                    <div class="row">
+                                        <div class="col=md-11 col-sm-11">
+                                        <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" >
+                                            <optgroup label="Διεκπεραίωση" data-max-options="1">
+                                                @foreach($writers_admins as $writer_admin)
+                                                    <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                            <optgroup label="Ενημέρωση" >
+                                                @foreach($writers_admins as $writer_admin)
+                                                    <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        </select>
+                                        </div>
+                                        <div class="col=md-1 col-sm-1 form-control-static"  style="padding-left: 5px;padding-right: 5px;" onclick="javascript:anathesiSe()" title="Ανάθεση πρωτοκόλλου"><img src="{{ URL::to('/') }}/images/todo.png" height=20 / ></div>
+                                        </div>
                                 </div>
-                                <div class="col=md-1 col-sm-1 form-control-static"  style="padding-left: 5px;padding-right: 5px;" onclick="javascript:anathesiSe()" title="Ανάθεση πρωτοκόλλου"><img src="{{ URL::to('/') }}/images/todo.png" height=20 / ></div>
-                                </div>
-                        </div>
                             @endif
 
                         <div class="col-md-1 col-sm-1 small text-center">
@@ -446,24 +448,10 @@ function chkfind(){
     }
 }
 
-function periigisi(id){
+function periigisi(step){
     var protocolnum = parseInt($('#protocolnum').val())
     var etos = $('#etos').val()
-    switch(id){
-        case 'bb':
-            protocolnum -= {{$protocolArrowStep}}
-            break;
-        case 'b':
-            protocolnum -= 1
-            break;
-        case 'f':
-            protocolnum += 1
-            break;
-        case 'ff':
-            protocolnum += {{$protocolArrowStep}}
-            break;
-            }
-        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum)
+    $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + etos + "/" + protocolnum+ "/" + step)
 }
 
 function getFileInputs() {
@@ -511,16 +499,18 @@ window.onload = function () {
     display = document.querySelector('#timer')
     startTimer(duration, display);
     @endif
-    $.ajax({
-      url: '{{ URL::to('/') }}/getEmailNum',
-      success: function(data){
-        if(data > 0){
-          $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
-          $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
-          $('#emailNum').show();
-        }
-      }
-    })
+    @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
+        $.ajax({
+            url: '{{ URL::to('/') }}/getEmailNum',
+            success: function(data){
+                if(data > 0){
+                    $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+                    $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
+                    $('#emailNum').show();
+                }
+            }
+        })
+    @endif
 }
 
 function getValues(id, field, divId,  multi){

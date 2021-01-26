@@ -315,20 +315,18 @@ window.onload = function () {
     var duration =  {{$refreshInterval}},
         display = document.querySelector('#timer')
     startTimer(duration, display);
-    $.ajax({
-      url: '{{ URL::to('/') }}/getEmailNum',
-      success: function(data){
-        if(data > 0){
-            @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
-            $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
-            @else
-            $('#emailNumDiv').html("<a href=\"#\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
-            @endif
-          $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
-          $('#emailNum').show();
-        }
-      }
-    })
+    @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
+        $.ajax({
+            url: '{{ URL::to('/') }}/getEmailNum',
+            success: function(data){
+                if(data > 0){
+                    $('#emailNumDiv').html("<a href=\"{{ URL::to('/') }}/viewEmails\" id=\"emailNum\" class=\"active\" role=\"button\" title=\"\" style=\"display:block\"><img src=\"{{ URL::to('/') }}/images/email-in.png\" height=30 / ></a>")
+                    $('#emailNum').prop('title', "Eισερχόμενα email: "  + data);
+                    $('#emailNum').show();
+                }
+            }
+        })
+    @endif
 }
 </script>
 @endif

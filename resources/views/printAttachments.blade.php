@@ -153,7 +153,10 @@ function chkDate (id ,notnull){
 function getPrintData() {
 
     var chk_novalue = $("#aponum").val() +  $("#eosnum").val() +  $("#etosForMany").val() +  $("#apoProtocolDate").val() +  $("#eosProtocolDate").val()
-    if(! chk_novalue) return false;
+    if(! chk_novalue){
+        toastr.info("<center><h4>Ενημέρωση...</h4><hr>Συμπληρώστε τουλάχιστον ένα πεδίο<br>&nbsp;</center>")
+        return false
+    } 
 
     var chk_ok = 1
     var aponum = chkNum('aponum',false)
