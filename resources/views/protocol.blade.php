@@ -184,18 +184,18 @@ textarea[readonly].inout{
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Διεκπεραίωση</strong>
                         </div>
-                            <input id="sendEmailTo" name="sendEmailTo" type="hidden" />
+                            <input id="sendEmailTo" name="sendEmailTo" type="hidden" value="" />
                             @if($forbidenChangeDiekperaiosiSelect)
                                 <div class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
                                     <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" disabled="disabled" >
                                         <optgroup label="Διεκπεραίωση" data-max-options="1">
                                             @foreach($writers_admins as $writer_admin)
-                                                <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                                <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi . ',' , "d" . $writer_admin->id . ',' ) !== false) selected @endif>{{$writer_admin->name}}</option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Ενημέρωση" >
                                             @foreach($writers_admins as $writer_admin)
-                                                <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "e" . $writer_admin->id ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                                <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi . ',' , "e" . $writer_admin->id . ',' ) !== false) selected  @endif>{{$writer_admin->name}}</option>
                                             @endforeach
                                         </optgroup>
                                     </select>
@@ -207,7 +207,7 @@ textarea[readonly].inout{
                                         <select id="diekperaiosi" multiple class="form-control selectpicker" style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" >
                                             <optgroup label="Διεκπεραίωση" data-max-options="1">
                                                 @foreach($writers_admins as $writer_admin)
-                                                    <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi, "d" . $writer_admin->id ) !== false) selected @endif>{{$writer_admin->name}}</option>
+                                                    <option value='d{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi . ',' , "d" . $writer_admin->id . ',' ) !== false) selected @endif>{{$writer_admin->name}}</option>
                                                 @endforeach
                                             </optgroup>
                                             <optgroup label="Ενημέρωση" >
