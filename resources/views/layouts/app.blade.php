@@ -133,7 +133,7 @@
                                         <ul class="dropdown-menu">
                                           <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
                                           @if( Auth::user()->role_description() != "Αναγνώστης")
-                                          @if(isset($defaultImapEmail))
+                                          @if($defaultImapEmail)
                                           @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
                                           <li class="divider"></li>
                                           <li><a  tabindex="-1" href="{{ url('/viewEmails') }}">Εισερχόμενα Email</a></li>

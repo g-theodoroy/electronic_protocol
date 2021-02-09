@@ -352,6 +352,17 @@ class ProtocolController extends Controller
                         $diekpDateReadonly = 'readonly';
                     }
                 }
+                /*
+                // αν δεν έχει συμπληρωμένα εξερχόμενα παραμένει ανοιχτό μόνο για εξερχόμενα
+                if(! $outWithData){
+                    $submitVisible = '';
+                    $headReadonly = 'readonly';
+                    $inReadonly = 'readonly';
+                    $outReadonly = '';
+                    $diekpDateReadonly = 'readonly';
+                    $time2update = 0;
+                }
+                */
                  // αν δεν έχει οριστεί χρόνος που μπορεί ο συγγραφέας να επεξεργαστεί
                 // τότε η επεξεργασία επιτρέπεται και ανοίγουν όλα
                 if(! $allowWriterUpdateProtocolTimeInMinutes){
@@ -521,8 +532,6 @@ class ProtocolController extends Controller
                 $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
             }
         }
-
-
         // παίρνω τα πρωτόκολλα σε σελίδες με αριθμό πρωτοκόλλων σύμφωνα με τις ρυθμίσεις
         $protocols = $protocols->paginate(Config::getConfigValueOf('showRowsInPage'));
         // αλλάζω τη μορφή στις ημερομηνίες και παίρνω την περιγραφή του φακέλου Φ.
@@ -2075,9 +2084,17 @@ class ProtocolController extends Controller
 
         $protocol = $protocolCreated;
 
-        // αποθηκεύω το email σαν συνημμένο html
-        $html = view('viewEmail', compact('oMessage'))->render();
-        $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.html';
+        if(Config::getConfigValueOf('saveEmailAs')){
+            // αποθηκεύω το email σαν συνημμένο eml
+            $html = $oMessage->getRawBody();
+            $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.' . Config::getConfigValueOf('saveEmailAs');
+            $mimetype = 'message/rfc822';
+        }else{
+            // αποθηκεύω το email σαν συνημμένο html
+            $html = view('viewEmail', compact('oMessage'))->render();
+            $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.html';
+            $mimetype = 'text/html';
+        }
         $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
         $dir = $fakelos ? '/arxeio/' . $fakelos . '/' : '/arxeio/emails/';
         $savedPath = $dir . $filenameToStore;
@@ -2094,7 +2111,7 @@ class ProtocolController extends Controller
                 'protocol_id' => $protocol->id,
                 'ada' => null,
                 'name' => $filename,
-                'mimeType' => 'text/html',
+                'mimeType' => $mimetype,
                 'savedPath' => $savedPath,
                 'keep' => $keep,
                 'expires' => $expires,

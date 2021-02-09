@@ -39,7 +39,9 @@
                       <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
                       @php 
                           $num++; 
-                          $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+                          if($oMessage->getSubject()){
+                            $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+                          }
                           if(! $subject) $subject = $oMessage->getSubject();
                       @endphp
 

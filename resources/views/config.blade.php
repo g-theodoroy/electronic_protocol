@@ -532,6 +532,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
+
                                                     <div class="row">
                                                         <div
                                                             class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1">
@@ -566,6 +567,25 @@
                                                         </div>
                                                     </div>
 
+                                                   <div class="row">
+                                                        <div
+                                                            class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1">
+                                                            Αποθήκευση email με τη μορφή
+                                                        </div>
+                                                        <div class="col-md-2 col-sm-2  " id="saveEmailAsdiv">
+                                                            <select id='saveEmailAs'
+                                                                name='saveEmailAs' class="form-control"
+                                                                title=''>
+                                                                @if (! App\Config::getConfigValueOf('saveEmailAs'))
+                                                                    <option value="" selected>html</option>
+                                                                    <option value="eml" >eml</option>
+                                                                @else
+                                                                         <option value="" >html</option>
+                                                                        <option value="eml" selected>eml</option>
+                                                                 @endif
+                                                            </select>
+                                                        </div>
+                                                    </div>
 
 
 
