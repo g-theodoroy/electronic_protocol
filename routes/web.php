@@ -104,6 +104,6 @@ Route::get('/downloadBackup/{name}', 'ConfigController@downloadBackup');
 Route::get('/deleteBackup/{name}', 'ConfigController@deleteBackup');
 
 Route::get('/arxeio', 'ConfigController@arxeio');
-Route::get('/expired', 'ConfigController@expired');
+Route::get('/expired/{deleted?}', 'ConfigController@expired');
 Route::get('/delExpired', 'ConfigController@delExpired');
 Route::get('/delDeleted', 'ConfigController@delDeleted');

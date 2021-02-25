@@ -116,11 +116,11 @@ class ProtocolController extends Controller
         $allowListValuesMatchingInput = Config::getConfigValueOf('allowListValuesMatchingInput');
 
         // βρίσκω το νέο αριθμό πρωτοκόλλου
-        if (Protocol::all()->count()) {
+        if (Protocol::count()) {
             if (Config::getConfigValueOf('yearInUse')) {
                 $newprotocolnum = Protocol::whereEtos($newetos)->max('protocolnum') ? Protocol::whereEtos($newetos)->max('protocolnum') + 1 : 1;
             } else {
-                $newprotocolnum = Protocol::all()->last()->protocolnum ? Protocol::all()->last()->protocolnum + 1 : 1;
+                $newprotocolnum = Protocol::last()->protocolnum ? Protocol::last()->protocolnum + 1 : 1;
             }
         } else {
             if ($firstProtocolNum) {
@@ -354,7 +354,7 @@ class ProtocolController extends Controller
                 }
                 /*
                 // αν δεν έχει συμπληρωμένα εξερχόμενα παραμένει ανοιχτό μόνο για εξερχόμενα
-                if(! $outWithData){
+                if(! $outWithData && ! $inTimeFirstCommit && ! $inTimeLastEdit){
                     $submitVisible = '';
                     $headReadonly = 'readonly';
                     $inReadonly = 'readonly';
@@ -611,11 +611,11 @@ class ProtocolController extends Controller
 
         // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
         $firstProtocolNum = Config::getConfigValueOf('firstProtocolNum');
-        if (Protocol::all()->count()) {
+        if (Protocol::count()) {
             if (Config::getConfigValueOf('yearInUse')) {
                 $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1;
             } else {
-                $newprotocolnum = Protocol::all()->last()->protocolnum ? Protocol::all()->last()->protocolnum + 1 : 1;
+                $newprotocolnum = Protocol::last()->protocolnum ? Protocol::last()->protocolnum + 1 : 1;
             }
         } else {
             if ($firstProtocolNum) {
@@ -2027,11 +2027,11 @@ class ProtocolController extends Controller
 
         // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
         $firstProtocolNum = Config::getConfigValueOf('firstProtocolNum');
-        if (Protocol::all()->count()) {
+        if (Protocol::count()) {
             if (Config::getConfigValueOf('yearInUse')) {
                 $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1;
             } else {
-                $newprotocolnum = Protocol::all()->last()->protocolnum ? Protocol::all()->last()->protocolnum + 1 : 1;
+                $newprotocolnum = Protocol::last()->protocolnum ? Protocol::last()->protocolnum + 1 : 1;
             }
         } else {
             if ($firstProtocolNum) {

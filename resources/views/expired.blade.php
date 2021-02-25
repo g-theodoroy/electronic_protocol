@@ -44,7 +44,7 @@
                 <tr>
                     <th colspan=7>
                         <div class="col-md-3">{{$ipiresiasName}}</div>
-                        <div class="col-md-6 text-center">ΕΚΚΑΘΑΡΙΣΗ ΑΡΧΕΙΟΥ</div>
+                        <div class="col-md-6 text-center">{{ $title }}</div>
                     </th>
                 </tr>
                 <tr >

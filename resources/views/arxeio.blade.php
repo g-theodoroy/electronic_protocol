@@ -19,20 +19,32 @@
                 <div class="panel-body ">
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-success">
-                            <div class="form-control-static h4 text-center col-md-12 col-sm-12  " >
-                              @if($arxeianum)
+                          @if($arxeianum)
+                            <div class="form-control-static h4 text-center col-md-10 col-sm-10  col-md-offset-1 col-sm-offset-1" >
                               Βρέθηκαν {{$arxeianum}} έγγραφα προς εκκαθάριση
-                              @else
-                              Δεν υπάρχουν έγγραφα προς εκκαθάριση
-                              @endif
                             </div>
+                           <div class="form-control-static h4 text-center col-md-1 col-sm-1  " >
+                              <a href="{{ URL::to('/expired') }}"  target="_blank" role="button" title="Εκτύπωση" >
+                              <img src="{{ URL::to('/') }}/images/print.png" height="25" />
+                              </a>
+                            </div>
+                              @else
+                            <div class="form-control-static h4 text-center col-md-12 col-sm-12  " >
+                              Δεν υπάρχουν έγγραφα προς εκκαθάριση
+                            </div>
+                          @endif
                         </div>
                     </div>
                     @if($arxeiaNumTrash)
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                         <div class="row bg-info">
-                            <div class="form-control-static h4 text-center col-md-12 col-sm-12  " >
+                            <div class="form-control-static h4 text-center col-md-10 col-sm-10  col-md-offset-1 col-sm-offset-1" >
                               Βρέθηκαν {{$arxeiaNumTrash}} έγγραφα στον Κάδο Ανακύκλωσης
+                            </div>
+                            <div class="form-control-static h4 text-center col-md-1 col-sm-1" >
+                              <a href="{{ URL::to('/expired/1') }}"  target="_blank" role="button" title="Εκτύπωση" >
+                              <img src="{{ URL::to('/') }}/images/print.png" height="25" />
+                              </a>
                             </div>
                         </div>
                     </div>
@@ -40,11 +52,6 @@
 
                       <div class="row">
                           <div class="col-md-2 col-sm-2 col-md-offset-4 col-sm-offset-4 text-center">
-                            @if($arxeianum)
-                              <a href="{{ URL::to('/expired') }}"  target="_blank" role="button" title="Εκτύπωση" > <img src="{{ URL::to('/') }}/images/print.png" height="30" /></a>
-                            @endif
-                          </div>
-                          <div class="col-md-2 col-sm-2 text-center ">
                             @if($arxeianum)
                               <a href="javascript:chkdelete({{$arxeianum}})"  role="button" title="Διαγραφή" > <img src="{{ URL::to('/') }}/images/delete.ico" height="25" /></a>
                             @endif
@@ -54,7 +61,7 @@
                               <a href="javascript:chkdeldelete()"  role="button" title="Άδειασμα Κάδου Ανακύκλωσης" > <img src="{{ URL::to('/') }}/images/deldelete.png" height="25" /></a>
                             @endif
                           </div>
-                          <div class="col-md-2 col-sm-2 text-right ">
+                          <div class="col-md-2 col-sm-2 text-center col-md-offset-2 col-sm-offset-2">
                               <a href="{{ URL::to('/home/list') }}"  class="" role="button" title="Πρωτόκολλο" > <img src="{{ URL::to('/') }}/images/protocol.png" height="30" /></a>
                           </div>
                       </div>

@@ -134,9 +134,15 @@ class ConfigController extends Controller
         return view('arxeio', compact('arxeianum', 'arxeiaNumTrash'));
    }
 
-    public function expired(){
-        $arxeia = Attachment::whereNotNull('expires')->where('expires', '<' , Carbon::now()->format('Ymd'))->get();
-        foreach($arxeia as $arxeio){
+    public function expired($deleted = null){
+        if( $deleted){
+            $arxeia = Attachment::onlyTrashed()->get();
+            $title = "ΕΓΓΡΑΦΑ ΓΙΑ ΟΡΙΣΤΙΚΗ ΔΙΑΓΡΑΦΗ";
+        }else{
+            $arxeia = Attachment::whereNotNull('expires')->where('expires', '<', Carbon::now()->format('Ymd'))->get();
+            $title = "ΕΚΚΑΘΑΡΙΣΗ ΑΡΧΕΙΟΥ";
+        }
+       foreach($arxeia as $arxeio){
             if($arxeio->protocol->protocoldate) $arxeio->protocol->protocoldate = Carbon::createFromFormat('Ymd', $arxeio->protocol->protocoldate)->format('d/m/Y');
             if($arxeio->protocol->in_date) $arxeio->protocol->in_date = Carbon::createFromFormat('Ymd', $arxeio->protocol->in_date)->format('d/m/Y');
             if($arxeio->protocol->out_date) $arxeio->protocol->out_date = Carbon::createFromFormat('Ymd', $arxeio->protocol->out_date)->format('d/m/Y');
@@ -150,6 +156,28 @@ class ConfigController extends Controller
                         ?: strcmp($a->protocol->protocolnum, $b->protocol->protocolnum)
                         ?: strcmp($a->id, $b->id);
                 }
+        );
+
+        $config = new Config;
+        $datetime = Carbon::now()->format('d/m/Y H:m:s');
+        return view('expired', compact('arxeia', 'datetime', 'title'));
+    }
+
+    public function deleted(){
+        foreach ($arxeia as $arxeio) {
+            if ($arxeio->protocol->protocoldate) $arxeio->protocol->protocoldate = Carbon::createFromFormat('Ymd', $arxeio->protocol->protocoldate)->format('d/m/Y');
+            if ($arxeio->protocol->in_date) $arxeio->protocol->in_date = Carbon::createFromFormat('Ymd', $arxeio->protocol->in_date)->format('d/m/Y');
+            if ($arxeio->protocol->out_date) $arxeio->protocol->out_date = Carbon::createFromFormat('Ymd', $arxeio->protocol->out_date)->format('d/m/Y');
+            if ($arxeio->expires) $arxeio->expires = Carbon::createFromFormat('Ymd', $arxeio->expires)->format('d/m/Y');
+        }
+
+        $arxeia = $arxeia->sort(
+            function ($a, $b) {
+                // sort by column1 first, then 2, and so on
+                return strcmp($a->protocol->fakelos, $b->protocol->fakelos)
+                    ?: strcmp($a->protocol->protocolnum, $b->protocol->protocolnum)
+                    ?: strcmp($a->id, $b->id);
+            }
         );
 
         $config = new Config;
