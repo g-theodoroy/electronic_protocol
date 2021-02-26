@@ -2234,7 +2234,8 @@ class ProtocolController extends Controller
     // βρίσκει τις καταχωρίσεις που ταιριάζουν με αυτά που πληκτρολογεί ο χρήστης και επιστρέφει λίστα
     public function getValues($term, $field, $id, $divId, $multi)
     {
-        $protocols = Protocol::where($field, 'like', "%" . $term . "%")->distinct($field)->orderby($field)->get($field);
+        $protocols = Protocol::latest()->take(10);
+        $protocols = $protocols->where($field, 'like', "%" . $term . "%")->distinct($field)->orderby($field)->get($field);
         if (!$protocols) {
             return;
         }

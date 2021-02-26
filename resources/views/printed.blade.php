@@ -119,7 +119,7 @@
                     @if($protocol->diekperaiosi)
                         @php($str ='d')
                         @foreach(explode(',',$protocol->diekperaiosi) as $d)
-                            @if(strpos($str,substr($d,0,1))!==false)
+                            @if($d && strpos($str,substr($d,0,1))!==false)
                                 @if($myUsers->where('id', '==', ltrim($d,$str))->count())
                                     {{$myUsers->where('id', '==', ltrim($d,$str))->first()->name}}
                                 @else
