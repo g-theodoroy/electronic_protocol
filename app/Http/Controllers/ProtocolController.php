@@ -96,7 +96,7 @@ class ProtocolController extends Controller
             // αν δεν είναι νέο πρωτόκολλο και οι συγγραφείς περιορίζονται στη λίστα διεκπεραιωσης και δεν έχει καταχωριστεί από το χρήστη
             if ($protocol->id && strpos($protocol->diekperaiosi  . ',' , 'd' . Auth::user()->id . ',' ) === false && strpos($protocol->diekperaiosi . ',' , 'e' . Auth::user()->id . ',' ) === false && $protocol->user_id !== Auth::user()->id){
                 return abort(404);
-            } 
+            }
         }
          // βρίσκω τους Συγγραφείς, Αναθέτοντες και Διαχειριστές
         $writers_admins = User::get_writers_and_admins();
@@ -198,7 +198,7 @@ class ProtocolController extends Controller
         // έλεγχος αν επιτρέπεται η ενημέρωση
         // αν δεν έχει περάσει ο χρόνος που ορίζεται στις ρυθμίσεις
         // η μεταβλητή γίνεται true = επεξεργασία
-        // μόνο σε ενημέρωση και όχι σε νέο πρωτόκολλο 
+        // μόνο σε ενημέρωση και όχι σε νέο πρωτόκολλο
         if ($protocol->id){
             // αν ο χρόνος που πέρασε από την πρώτη καταχώριση είναι μέσα στα όρια επιτρέπεται η επεξεργασία
             $inTimeFirstCommit = false;
@@ -525,10 +525,10 @@ class ProtocolController extends Controller
             }
         } else {
             if ($filter == 'd') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . ",%" )->whereNull('diekp_date');
+                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . "%" )->whereNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, προς Διεκπεραίωση";
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . ",%" )->wherenotNull('diekp_date');
+                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . "%" )->wherenotNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
             }
         }
@@ -1475,7 +1475,7 @@ class ProtocolController extends Controller
             $protocols = $protocols->whereNull($whereNullField);
         }
         if ($wherevalues) {
-            // αν η ρύθμιση για Συγγραφείς και Αναγνώστες είναι ΝΑΙ περιορισμός στη λίστα 
+            // αν η ρύθμιση για Συγγραφείς και Αναγνώστες είναι ΝΑΙ περιορισμός στη λίστα
             // φιλτράρω τα μηνύματα. Επιτρέπονται μόνο όσα είναι για διεκπεραίωση - ενημέρωση - δημιουργήθηκαν από αυτούς
             if ($this->limitProtocolAccessList()) {
                 $protocols = $protocols->where(function ($query) {
@@ -1571,7 +1571,7 @@ class ProtocolController extends Controller
 
         if($target == 'xls'){
             $filename = $this->filter_filename( Config::getConfigValueOf('ipiresiasName') . " - εξαγωγή πρωτοκόλλου σε xls - " . Carbon::now()->format('Ymd-Hms') . '.xlsx', false);
-            return Excel::download(new ProtocolExport("printedXls", compact('protocols', 'etos', 'datetime')), $filename );  
+            return Excel::download(new ProtocolExport("printedXls", compact('protocols', 'etos', 'datetime')), $filename );
         }
         return view('printed', compact('protocols', 'etos', 'datetime'));
     }

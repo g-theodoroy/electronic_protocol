@@ -670,7 +670,7 @@ function findSxetiko(){
     }
     if(terms.length == 1){
         var data = terms[0].split( /\// );
-        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + data[1] + "/" + data[0])
+        $(location).attr('href', "{{ URL::to('/') }}" + "/goto/" + data[1] + "/" + data[0] + "?find=1")
     }else{
         var msg = '';
         for(var i=0 ; i<terms.length ; i++){
