@@ -31,7 +31,7 @@
               'Αρχή έκδοσης' => $protocol->in_arxi_ekdosis,
               'Παρελήφθη από' => $protocol->in_paraliptis,
               'Περίληψη εισερχομένου' => $protocol->in_perilipsi,
-              'Διεκπεραίση από' => $protocol->diekperaiosi ? \App\User::find($protocol->diekperaiosi)->name : '',
+              'Διεκπεραίση από' => $protocol->diekperaiosi ? \App\User::diekperaiosi_name($protocol->diekperaiosi) : null ,
               'Ημνια διεκπεραίωσης' => $protocol->diekp_date ? \Carbon\Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y') : '',
               'Σχετικοί αριθμόι' => $protocol->sxetiko,
               'Απευθύνεται σε' => $protocol->out_to,

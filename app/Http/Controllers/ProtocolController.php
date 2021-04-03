@@ -1486,7 +1486,7 @@ class ProtocolController extends Controller
                 $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
             }
             if ($protocol->diekperaiosi) {
-                $protocol->diekperaiosi = User::where('id', ltrim($protocol->diekperaiosi, $diekpStr))->first('name')->name;
+                $protocol->diekperaiosi = User::where('id', ltrim($protocol->diekperaiosi, $diekpStr))->first('name')->name ?? null;
             }
         }
 
@@ -2147,7 +2147,7 @@ class ProtocolController extends Controller
                 'alert-type' => 'error'
             );
             session()->flash('notification', $notification);
-            return redirect("home/$protocol_id");
+            return redirect("home/" . $protocol->id);
         }
 
         if ($numCreatedAttachments) {
@@ -2224,7 +2224,7 @@ class ProtocolController extends Controller
         if (!$protocols) {
             return;
         }
-
+        $output = '';
         if ($multi) {
             $valuesArray = [];
             foreach ($protocols as $protocol) {

@@ -214,7 +214,7 @@ textarea[readonly].inout{
                                             </optgroup>
                                             <optgroup label="Ενημέρωση" >
                                                 @foreach($writers_admins as $writer_admin)
-                                                    <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi . ',' , "e" . $writer_admin->id . ','  ) !== false) selected  @endif>{{$writer_admin->name}}</option>
+                                                    <option value='e{{$writer_admin->id}}' @if( strpos($protocol->diekperaiosi . ',' , "e" . $writer_admin->id . ',' ) !== false) selected  @endif>{{$writer_admin->name}}</option>
                                                 @endforeach
                                             </optgroup>
                                         </select>

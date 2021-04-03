@@ -61,43 +61,43 @@
                 @foreach($arxeia as $arxeio)
                 <tr>
                 <td class="small middle">
-                    @if($arxeio->protocol->fakelos)
+                    @if($arxeio->protocol->fakelos ?? null)
                     <span class='small'>{{$arxeio->protocol->fakelos}}/</span>
                     @endif
-                    <strong>{{$arxeio->protocol->protocolnum}}</strong>
+                    <strong>{{$arxeio->protocol->protocolnum ?? null}}</strong>
                 </td>
                 <td class="small middle">
-                    <span class='small'>{{$arxeio->protocol->protocoldate}}</span></td>
+                    <span class='small'>{{$arxeio->protocol->protocoldate ?? null}}</span></td>
                 <td class="small middle"><span class='small'>{{$arxeio->expires}}</span></td>
                 <td class="small middle">
                   @if ($arxeio->name)<span class='small'>{{$arxeio->name}}</span> @endif
                   @if ($arxeio->name and $arxeio->ada)<br> @endif
                   @if ($arxeio->ada)<span class='small'>ΑΔΑ:{{$arxeio->ada}}</span> @endif
                 </td>
-                <td class="small middle"><span class='small'>{{$arxeio->protocol->thema}}</span></td>
+                <td class="small middle"><span class='small'>{{$arxeio->protocol->thema ?? null}}</span></td>
                 <td class="small middle">
                     <span class='small'>
-                    @if($arxeio->protocol->in_num)
+                    @if($arxeio->protocol->in_num ?? null)
                     {{$arxeio->protocol->in_num}}/
                     @endif
-                    @if($arxeio->protocol->in_date)
+                    @if($arxeio->protocol->in_date ?? null)
                     {{$arxeio->protocol->in_date}}
                     @endif
-                    @if($arxeio->protocol->in_date and $arxeio->protocol->out_date)
+                    @if($arxeio->protocol->in_date ?? null  and $arxeio->protocol->out_date ?? null )
                     <br>
                     @endif
-                    @if($arxeio->protocol->out_date)
+                    @if($arxeio->protocol->out_date ?? null )
                     &#x2727; {{$arxeio->protocol->out_date}}</span>
                     @endif
                 </td>
                  <td class="small middle"><span class='small'>
-                    @if($arxeio->protocol->in_perilipsi)
+                    @if($arxeio->protocol->in_perilipsi ?? null )
                     {{$arxeio->protocol->in_perilipsi}}</span>
                     @endif
-                    @if($arxeio->protocol->in_perilipsi and $arxeio->protocol->out_perilipsi)
+                    @if($arxeio->protocol->in_perilipsi ?? null  and $arxeio->protocol->out_perilipsi ?? null )
                     <br>
                     @endif
-                    @if($arxeio->protocol->out_perilipsi)
+                    @if($arxeio->protocol->out_perilipsi ?? null )
                     &#x2727; {{$arxeio->protocol->out_perilipsi}}</span>
                     @endif
                 </td>

@@ -49,6 +49,17 @@ class User extends Authenticatable
         return User::orderby('name')->get();
     }
 
+    public static function diekperaiosi_name($diekperaiosi){
+        $str = 'd';
+        foreach(explode(',',$diekperaiosi) as $d){
+            if($d && strpos($str,substr($d,0,1))!==false){
+                return User::find(ltrim($d, $str))->name;
+                break;
+            }
+        }
+        return null;
+    }
+
     /**
      * Βρίσκω τον αριθμό των διαχειριστών
      * αφου βρω τον id του Διαχειριστή
