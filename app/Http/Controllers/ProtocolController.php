@@ -1248,98 +1248,58 @@ class ProtocolController extends Controller
             if ($step == 'b') {
                 if($limitProtocolAccessList){
                     $protocol_id = Protocol::where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id );
-                    })->where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->take(1)->get('id');
-                    if (count($protocol_id)){
-                        return redirect("home/" . $protocol_id[0]->id);
-                    }else{
-                        $protocol_id = Protocol::where(function ($query) {
-                            $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id );
-                        })->where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->take(1)->get('id');
-                             return redirect("home/" . $protocol_id[0]->id);
-                    }
+                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                    })->where(function ($query) use($protocolnum, $etos) {
+                        $query->where([['protocolnum', '<', $protocolnum],['etos', $etos]])->orwhere('etos', "<", $etos);
+                    })->orderby('etos', 'DESC')->orderby('protocolnum', 'DESC')->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 }else{
-                    $protocol_id = Protocol::where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        $protocol_id = Protocol::where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->take(1)->get('id');
-                        return redirect("home/" . $protocol_id[0]->id);
-                    }
+                    $protocol_id = Protocol::where([['protocolnum', '<', $protocolnum],['etos', $etos]])->orwhere('etos', "<", $etos)->orderby('etos', 'DESC')->orderby('protocolnum', 'DESC')->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 }
             } elseif($step == 'f') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id );
-                    })->where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        if($etos < Carbon::now()->year){
-                                $protocol_id = Protocol::where(function ($query) {
-                                $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id );
-                                })->where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->take(1)->get('id');
-                                return redirect("home/" . $protocol_id[0]->id);
-                        }
-                    }
+                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                    })->where(function ($query) use($protocolnum, $etos) {
+                        $query->where([['protocolnum', '>', $protocolnum],['etos', $etos]])->orwhere('etos', ">", $etos);
+                    })->orderby('etos', 'ASC')->orderby('protocolnum', 'ASC')->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 } else {
-                    $protocol_id = Protocol::where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        if ($etos < Carbon::now()->year) {
-                            $protocol_id = Protocol::where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->take(1)->get('id');
-                            return redirect("home/" . $protocol_id[0]->id);
-                        }
-                    }
+                    $protocol_id = Protocol::where([['protocolnum', '>', $protocolnum],['etos', $etos]])->orwhere('etos', ">", $etos)->orderby('etos', 'ASC')->orderby('protocolnum', 'ASC')->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 }
             } elseif($step == 'bb') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
                         $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
-                    })->where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep')-1)->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        $protocol_id = Protocol::where(function ($query) {
-                            $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
-                        })->where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                        return redirect("home/" . $protocol_id[0]->id);
-                    }
+                    })->where(function ($query) use($protocolnum, $etos) {
+                        $query->where([['protocolnum', '<', $protocolnum],['etos', $etos]])->orwhere('etos', "<", $etos);
+                    })->orderby('etos', 'DESC')->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep')-1)->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 } else {
-                    $protocol_id = Protocol::where('protocolnum', '<', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        $protocol_id = Protocol::where('etos', $etos - 1)->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                        return redirect("home/" . $protocol_id[0]->id);
-                    }
+                    $protocol_id = Protocol::where([['protocolnum', '<', $protocolnum],['etos', $etos]])->orwhere('etos', "<", $etos)->orderby('etos', 'DESC')->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 }
             } elseif( $step == 'ff') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
                         $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
-                    })->where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        if ($etos < Carbon::now()->year) {
-                            $protocol_id = Protocol::where(function ($query) {
-                                $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
-                            })->where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                            return redirect("home/" . $protocol_id[0]->id);
-                        }
-                    }
+                    })->where(function ($query) use($protocolnum, $etos) {
+                        $query->where([['protocolnum', '>', $protocolnum],['etos', $etos]])->orwhere('etos', ">", $etos);
+                    })->orderby('etos', 'ASC')->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 } else {
-                    $protocol_id = Protocol::where('protocolnum', '>', $protocolnum)->where('etos', $etos)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                    if (count($protocol_id)) {
-                        return redirect("home/" . $protocol_id[0]->id);
-                    } else {
-                        if ($etos < Carbon::now()->year) {
-                            $protocol_id = Protocol::where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
-                            return redirect("home/" . $protocol_id[0]->id);
-                        }
-                    }
+                    $protocol_id = Protocol::where([['protocolnum', '>', $protocolnum],['etos', $etos]])->orwhere('etos', ">", $etos)->orderby('etos', 'ASC')->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
+                    if (count($protocol_id)) return redirect("home/" . $protocol_id[0]->id);
+                    return redirect("home");
                 }
             }
         }
