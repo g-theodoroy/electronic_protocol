@@ -39,7 +39,7 @@
                       <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
                       @php 
                           $num++; 
-                          if($oMessage->getSubject()){
+                          if(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true)){
                             $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
                           }
                           if(! $subject) $subject = $oMessage->getSubject();
@@ -96,7 +96,7 @@
                             <strong>Τόπος<br>Έκδοσης</strong>
                         </div>
                         <div id="in_topos_ekdosisDiv" class="col-md-5 col-sm-5 {{ $errors->has('in_topos_ekdosis') ? ' has-error' : '' }}">
-                            <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis }}"  title='4. Τόπος που εκδόθηκε'>
+                            <input id="in_topos_ekdosis"  oninput="getValues(this.id, 'in_topos_ekdosis', 'in_topos_ekdosisList', 0)" type="text" class="form-control" name="in_topos_ekdosis" placeholder="in_topos_ekdosis" value="{{ old('in_topos_ekdosis') ? old('in_topos_ekdosis') : $protocol->in_topos_ekdosis ?? '' }}"  title='4. Τόπος που εκδόθηκε'>
                             <div id="in_topos_ekdosisList" class="col-md-12 col-sm-12" ></div>
                         </div>
                     </div>
@@ -141,7 +141,7 @@
                         </div>
                         <div id="diekperaiosi{{$oMessage->getUid()}}Div"  class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
 
-                            <select id="diekperaiosi{{$oMessage->getUid()}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi}}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
+                            <select id="diekperaiosi{{$oMessage->getUid()}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi ?? '' }}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
                               <optgroup label="Διεκπεραίωση" data-max-options="1">
                                         @foreach($writers_admins as $writer_admin)
                                             <option value='d{{$writer_admin->id}}'>{{$writer_admin->name}}</option>
@@ -227,7 +227,7 @@
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Προς:</strong></div>
                         <div class="form-control-static col-md-11 col-sm-11">
                           @foreach($oMessage->getTo() as $getTo)
-                          {{$getTo->name}}{{$getTo->mail}}@if(! $loop->last),&nbsp;@endif
+                          {{$getTo->name ?? null}}{{$getTo->mail}}@if(! $loop->last),&nbsp;@endif
                           @endforeach
                         </div>
                       </div>
@@ -247,7 +247,7 @@
                           <div class="form-control-static col-md-1 col-sm-1"><strong>Απάντηση:</strong></div>
                           <div class="form-control-static col-md-11 col-sm-11">
                             @foreach($oMessage->getReplyTo() as $getReplyTo)
-                            {{$getReplyTo->name}}{{$getReplyTo->mail}}@if(! $loop->last),&nbsp;@endif
+                            {{$getReplyTo->name ?? null }}{{$getReplyTo->mail}}@if(! $loop->last),&nbsp;@endif
                             @endforeach
                           </div>
                       </div>

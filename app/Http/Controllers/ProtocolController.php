@@ -699,9 +699,11 @@ class ProtocolController extends Controller
         if ($data['diekp_date']) {
             $diekp_date = Carbon::createFromFormat('d/m/Y', $data['diekp_date'])->format('Ymd');
         }
+        $keywords = null;
         if ($data['keywords']) {
             $keywords = rtrim($data['keywords'], ',');
         }
+        $sxetiko = null;
         if ($data['sxetiko']) {
             $sxetiko = rtrim($data['sxetiko'], ',');
         }
@@ -814,9 +816,9 @@ class ProtocolController extends Controller
         // αν πρέπει να στείλω email στον Διεκπεραιωτή $sendEmailTo = user.id
         // και οι ρυθμίσεις λένα να στέλνω email σε ανάθεση
         // στέλνω email
+            $message = '';
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
             $sendEmailToArray = explode(',', $sendEmailTo);
-            $message = '';
             foreach ($sendEmailToArray as $smt) {
                 if (substr($smt, 0, 1) == 'd') {
                     $message .= $this->sendMailToDiekperaioti(ltrim($smt, 'd'), $protocol);
@@ -939,25 +941,25 @@ class ProtocolController extends Controller
             $diekp_date = Carbon::createFromFormat('d/m/Y', $data['diekp_date'])->format('Ymd');
         }
         // βγάζω το τελευταίο (,) κόμα από τις λέξεις κλειδιά
+        $keywords = null;
         if ($data['keywords']) {
             $keywords = rtrim($data['keywords'], ',');
         }
+        $sxetiko = null;
         if ($data['sxetiko']) {
             $sxetiko = rtrim($data['sxetiko'], ',');
         }
 
-        // αν άλλαξε ο Φακελλος και υπάρχουν συνημμένα αρχεία
-        // ενημερώνω ότι δεν μπορεί να άλλαξειο ο φάκελος Φ.
-        if ($protocol->attachments()->count()) {
-            if ($data['fakelos'] !== $oldFakelos) {
+        // αν διαγράφηκε και υπάρχουν συνημμένα αρχεία
+        // ενημερώνω ότι δεν μπορεί να ο φάκελος Φ. είναι κενός
+        if ($protocol->attachments()->count() && ! $data['fakelos']) {
                 $validator = Validator::make(request()->all(), [
-                    'fakelos' => "required|in:$oldFakelos",
+                    'fakelos' => "required",
                 ], [
-                    'fakelos.required' => "Δεν μπορείτε να αλλάξετε τον Φάκελλο πρωτοκόλλου με συνημμένα αρχεία.<br>Για να επιτευχθεί αυτό πρέπει πρώτα να διαγράψετε τα συνημμένα αρχεία.",
-                    'fakelos.in' => "Δεν μπορείτε να αλλάξετε τον Φάκελλο πρωτοκόλλου με συνημμένα αρχεία.<br>Για να επιτευχθεί αυτό πρέπει πρώτα να διαγράψετε τα συνημμένα αρχεία.",
+                    'fakelos.required' => "Ο Φάκελλος πρωτοκόλλου με συνημμένα αρχεία δεν μπορεί να είναι κενός.<br>Για να επιτευχθεί αυτό πρέπει πρώτα να διαγράψετε τα συνημμένα αρχεία.",
                 ])->validate();
-            }
         }
+
         // ενημέρωση του πρωτοκόλλου
         try {
             Protocol::whereId($id)->update([
@@ -995,7 +997,28 @@ class ProtocolController extends Controller
             return redirect("home/$id");
         }
 
-        // αποθηκεύω τασ υνημμένα αρχεία
+
+        // αν άλλαξε ο Φακελλος και υπάρχουν συνημμένα αρχεία
+        if ($protocol->attachments()->count()) {
+            if ($data['fakelos'] !== $oldFakelos) {
+
+                $attachments = $protocol->attachments()->get();
+                foreach( $attachments as $attachment){
+                    $savedPath = $attachment->savedPath;
+                    $newPath = str_replace($oldFakelos, $data['fakelos'], $savedPath);
+                    // αν υπάρχει το αρχείο
+                    if (Storage::exists($attachment->savedPath)) {
+                        // το μετακινώ στον Κάδο Ανακύκλωσης
+                        Storage::move($savedPath, $newPath);
+                    }
+                    $attachment->savedPath = $newPath;
+                    $attachment->save();
+                }
+            }
+        }
+
+
+        // αποθηκεύω τα συνημμένα αρχεία
         $filescount = 3 * $data['file_inputs_count'];
         for ($i = 1; $i < $filescount + 1; $i++) {
             if ($data["ada$i"] or request()->hasFile("att$i")) {
@@ -1052,9 +1075,9 @@ class ProtocolController extends Controller
             }
         }
         // αν έχω id του Διεκπεραιωτή και επιτρέπεται από τις ρυθμίσεις στέλνω email στον Διεκπεραιωτή
+        $message = '';
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
             $sendEmailToArray = explode(',', $sendEmailTo);
-            $message = '';
             foreach ($sendEmailToArray as $smt) {
                 if (substr($smt, 0, 1) == 'd') {
                     $message .= $this->sendMailToDiekperaioti(ltrim($smt, 'd'), $protocol);
@@ -1252,7 +1275,7 @@ class ProtocolController extends Controller
                     if (count($protocol_id)) {
                         return redirect("home/" . $protocol_id[0]->id);
                     } else {
-                        if($year < Carbon::now()->year){
+                        if($etos < Carbon::now()->year){
                                 $protocol_id = Protocol::where(function ($query) {
                                 $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id );
                                 })->where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->take(1)->get('id');
@@ -1264,7 +1287,7 @@ class ProtocolController extends Controller
                     if (count($protocol_id)) {
                         return redirect("home/" . $protocol_id[0]->id);
                     } else {
-                        if ($year < Carbon::now()->year) {
+                        if ($etos < Carbon::now()->year) {
                             $protocol_id = Protocol::where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->take(1)->get('id');
                             return redirect("home/" . $protocol_id[0]->id);
                         }
@@ -1300,7 +1323,7 @@ class ProtocolController extends Controller
                     if (count($protocol_id)) {
                         return redirect("home/" . $protocol_id[0]->id);
                     } else {
-                        if ($year < Carbon::now()->year) {
+                        if ($etos < Carbon::now()->year) {
                             $protocol_id = Protocol::where(function ($query) {
                                 $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                             })->where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
@@ -1312,7 +1335,7 @@ class ProtocolController extends Controller
                     if (count($protocol_id)) {
                         return redirect("home/" . $protocol_id[0]->id);
                     } else {
-                        if ($year < Carbon::now()->year) {
+                        if ($etos < Carbon::now()->year) {
                             $protocol_id = Protocol::where('etos', $etos + 1)->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
                             return redirect("home/" . $protocol_id[0]->id);
                         }
@@ -1991,7 +2014,9 @@ class ProtocolController extends Controller
         if (isset($data["thema"])) {
             $thema = $data["thema"];
         } else {
-            $thema = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+            if (json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true)) {
+                $thema = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+            }
             if (!$thema) $thema = $oMessage->getSubject();
         }
         // αλλάζω τις ημνιες στην κατάλληλη μορφή για αποθήκευση

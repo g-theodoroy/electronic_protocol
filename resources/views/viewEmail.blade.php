@@ -23,7 +23,9 @@
           <div class="row bg-warning ">
             <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
             @php
+            if(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true)){
               $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
+            }
               if(! $subject) $subject = $oMessage->getSubject();
             @endphp
             <div class="form-control-static col-md-11 col-sm-11  "><strong>{{ $subject }}</strong></div>

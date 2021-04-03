@@ -98,8 +98,10 @@ textarea[readonly].inout{
                         </div>
                         <div class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
                             <select id="fakelos" class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos"  autofocus data-value="{{$protocol->fakelos}}" @if($headReadonly) onchange="this.value = this.getAttribute('data-value');" disabled="disabled"  @else onchange='getKeep4Fakelos()' @endif>
-                                 <option value=''></option>
-                               @foreach($fakeloi as $fakelos)
+                                @if(!$protocol->attachments()->count())
+                                <option value=''></option>
+                                @endif
+                                @foreach($fakeloi as $fakelos)
                                 @if ($fakelos['fakelos'] == $protocol->fakelos)
                                     <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" selected >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
                                 @else
