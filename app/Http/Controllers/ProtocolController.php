@@ -951,7 +951,7 @@ class ProtocolController extends Controller
         }
 
         // αν διαγράφηκε και υπάρχουν συνημμένα αρχεία
-        // ενημερώνω ότι δεν μπορεί να ο φάκελος Φ. είναι κενός
+        // ενημερώνω ότι δεν μπορεί ο φάκελος Φ. να είναι κενός
         if ($protocol->attachments()->count() && ! $data['fakelos']) {
                 $validator = Validator::make(request()->all(), [
                     'fakelos' => "required",
@@ -1008,7 +1008,7 @@ class ProtocolController extends Controller
                     $newPath = str_replace($oldFakelos, $data['fakelos'], $savedPath);
                     // αν υπάρχει το αρχείο
                     if (Storage::exists($attachment->savedPath)) {
-                        // το μετακινώ στον Κάδο Ανακύκλωσης
+                        // το μετακινώ στον νέο φάκελο
                         Storage::move($savedPath, $newPath);
                     }
                     $attachment->savedPath = $newPath;
@@ -1183,13 +1183,14 @@ class ProtocolController extends Controller
         $protocolnum = $protocol->protocolnum;
         $etos = $protocol->etos;
         // αν υπάρχουν συνημμένα δεν διαγράφω και ενημερώνω
-        if ($protocol->attachments->count()) {
-            $notification = array(
-                'message' => 'Δεν μπορώ να διαγράψω πρωτόκολλο με συνημμένα.',
-                'alert-type' => 'error'
-            );
-            session()->flash('notification', $notification);
-            return back();
+        if ($protocol->attachments()->count()) {
+            //return $protocol->attachments()->get();
+            foreach($protocol->attachments()->get() as $att){
+                // διαγραφή του αρχείου
+                Storage::delete($att->savedPath);
+                // hard delete
+                $att->forceDelete();
+            }
         }
         // διαγραφή Πρωτοκόλλου
         Protocol::destroy($protocol->id);
