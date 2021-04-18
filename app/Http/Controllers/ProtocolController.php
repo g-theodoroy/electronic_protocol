@@ -1842,7 +1842,7 @@ class ProtocolController extends Controller
         // παίρνω το περιεχόμενο
         $content = $oAttachment->getContent();
         // το στέλνω για εμφάνιση
-        $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oAttachment->getName())), true), 'text'));
+        $filename = imap_utf8($oAttachment->getName());
         if (!$filename) $filename = $oAttachment->getName();
         return response($content)
             ->header('Content-Type', $oAttachment->getMimeType())
@@ -1977,9 +1977,7 @@ class ProtocolController extends Controller
         if (isset($data["thema"])) {
             $thema = $data["thema"];
         } else {
-            if (json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true)) {
-                $thema = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
-            }
+            $thema = imap_utf8($oMessage->getSubject());
             if (!$thema) $thema = $oMessage->getSubject();
         }
         // αλλάζω τις ημνιες στην κατάλληλη μορφή για αποθήκευση
@@ -2118,13 +2116,13 @@ class ProtocolController extends Controller
                 }
                 $content = $oAttachment->getContent();
                 $mimeType = $oAttachment->getMimeType();
-                $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oAttachment->getName())), true), 'text'));
+                $filename = imap_utf8($oAttachment->getName());
                 if (!$filename) $filename = $oAttachment->getName();
 
                 // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                 $filename = $this->filter_filename($filename, false);
 
-                $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
+                $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $attachmentKey . '_' . $filename;
 
                 $dir = '/arxeio/' . $fakelos . '/';
                 $savedPath = $dir . $filenameToStore;

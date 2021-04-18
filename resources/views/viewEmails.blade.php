@@ -53,10 +53,7 @@
                       <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{($aMessage->currentPage()-1)* $aMessage->perPage() + $num}} από {{ $aMessageNum }}</div></div>
                       @php 
                           $num++;
-                          $subject = ''; 
-                          if(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true)){
-                            $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
-                          }
+                          $subject = imap_utf8($oMessage->getSubject());
                           if(! $subject) $subject = $oMessage->getSubject();
                       @endphp
 
@@ -298,9 +295,7 @@
                         <div class="form-control-static col-md-10 col-sm-10 ">
                           @foreach($oMessage->attachments as $key=>$attachment)
                           @php
-			    if(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true)){
-                            	$filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true), 'text'));
-                            }
+                            $filename = imap_utf8($attachment->getName());
 			    if (! $filename) $filename = $attachment->getName();
                            @endphp
                           <a href='{{ URL::to('/') }}/viewEmailAttachment/{{$oMessage->getUid()}}/{{$key}}' target="_blank"  title='Λήψη {{ $filename }}'>{{ $filename }}</a>
