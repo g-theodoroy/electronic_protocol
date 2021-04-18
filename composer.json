@@ -16,7 +16,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^2.4",
         "maatwebsite/excel": "^3.1",
-        "webklex/laravel-imap": "^1.4"
+        "webklex/laravel-imap": "^2.2.5"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

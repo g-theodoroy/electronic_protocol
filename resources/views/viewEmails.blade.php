@@ -12,13 +12,27 @@
                     @php
                         $aMessageCount = $aMessage->count();
                     @endphp
+
+                      @if ($aMessage->links())
+                        <div class="row">
+                          <div class="small text-center">
+                              <span class="small" >{{$aMessage->links()}}</span>
+                          </div>
+                        </div>
+                      @endif
+
                       @if($aMessageCount)
                       @if($aMessageCount < $aMessageNum)
                       <div class="row bg-warning">
-                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}}</strong> - Εμφανίζονται τα <strong>{{count($aMessage)}} {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'τελευταία' : 'πρώτα' }}</strong> από <strong>{{$aMessageNum}}</strong> εισερχόμενα emails - ταξινόμηση <strong>{{App\Config::getConfigValueOf('emailShowOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
+                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center">
+                        <strong>{{$defaultImapEmail}}</strong> - Εμφανίζονται τα 
+                        <strong>{{($aMessage->currentPage()-1)* $aMessage->perPage() + 1 }}</strong> έως 
+                        <strong>{{ $aMessage->currentPage()* $aMessage->perPage() > $aMessageNum ? $aMessageNum :  $aMessage->currentPage() * $aMessage->perPage() }}</strong> 
+                        από <strong>{{$aMessageNum}}</strong> εισερχόμενα emails - 
+                        ταξινόμηση <strong>{{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @else
                       <div class="row bg-success">
-                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εισερχόμενα emails: {{count($aMessage)}}  - ταξινόμηση {{App\Config::getConfigValueOf('emailShowOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
+                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εισερχόμενα emails: {{count($aMessage)}}  - ταξινόμηση {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @endif
                       @else
                       <div class="row bg-info">
@@ -36,9 +50,10 @@
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                       <form name="frm{{$oMessage->getUid()}}" id="frm{{$oMessage->getUid()}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
                       {{ csrf_field() }}
-                      <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{$num}} από {{ $aMessageCount }}</div></div>
+                      <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{($aMessage->currentPage()-1)* $aMessage->perPage() + $num}} από {{ $aMessageNum }}</div></div>
                       @php 
-                          $num++; 
+                          $num++;
+                          $subject = ''; 
                           if(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true)){
                             $subject = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($oMessage->getSubject())), true), 'text'));
                           }
@@ -283,8 +298,10 @@
                         <div class="form-control-static col-md-10 col-sm-10 ">
                           @foreach($oMessage->attachments as $key=>$attachment)
                           @php
-                            $filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true), 'text'));
-                            if (! $filename) $filename = $attachment->getName();
+			    if(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true)){
+                            	$filename = implode('', array_column(json_decode(json_encode(imap_mime_header_decode($attachment->getName())), true), 'text'));
+                            }
+			    if (! $filename) $filename = $attachment->getName();
                            @endphp
                           <a href='{{ URL::to('/') }}/viewEmailAttachment/{{$oMessage->getUid()}}/{{$key}}' target="_blank"  title='Λήψη {{ $filename }}'>{{ $filename }}</a>
                           <input type="checkbox" class="" id="chk{{$oMessage->getUid()}}-{{$key}}" name="chk{{$oMessage->getUid()}}-{{$key}}" title="Αν είναι επιλεγμένο αποθηκεύεται το συνημμένο {{ $filename  }}" checked  >
@@ -297,7 +314,16 @@
                     </div>
                 @endforeach
                 @endif
-               </div>
+
+                @if ($aMessage->links())
+                <div class="row">
+                <div class="small text-center">
+                    <span class="small" >{{$aMessage->links()}}</span>
+                </div>
+              </div>
+                @endif
+      
+              </div>
             </div>
         </div>
     </div>

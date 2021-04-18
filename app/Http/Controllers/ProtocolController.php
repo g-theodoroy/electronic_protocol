@@ -1718,6 +1718,7 @@ class ProtocolController extends Controller
 
     public function viewEmails()
     {
+        $imap_page = request('imap_page') ?? 1;
         // διαβάζω τις ρυθμίσεις
         $writers_admins = User::get_writers_and_admins();
         $allowUserChangeKeepSelect = Config::getConfigValueOf('allowUserChangeKeepSelect');
@@ -1733,6 +1734,13 @@ class ProtocolController extends Controller
         if (in_array(Auth::user()->role_description(), ["Διαχειριστής",  "Αναθέτων"])) {
             $forbidenChangeDiekperaiosiSelect = null;
         }
+
+        // παίρνω τα ΠΡΩΤΑ ή ΤΕΛΕΥΤΑΙΑ μηνύματα  με βάση τις ρυθμίσεις
+        // emailFetchOrderDesc == 1 => ΤΕΛΕΥΤΑΙΑ
+        if (Config::getConfigValueOf('emailFetchOrderDesc')) {
+            config(['imap.options.fetch_order' => 'desc']);
+        }
+
 
         // φορτώνω τον πελάτη (λογαριασμό)
         $oClient = Client::account($defaultImapEmail);
@@ -1759,26 +1767,12 @@ class ProtocolController extends Controller
         // σύνδεση στον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
         // σειρά ταξινόμησης μηνυμάτων στον imap server πριν τα κατεβάσω
-        // παίρνω τα ΠΡΩΤΑ ή ΤΕΛΕΥΤΑΙΑ μηνύματα  με βάση τις ρυθμίσεις
-        // emailFetchOrderDesc == 1 => ΤΕΛΕΥΤΑΙΑ
-        if (Config::getConfigValueOf('emailFetchOrderDesc')) {
-            config(['imap.options.fetch_order' => 'desc']);
-        }
         // παίρνω τον αριθμό των μηνυμάτων από sinceDate και μετά
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
         // παίρνω τα μηνύματα από sinceDate και μετά
-        $aMessage = $oFolder->query()->since($sinceDate)->limit($emailNumFetch)->get();
+        $aMessage = $oFolder->query()->since($sinceDate)->paginate($emailNumFetch, $imap_page);
 
-        // ταξινόμηση των μηνυμάτων που πήρα ΦΘΙΝΟΥΣΑ ή ΑΥΞΟΥΣΑ
-        if (Config::getConfigValueOf('emailShowOrderDesc')) {
-            $aMessage = $aMessage->sortByDesc(function ($oMessage) {
-                return Carbon::parse($oMessage->getDate());
-            });
-        } else {
-            $aMessage = $aMessage->sortBy(function ($oMessage) {
-                return Carbon::parse($oMessage->getDate());
-            });
-        }
+
         // διαγραφή τυχόν προηγούμενα αποθηκευμένων email.html
         $files = Storage::disk('tmp')->files();
         Storage::disk('tmp')->delete($files);
@@ -1786,7 +1780,7 @@ class ProtocolController extends Controller
         $emailFilePaths = array();
         // για κάθε μήνυμα
         foreach ($aMessage as $oMessage) {
-            if ($oMessage->getHTMLBody()) {
+            if ($oMessage->hasHTMLBody()) {
                 // κωδικός
                 $Uid = $oMessage->getUid();
                 // περιεχόμενο HTML
@@ -1803,7 +1797,8 @@ class ProtocolController extends Controller
                 $emailFilePaths[$Uid] = $savedPath;
             }
         }
-        return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput'));
+        session()->put('imap_page', $imap_page);
+        return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput', 'imap_page'));
     }
 
     // εμφάνιση του συνημμένου αρχείου
@@ -1839,7 +1834,7 @@ class ProtocolController extends Controller
         // πηγαίνω στον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
         // παίρνω το νήνυμα με το messageUid
-        $oMessage = $oFolder->getMessage($messageUid, null, null, true, true, false);
+        $oMessage = $oFolder->query()->getMessageByUid($messageUid, null, null, true, true, false);
         // παίρνω τα συνημμένα
         $aAttachment = $oMessage->getAttachments();
         // το συνημμένο μς το attachmentKey
@@ -1889,10 +1884,10 @@ class ProtocolController extends Controller
         }
 
         $oFolder = $oClient->getFolder('INBOX');
-        $oMessage = $oFolder->getMessage($messageUid, null, null, false, false, false);
+        $oMessage = $oFolder->query()->getMessageByUid($messageUid, null, null, false, false, false);
         if ($oMessage) {
             // μεταφέρω το μήνυμα στα διαβασμένα
-            $oMessage->moveToFolder('INBOX.beenRead', true);
+            $oMessage->move('INBOX.beenRead', true);
             // ενημερώνω τον χρήστη
             $notification = array(
                 'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
@@ -1907,6 +1902,13 @@ class ProtocolController extends Controller
             );
             session()->flash('notification', $notification);
         }
+
+        if(session()->has('imap_page')) {
+            $imap_page = session('imap_page');
+            session()->pull('imap_page');
+            return redirect('/viewEmails?imap_page=' . $imap_page);
+        }
+
         // επιστρέφω
         return redirect('/viewEmails');
     }
@@ -1931,11 +1933,11 @@ class ProtocolController extends Controller
         isset($data["keep$uid"]) ? $keep = $data["keep$uid"] : $keep = null;
 
         // id περαιωτή. Αν υπάρχει θα στείλω email για ανάθεση Πρωτοκόλλου
-        $sendEmailTo = $data["sendEmailTo"];
+        $sendEmailTo = $data["sendEmailTo"] ?? '';
         // θα στείλω απόδειξη παραλαβής; ΝΑΙ(1) - ΟΧΙ(0)
-        $sendReceipt = $data["sendReceipt$uid"];
+        $sendReceipt = $data["sendReceipt$uid"] ?? '';
         // παίρνω το email για απόδειξη παραλαβής
-        $sendReplyTo = trim($data["reply_to"]);
+        $sendReplyTo = trim($data["reply_to"]?? '') ;
         // βρίσκω τα τσεκαρισμένα checkboxes για να δω ποια συνημμένα θα αποθηκευτούν
         $chkboxes = array_filter($data, function ($k) use ($uid) {
             return strpos($k, "chk$uid-") !== false;
@@ -1969,7 +1971,7 @@ class ProtocolController extends Controller
         // παίρνω τον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
         // το μήνυμα με το uid για αποθήκευση
-        $oMessage = $oFolder->getMessage($uid, null, null, true, true, false);
+        $oMessage = $oFolder->query()->getMessageByUid($uid, null, null, true, true, false);
 
         // βάζω τα δεδομένα σε μεταβλητές
         if (isset($data["thema"])) {
@@ -1983,6 +1985,7 @@ class ProtocolController extends Controller
         // αλλάζω τις ημνιες στην κατάλληλη μορφή για αποθήκευση
         $in_num = isset($data["in_num"]) ? $data["in_num"] : Carbon::parse($oMessage->getDate())->format('H:i:s');
         $in_date = isset($data["in_date"]) ? Carbon::createFromFormat('d/m/Y', $data["in_date"])->format('Ymd') : Carbon::parse($oMessage->getDate())->format('Ymd');
+        $in_arxi_ekdosis = null;
         // αν πληκτρολογήθηκε αρχή έκδοσης
         if (isset($data["in_arxi_ekdosis"])) {
             $in_arxi_ekdosis = $data["in_arxi_ekdosis"];
@@ -2072,7 +2075,7 @@ class ProtocolController extends Controller
 
         if(Config::getConfigValueOf('saveEmailAs')){
             // αποθηκεύω το email σαν συνημμένο eml
-            $html = $oMessage->getRawBody();
+            $html = $oMessage->getHeader()->raw . $oMessage->getRawBody();
             $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.' . Config::getConfigValueOf('saveEmailAs');
             $mimetype = 'message/rfc822';
         }else{
@@ -2201,7 +2204,7 @@ class ProtocolController extends Controller
             }
         }
         // μεταφέρω το μήνυμα στα πρωτοκολλημένα
-        $oMessage->moveToFolder('INBOX.inProtocol', true);
+        $oMessage->move('INBOX.inProtocol', true);
 
         $alertType = 'success';
         if ($numMissedAttachments) {
@@ -2214,6 +2217,11 @@ class ProtocolController extends Controller
         );
         session()->flash('notification', $notification);
 
+        if(session()->has('imap_page')) {
+            $imap_page = session('imap_page');
+            session()->pull('imap_page');
+            return redirect('/viewEmails?imap_page=' . $imap_page);
+        }
         return redirect('/viewEmails');
     }
 

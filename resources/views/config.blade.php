@@ -472,47 +472,24 @@
                                             <div class="row">
                                                 <div
                                                     class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1">
-                                                    Eμφάνισε τα ->
-                                                    <strong>{{ App\Config::getConfigValueOf('emailNumFetch') }}
-                                                        {{ App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'ΤΕΛΕΥΤΑΙΑ' : 'ΠΡΩΤΑ' }}</strong>
-                                                    <- email </div>
+                                                    Ταξινόμηση email 
+                                                    <strong>{{ App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'ΦΘΙΝΟΥΣΑ' : 'ΑΥΞΟΥΣΑ' }}</strong>
+                                                    </div>
                                                         <div class="col-md-3 col-sm-3  " id="emailFetchOrderDescdiv">
                                                             <select id='emailFetchOrderDesc' name='emailFetchOrderDesc'
                                                                 class="form-control" title=''>
                                                                 @if (App\Config::getConfigValueOf('emailFetchOrderDesc'))
-                                                                    <option value="0">ΠΡΩΤΑ</option>
-                                                                    <option value="1" selected>ΤΕΛΕΥΤΑΙΑ</option>
+                                                                    <option value="0">ΑΥΞΟΥΣΑ</option>
+                                                                    <option value="1" selected>ΦΘΙΝΟΥΣΑ</option>
                                                                 @else
-                                                                    <option value="0" selected>ΠΡΩΤΑ</option>
-                                                                    <option value="1">ΤΕΛΕΥΤΑΙΑ</option>
+                                                                    <option value="0" selected>ΑΥΞΟΥΣΑ</option>
+                                                                    <option value="1">ΦΘΙΝΟΥΣΑ</option>
                                                                 @endif
                                                             </select>
                                                         </div>
                                                 </div>
+
                                                 <div class="row">
-                                                    <div
-                                                        class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1">
-                                                        Ταξινόμισε τα ->
-                                                        <strong>{{ App\Config::getConfigValueOf('emailNumFetch') }}
-                                                            {{ App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'ΤΕΛΕΥΤΑΙΑ' : 'ΠΡΩΤΑ' }}</strong>
-                                                        <- email με ->
-                                                            <strong>{{ App\Config::getConfigValueOf('emailShowOrderDesc') ? 'ΦΘΙΝΟΥΣΑ' : 'ΑΥΞΟΥΣΑ' }}</strong>
-                                                            <- σειρά </div>
-                                                                <div class="col-md-3 col-sm-3  " id="emailShowOrderDescdiv">
-                                                                    <select id='emailShowOrderDesc'
-                                                                        name='emailShowOrderDesc' class="form-control"
-                                                                        title=''>
-                                                                        @if (App\Config::getConfigValueOf('emailShowOrderDesc'))
-                                                                            <option value="0">ΑΥΞΟΥΣΑ</option>
-                                                                            <option value="1" selected>ΦΘΙΝΟΥΣΑ</option>
-                                                                        @else
-                                                                            <option value="0" selected>ΑΥΞΟΥΣΑ</option>
-                                                                            <option value="1">ΦΘΙΝΟΥΣΑ</option>
-                                                                        @endif
-                                                                    </select>
-                                                                </div>
-                                                    </div>
-                                                    <div class="row">
                                                         <div
                                                             class="form-control-static col-md-8 col-sm-8   col-md-offset-1 col-sm-offset-1">
                                                             Το πεδίο Φάκελος απαιτείται για την πρωτοκόλληση email
