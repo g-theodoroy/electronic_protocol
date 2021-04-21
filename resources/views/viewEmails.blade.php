@@ -12,9 +12,6 @@
                 <div class="panel-heading h1 text-center">Πρωτοκόλληση εισερχομένων email</div>
                 <div class="panel-body ">
                   <div class="panel panel-default col-md-12 col-sm-12  ">
-                    @php
-                        $aMessageCount = $aMessage->count();
-                    @endphp
 
                       @if ($aMessage->links())
                         <div class="row">
@@ -49,12 +46,10 @@
 
                  @if($aMessageCount)
                  @php $num = 1; @endphp
-                 @foreach($aMessage as $oMessage)
+                 @foreach($aSortedMessage as $oMessage)
                  @php
                     $Uid = $oMessage->getUid();
                     $mailMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
-                   //dd($mailMessage);
-                   //dd($mailMessage->getHeader('From')->getAddresses()[0]->getName());
                  @endphp
                     <div class="panel panel-default col-md-12 col-sm-12  ">
                       <form name="frm{{$Uid}}" id="frm{{$Uid}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >

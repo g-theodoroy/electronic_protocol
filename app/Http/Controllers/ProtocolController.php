@@ -1776,7 +1776,15 @@ class ProtocolController extends Controller
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
         // παίρνω τα μηνύματα από sinceDate και μετά
         $aMessage = $oFolder->query()->since($sinceDate)->paginate($emailNumFetch, $imap_page);
+        $aMessageCount = $aMessage->count();
 
+        if(Config::getConfigValueOf('emailFetchOrderDesc')){
+            $aSortedMessage = $aMessage->sortByDesc(function ($oMessage) {
+                return Carbon::parse($oMessage->getDate());
+            });
+          } else {
+            $aSortedMessage = $aMessage;
+          }
 
         // διαγραφή τυχόν προηγούμενα αποθηκευμένων email.html
         $files = Storage::disk('tmp')->files();
@@ -1810,7 +1818,7 @@ class ProtocolController extends Controller
             Storage::disk('tmp')->put($savedPath, $contentRaw);
         }
         session()->put('imap_page', $imap_page);
-        return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput', 'imap_page'));
+        return view('viewEmails', compact('aMessage', 'aSortedMessage', 'aMessageNum', 'aMessageCount', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput', 'imap_page'));
     }
 
     // εμφάνιση του συνημμένου αρχείου
