@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  use ZBateson\MailMimeParser\Header\HeaderConsts;
+@endphp
 
 <div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
     <div class="row">
@@ -47,25 +50,30 @@
                  @if($aMessageCount)
                  @php $num = 1; @endphp
                  @foreach($aMessage as $oMessage)
+                 @php
+                    $Uid = $oMessage->getUid();
+                    $mailMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
+                   //dd($mailMessage);
+                   //dd($mailMessage->getHeader('From')->getAddresses()[0]->getName());
+                 @endphp
                     <div class="panel panel-default col-md-12 col-sm-12  ">
-                      <form name="frm{{$oMessage->getUid()}}" id="frm{{$oMessage->getUid()}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
+                      <form name="frm{{$Uid}}" id="frm{{$Uid}}" class="form-horizontal" role="form" method="POST" action="{{ url('/') }}/storeFromEmail" >
                       {{ csrf_field() }}
                       <div class="row bg-primary"><div class="col-md-12 col-sm-12 form-control-static strong ">{{($aMessage->currentPage()-1)* $aMessage->perPage() + $num}} από {{ $aMessageNum }}</div></div>
                       @php 
                           $num++;
-                          $subject = imap_utf8($oMessage->getSubject());
-                          if(! $subject) $subject = $oMessage->getSubject();
+                          $subject = $mailMessage->getHeaderValue(HeaderConsts::SUBJECT);
                       @endphp
 
-                        @if($oMessage->hasAttachments() || $alwaysShowFakelosInViewEmails)
+                        @if($mailMessage->getAttachmentCount() || $alwaysShowFakelosInViewEmails)
 
                       
                       <div class="row ">
                         <div class="col-md-1 col-sm-1 form-control-static small text-center">
                             <strong>Φάκελος</strong>
                         </div>
-                        <div id="fakelos{{$oMessage->getUid()}}Div" class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
-                            <select id="fakelos{{$oMessage->getUid()}}" onchange='getKeep4Fakelos({{$oMessage->getUid()}})' class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos{{$oMessage->getUid()}}"  title='13. Φάκελος αρχείου' autofocus >
+                        <div id="fakelos{{$Uid}}Div" class="col-md-2 col-sm-2 {{ $errors->has('fakelos') ? ' has-error' : '' }}">
+                            <select id="fakelos{{$Uid}}" onchange='getKeep4Fakelos({{$Uid}})' class="form-control selectpicker" data-live-search="true" liveSearchNormalize="true" name="fakelos{{$Uid}}"  title='13. Φάκελος αρχείου' autofocus >
                                 <option value=''></option>
                                 @foreach($fakeloi as $fakelos)
                                     <option value='{{$fakelos['fakelos']}}' title='{{$fakelos['fakelos']}} - {{$fakelos['describe']}}' style="white-space: pre-wrap; width: 500px;" >{{$fakelos['fakelos']}} - {{$fakelos['describe']}}</option>
@@ -80,13 +88,13 @@
                             <div id="themaList" class="col-md-12 col-sm-12" ></div>
                         </div>
                         <div class="col-md-2 col-sm-2 text-right">
-                          <input id="uid" type="hidden" class="form-control" name="uid" value="{{$oMessage->getUid()}}">
-                          <input id="sendReceipt{{$oMessage->getUid()}}" type="hidden" class="form-control" name="sendReceipt{{$oMessage->getUid()}}" value="0">
-                          <a href="{{ URL::to('/') }}/setEmailRead/{{$oMessage->getUid()}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
+                          <input id="uid" type="hidden" class="form-control" name="uid" value="{{$Uid}}">
+                          <input id="sendReceipt{{$Uid}}" type="hidden" class="form-control" name="sendReceipt{{$Uid}}" value="0">
+                          <a href="{{ URL::to('/') }}/setEmailRead/{{$Uid}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
                           @if(! $alwaysSendReceitForEmails)
-                            <a href="javascript:$('#sendReceipt{{$oMessage->getUid()}}').val(0);sendEmailTo({{$oMessage->getUid()}});chkSubmitForm({{$oMessage->getUid()}});" class="" role="button" title="Καταχώριση email χωρίς αποστολή Απόδειξης παραλαβής" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:$('#sendReceipt{{$Uid}}').val(0);sendEmailTo({{$Uid}});chkSubmitForm({{$Uid}});" class="" role="button" title="Καταχώριση email χωρίς αποστολή Απόδειξης παραλαβής" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
                           @endif
-                         <a href="javascript:$('#sendReceipt{{$oMessage->getUid()}}').val(1);sendEmailTo({{$oMessage->getUid()}});chkSubmitForm({{$oMessage->getUid()}});" class="" role="button" title="Καταχώριση email και αποστολή Απόδειξης παραλαβής" tabindex=-1 > <img src="{{  URL::to('/') }}/images/{{ $alwaysSendReceitForEmails ? 'save.ico' : 'receipt.png'}}" height="25" /></a>
+                         <a href="javascript:$('#sendReceipt{{$Uid}}').val(1);sendEmailTo({{$Uid}});chkSubmitForm({{$Uid}});" class="" role="button" title="Καταχώριση email και αποστολή Απόδειξης παραλαβής" tabindex=-1 > <img src="{{  URL::to('/') }}/images/{{ $alwaysSendReceitForEmails ? 'save.ico' : 'receipt.png'}}" height="25" /></a>
                         </div>
                     </div>
 
@@ -96,13 +104,13 @@
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
                         <div id="in_numDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
-                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
+                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
                         <div id="in_dateDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
-                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
+                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
@@ -120,8 +128,8 @@
                                     <strong>Αρχή<br>Έκδοσης</strong>
                                 </div>
                                 <div id="in_arxi_ekdosisDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_arxi_ekdosis') ? ' has-error' : '' }}">
-                                <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ mb_detect_encoding($oMessage->getFrom()[0]->personal, 'UTF-8, ISO-8859-7', true)== 'ISO-8859-7' ? iconv("ISO-8859-7", "UTF-8//IGNORE", $oMessage->getFrom()[0]->personal) : $oMessage->getFrom()[0]->personal }} {{ $oMessage->getFrom()[0]->personal ? "<" : "" }}{{ $oMessage->getFrom()[0]->mail  }}{{ $oMessage->getFrom()[0]->personal ? ">" : "" }}" title='5. Αρχή που το έχει εκδώσει'>
-                                    <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
+                                  <input id="in_arxi_ekdosis" oninput="getValues(this.id, 'in_arxi_ekdosis', 'in_arxi_ekdosisList', 0)" type="text" class="form-control" name="in_arxi_ekdosis" placeholder="in_arxi_ekdosis" value="{{ $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() }} {{$mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() ? '<' . $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() . '>' : $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() }}" title='5. Αρχή που το έχει εκδώσει'>
+                                  <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                                 </div>
                                 <div class="row">
@@ -140,7 +148,7 @@
                                     <strong>Περίληψη</strong>
                                 </div>
                                 <div id="in_perilipsiDiv" class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
-                                    <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($oMessage->getTextBody())), 0, 250) }}</textarea>
+                                    <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi"  placeholder="in_perilipsi" value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($mailMessage->getTextContent())), 0, 250) }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -151,9 +159,9 @@
                         <div class="col-md-1 col-sm-1 small text-center form-control-static">
                             <strong>Διεκπεραίωση</strong>
                         </div>
-                        <div id="diekperaiosi{{$oMessage->getUid()}}Div"  class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                        <div id="diekperaiosi{{$Uid}}Div"  class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
 
-                            <select id="diekperaiosi{{$oMessage->getUid()}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi ?? '' }}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
+                            <select id="diekperaiosi{{$Uid}}" multiple class="form-control selectpicker " style="text-overflow:hidden;" name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση' data-value="{{$protocol->diekperaiosi ?? '' }}" @if($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif >
                               <optgroup label="Διεκπεραίωση" data-max-options="1">
                                         @foreach($writers_admins as $writer_admin)
                                             <option value='d{{$writer_admin->id}}'>{{$writer_admin->name}}</option>
@@ -165,7 +173,7 @@
                                         @endforeach
                                     </optgroup>
                                 </select>
-                           <input id="sendEmailTo{{$oMessage->getUid()}}" name="sendEmailTo" type="hidden" value="" />
+                           <input id="sendEmailTo{{$Uid}}" name="sendEmailTo" type="hidden" value="" />
                         </div>
 
                           @if($allowUserChangeKeepSelect)
@@ -173,13 +181,13 @@
                                   <strong>Χρόνος διατήρησης</strong>
                               </div>
                               <div class="col-md-3 col-sm-3">
-                                <select id="keep{{$oMessage->getUid()}}" class="form-control small selectpicker" name="keep{{$oMessage->getUid()}}" title='Χρόνος Διατήρησης' >
+                                <select id="keep{{$Uid}}" class="form-control small selectpicker" name="keep{{$Uid}}" title='Χρόνος Διατήρησης' >
                           @else
                               <div class="col-md-1 col-sm-1 small text-center form-control-static" title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
                                   <strong>Χρόνος διατήρησης</strong>
                               </div>
                               <div class="col-md-3 col-sm-3" title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
-                                <select id="keep{{$oMessage->getUid()}}" class="form-control small selectpicker" data-value="" onchange="this.value = this.getAttribute('data-value');" name="keep{{$oMessage->getUid()}}" title='Χρόνος Διατήρησης' >
+                                <select id="keep{{$Uid}}" class="form-control small selectpicker" data-value="" onchange="this.value = this.getAttribute('data-value');" name="keep{{$Uid}}" title='Χρόνος Διατήρησης' >
                           @endif
                                 <option value=''></option>
                                 @foreach($years as $year)
@@ -196,7 +204,7 @@
                                     <strong>Απάντηση<br>σε email</strong>
                                 </div>
                                 <div class="col-md-9 col-sm-9 {{ $errors->has('reply_to') ? ' has-error' : '' }}">
-                                <input id="reply_to" type="text" class="form-control" name="reply_to" placeholder="reply_to" value="{{  $oMessage->getReplyTo()[0]->mail ? $oMessage->getReplyTo()[0]->mail : $oMessage->getFrom()[0]->mail  }}" title='5. Αρχή που το έχει εκδώσει'>
+                                <input id="reply_to" type="text" class="form-control" name="reply_to" placeholder="reply_to" value="{{ $mailMessage->getHeader(HeaderConsts::REPLY_TO) && $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getRawValue() ? $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getAddresses()[0]->getEmail() : $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail()  }}" title='5. Αρχή που το έχει εκδώσει'>
                                     <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12" ></div>
                                 </div>
                                 </div>
@@ -209,16 +217,16 @@
                       @else
                       <div class="row">
                         <div class="text-right">
-                          <input id="uid" type="hidden" class="form-control" name="uid" value="{{$oMessage->getUid()}}">
-                          <input id="sendReceipt{{$oMessage->getUid()}}" type="hidden" class="form-control" name="sendReceipt{{$oMessage->getUid()}}" value="0">
-                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('H:i:s') }}" >
-                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($oMessage->getDate())->format('d/m/Y') }}" >
+                          <input id="uid" type="hidden" class="form-control" name="uid" value="{{$Uid}}">
+                          <input id="sendReceipt{{$Uid}}" type="hidden" class="form-control" name="sendReceipt{{$Uid}}" value="0">
+                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('H:i:s') }}" >
+                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('d/m/Y') }}" >
                           <input id="thema" type="hidden" class="form-control" name="thema" placeholder="thema" value="{{ $subject }}" >
-                          <a href="{{ URL::to('/') }}/setEmailRead/{{$oMessage->getUid()}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
+                          <a href="{{ URL::to('/') }}/setEmailRead/{{$Uid}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
                           @if(! $alwaysSendReceitForEmails)
-                            <a href="javascript:$('#sendReceipt{{$oMessage->getUid()}}').val(0);chkSubmitForm({{$oMessage->getUid()}});" class="" role="button" title="Καταχώριση email χωρίς αποστολή Απόδειξης παραλαβής" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
+                            <a href="javascript:$('#sendReceipt{{$Uid}}').val(0);chkSubmitForm({{$Uid}});" class="" role="button" title="Καταχώριση email χωρίς αποστολή Απόδειξης παραλαβής" > <img src="{{ URL::to('/') }}/images/save.ico" height=25 /></a>
                           @endif
-                        <a href="javascript:$('#sendReceipt{{$oMessage->getUid()}}').val(1);chkSubmitForm({{$oMessage->getUid()}});" class="" role="button" title="Καταχώριση email και αποστολή Απόδειξης παραλαβής" tabindex=-1 > <img src="{{  URL::to('/') }}/images/{{ $alwaysSendReceitForEmails ? 'save.ico' : 'receipt.png'}}" height="25" /></a>
+                        <a href="javascript:$('#sendReceipt{{$Uid}}').val(1);chkSubmitForm({{$Uid}});" class="" role="button" title="Καταχώριση email και αποστολή Απόδειξης παραλαβής" tabindex=-1 > <img src="{{  URL::to('/') }}/images/{{ $alwaysSendReceitForEmails ? 'save.ico' : 'receipt.png'}}" height="25" /></a>
                         </div>
                       </div>
                       <div class="row bg-info"><div class="col-md-3 col-sm-3 form-control-static ">Στοιχεία email</div></div>
@@ -226,48 +234,48 @@
                       
                       <div class="row bg-warning">
                         <div class="form-control-static col-md-1 col-sm-1  "><strong>Από:</strong></div>
-                        <div class="form-control-static col-md-8 col-sm-8  ">@if($oMessage->getFrom()[0]->personal) {{mb_detect_encoding($oMessage->getFrom()[0]->personal, 'UTF-8, ISO-8859-7', true)== 'ISO-8859-7' ? iconv("ISO-8859-7", "UTF-8//IGNORE", $oMessage->getFrom()[0]->personal) . " <" : $oMessage->getFrom()[0]->personal . " <" }}@endif{{$oMessage->getFrom()[0]->mail}}@if($oMessage->getFrom()[0]->personal)&gt;@endif</div>
+                        <div class="form-control-static col-md-8 col-sm-8  ">{{ $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() }} {{$mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() ? '<' . $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() . '>' : $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() }}</div>
                         <div class="form-control-static col-md-1 col-sm-1 "><strong>Ημνία:</strong></div>
-                        <div class="form-control-static col-md-2 col-sm-2 ">{{$oMessage->getDate()}}</div>
+                        <div class="form-control-static col-md-2 col-sm-2 ">{{\Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('d/m/Y H:i:s')}}</div>
                       </div>
                       <div class="row bg-warning ">
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
                         <div class="form-control-static col-md-11 col-sm-11"  style="overflow:hidden"><strong>{{ $subject }}</strong></div>
                       </div>
-                      @if($oMessage->getTo())
+                      @if($mailMessage->getHeader(HeaderConsts::TO) && $mailMessage->getHeader(HeaderConsts::TO)->getRawValue())
                       <div class="row bg-warning ">
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Προς:</strong></div>
                         <div class="form-control-static col-md-11 col-sm-11">
-                          @foreach($oMessage->getTo() as $getTo)
-                          {{$getTo->name ?? null}}{{$getTo->mail}}@if(! $loop->last),&nbsp;@endif
+                          @foreach($mailMessage->getHeader(HeaderConsts::TO)->getAddresses() as $getTo)
+                          {{$getTo->getName() ?? null}}{{$getTo->getName()? '<' . $getTo->getEmail() . '>' : $getTo->getEmail()}}@if(! $loop->last),&nbsp;@endif
                           @endforeach
                         </div>
                       </div>
                       @endif
-                      @if($oMessage->getCc())
+                      @if($mailMessage->getHeader(HeaderConsts::CC) && $mailMessage->getHeader(HeaderConsts::CC)->getRawValue())
                       <div class="row bg-warning ">
                           <div class="form-control-static col-md-1 col-sm-1"><strong>Κοιν:</strong></div>
                           <div class="form-control-static col-md-11 col-sm-11">
-                            @foreach($oMessage->getCc() as $getCc)
-                            {{$getCc->name}}{{$getCc->mail}}@if(! $loop->last),&nbsp;@endif
+                            @foreach($mailMessage->getHeader(HeaderConsts::CC)->getAddresses() as $getCc)
+                            {{$getCc->getName() ?? null}}{{$getCc->getName()? '<' . $getCc->getEmail() . '>' : $getCc->getEmail()}}@if(! $loop->last),&nbsp;@endif
                             @endforeach
                           </div>
                       </div>
                       @endif
-                      @if($oMessage->getReplyTo())
+                      @if($mailMessage->getHeader(HeaderConsts::REPLY_TO) && $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getRawValue())
                       <div class="row bg-warning ">
                           <div class="form-control-static col-md-1 col-sm-1"><strong>Απάντηση:</strong></div>
                           <div class="form-control-static col-md-11 col-sm-11">
-                            @foreach($oMessage->getReplyTo() as $getReplyTo)
-                            {{$getReplyTo->name ?? null }}{{$getReplyTo->mail}}@if(! $loop->last),&nbsp;@endif
+                            @foreach($mailMessage->getHeader(HeaderConsts::REPLY_TO)->getAddresses() as $getReplyTo)
+                            {{$getReplyTo->getName() ?? null }}{{$getReplyTo->getName()? '<' . $getReplyTo->getEmail() . '>' : $getReplyTo->getEmail()}}@if(! $loop->last),&nbsp;@endif
                             @endforeach
                           </div>
                       </div>
                       @endif
-                      @if($oMessage->hasHTMLBody())
                       @php
-                       $uid = $oMessage->getUid();
+                       $uid = $Uid;
                        @endphp
+                      @if(array_key_exists($uid,$emailFilePaths) && file_exists('tmp/' .$emailFilePaths[$uid]))
                       <div class="row bg-info">
                         <div class="col-md-3 col-sm-3 form-control-static ">Σώμα email ως HTML</div>
                         <div class="col-md-4 col-sm-4 col-md-offset-5 col-sm-offset-5 form-control-static text-right">
@@ -276,30 +284,29 @@
                       </div>
                       <div class="row">
                         <div class="col-md-12 col-sm-12  ">
-                          <iframe id="ifr{{$oMessage->getUid()}}" src="{{ asset( 'tmp/' .$emailFilePaths[$uid]) }}" width="100%" frameBorder="0" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
+                          <iframe id="ifr{{$Uid}}" src="{{ asset( 'tmp/' .$emailFilePaths[$uid]) }}" width="100%" frameBorder="0" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
                         </div>
                       </div>
                       @endif
-                      @if($oMessage->hasTextBody())
+                      @if(strlen($mailMessage->getTextContent()))
                       <div class="row bg-info">
                         <div class="col-md-3 col-sm-3 form-control-static ">Σώμα email ως Text</div>
                       </div>
                       <div class="row">
-                        <div class="col-md-12 col-sm-12  small" style="overflow: hidden">{{$oMessage->getTextBody()}}</div>
+                        <div class="col-md-12 col-sm-12  small" style="white-space: pre-wrap; overflow: hidden">{{$mailMessage->getTextContent()}}</div>
                       </div>
                       @endif
-                      @if($oMessage->hasAttachments())
+                      @if($mailMessage->getAttachmentCount())
                       <div class="row bg-warning">
                         <div class="form-control-static col-md-2 col-sm-2"><strong>Συνημμένα:</strong></div>
 
                         <div class="form-control-static col-md-10 col-sm-10 ">
-                          @foreach($oMessage->attachments as $key=>$attachment)
+                          @foreach($mailMessage->getAllAttachmentParts() as $key=>$attachment)
                           @php
-                            $filename = imap_utf8($attachment->getName());
-			    if (! $filename) $filename = $attachment->getName();
+                            $filename = $attachment->getFilename();
                            @endphp
-                          <a href='{{ URL::to('/') }}/viewEmailAttachment/{{$oMessage->getUid()}}/{{$key}}' target="_blank"  title='Λήψη {{ $filename }}'>{{ $filename }}</a>
-                          <input type="checkbox" class="" id="chk{{$oMessage->getUid()}}-{{$key}}" name="chk{{$oMessage->getUid()}}-{{$key}}" title="Αν είναι επιλεγμένο αποθηκεύεται το συνημμένο {{ $filename  }}" checked  >
+                          <a href='{{ URL::to('/') }}/viewEmailAttachment/{{$Uid}}/{{$key}}' target="_blank"  title='Λήψη {{ $filename }}'>{{ $filename }}</a>
+                          <input type="checkbox" class="" id="chk{{$Uid}}-{{$key}}" name="chk{{$Uid}}-{{$key}}" title="Αν είναι επιλεγμένο αποθηκεύεται το συνημμένο {{ $filename  }}" checked  >
                           @if(! $loop->last), &nbsp; @endif
                           @endforeach
                         </div>
@@ -350,7 +357,10 @@ function chkSubmitForm(uid) {
     var alwaysShowFakelosInViewEmails = {{$alwaysShowFakelosInViewEmails ? 'true' : 'false'}}
     var emailHasAttachments = []
     @foreach ($aMessage as $oMessage)
-      emailHasAttachments[{{$oMessage->getUid()}}] = {{$oMessage->hasAttachments() ? 'true' : 'false'}}
+      @php
+        $chkMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
+      @endphp
+      emailHasAttachments[{{$Uid}}] = {{$chkMessage->getAttachmentCount() ? 'true' : 'false'}}
     @endforeach
 
     if( emailHasAttachments[uid] || alwaysShowFakelosInViewEmails){

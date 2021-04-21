@@ -21,6 +21,11 @@ use Illuminate\Support\Facades\Mail;
 use Webklex\IMAP\Facades\Client;
 use App\Exports\ProtocolExport;
 use Maatwebsite\Excel\Facades\Excel;
+
+use ZBateson\MailMimeParser\Message;
+use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Header\HeaderConsts;
+
 //use Illuminate\Support\Facades\Log;
 //Log::info('test');
 
@@ -1780,15 +1785,16 @@ class ProtocolController extends Controller
         $emailFilePaths = array();
         // για κάθε μήνυμα
         foreach ($aMessage as $oMessage) {
-            if ($oMessage->hasHTMLBody()) {
-                // κωδικός
-                $Uid = $oMessage->getUid();
+            $mailMessage = Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
+            $Uid = $oMessage->getUid();
+            $dir = '';
+            // αν έχει σώμα html το αποθηκεύω
+            if (strlen($mailMessage->getHtmlContent())) {
                 // περιεχόμενο HTML
-                $content = $oMessage->getHTMLBody();
+                $content = $mailMessage->getHtmlContent();
                 // αντικαθιστώ οτιδήποτε μετά το charset= με utf-8
                 $content = preg_replace('/charset=[\s\S]+?"/', 'charset=utf-8"', $content);
                 // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
-                $dir = '';
                 $filenameToStore = "$Uid.html";
                 $savedPath = $dir . $filenameToStore;
                 // αποθηκεύω το email στο /public/tmp
@@ -1796,6 +1802,12 @@ class ProtocolController extends Controller
                 // κρατάω σε πίνακα το path
                 $emailFilePaths[$Uid] = $savedPath;
             }
+            // αποθηκεύω το email σαν eml για να μη το ξανακατεβάζω
+            $filenameToStore = "$Uid.eml";
+            $savedPath = $dir . $filenameToStore;
+            $contentRaw = $oMessage->getHeader()->raw . $oMessage->getRawBody();
+            // αποθηκεύω το email στο /public/tmp
+            Storage::disk('tmp')->put($savedPath, $contentRaw);
         }
         session()->put('imap_page', $imap_page);
         return view('viewEmails', compact('aMessage', 'aMessageNum', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput', 'imap_page'));
@@ -1804,48 +1816,18 @@ class ProtocolController extends Controller
     // εμφάνιση του συνημμένου αρχείου
     public function viewEmailAttachment($messageUid, $attachmentKey)
     {
-        // διαβάζω τις ρυθμίσεις
-        $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
-        // αν ο λογαριασμός είναι κενός δεν προχωράω
-        if (!$defaultImapEmail) {
-            return back();
-        }
-        // αν η βιβλιοθήκη imap δεν είναι φορτωμένη δεν προχωράω
-        if (!extension_loaded('imap')) {
-            return back();
-        }
-        // φορτώνω τον πελάτη (λογαριασμό)
-        $oClient = Client::account($defaultImapEmail);
-        try {
-            //σύνδεση στον IMAP Server
-            $oClient->connect();
-        } catch (\Throwable $e) {
-            // σε λάθος ενημερώνω το log
-            report($e);
-            // ενημερώνω το χρήστη
-            $notification = array(
-                'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
-                'alert-type' => 'error'
-            );
-            session()->flash('notification', $notification);
-            // επιστρέφω
-            return back();
-        }
-        // πηγαίνω στον φάκελο INBOX
-        $oFolder = $oClient->getFolder('INBOX');
-        // παίρνω το νήνυμα με το messageUid
-        $oMessage = $oFolder->query()->getMessageByUid($messageUid, null, null, true, true, false);
-        // παίρνω τα συνημμένα
-        $aAttachment = $oMessage->getAttachments();
-        // το συνημμένο μς το attachmentKey
-        $oAttachment = $aAttachment->get($attachmentKey);
+        $mailMessage = $this->readSavedEmailFromFile($messageUid);
+        // αν είναι null σταματάω
+        if( ! $mailMessage ) return;
+        // παίρνω το συνημμένο
+        $oAttachment = $mailMessage->getAttachmentPart($attachmentKey);
         // παίρνω το περιεχόμενο
         $content = $oAttachment->getContent();
+        // παίρνω το όνομα του αρχείου
+        $filename = $oAttachment->getFilename();
         // το στέλνω για εμφάνιση
-        $filename = imap_utf8($oAttachment->getName());
-        if (!$filename) $filename = $oAttachment->getName();
         return response($content)
-            ->header('Content-Type', $oAttachment->getMimeType())
+            ->header('Content-Type', $oAttachment->getContentType())
             ->header('Content-Disposition', "filename=" . $filename);
     }
 
@@ -1858,13 +1840,6 @@ class ProtocolController extends Controller
         if (!extension_loaded('imap')) {
             return back();
         }
-        // διαγράφω το προσωρινά αποθηκευμένο email
-        // στον φάκελο public/tmp
-        $dir = '';
-        $filenameToStore = "$messageUid.html";
-        $savedPath = $dir . $filenameToStore;
-        Storage::disk('tmp')->delete($savedPath);
-
 
         $oClient = Client::account($defaultImapEmail);
         try {
@@ -1921,10 +1896,6 @@ class ProtocolController extends Controller
         // διαγράφω το προσωρινά αποθηκευμένο email
         // στον φάκελο public/tmp
         $uid = $data['uid'];
-        $dir = '';
-        $filenameToStore = "$uid.html";
-        $savedPath = $dir . $filenameToStore;
-        Storage::disk('tmp')->delete($savedPath);
 
         // φορτώνω σε μεταβλητές τιμές που θα χρησιμοποιήσω
         // φάκελος
@@ -1950,39 +1921,28 @@ class ProtocolController extends Controller
 
         // διαβάζω ρυθμίσεις
         $sendEmailOnDiekperaiosiChange = Config::getConfigValueOf('sendEmailOnDiekperaiosiChange');
-        $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
-        // σύνδεση στον λογαριασμό imap
-        $oClient = Client::account($defaultImapEmail);
-        try {
-            $oClient->connect();
-        } catch (\Throwable $e) {
-            report($e);
+
+        $mailMessage = $this->readSavedEmailFromFile($uid);
+        // αν είναι null σταματάω
+        if( ! $mailMessage ){
             $notification = array(
-                'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
+                'message' => "Δυστυχώς δεν μπορώ να αποθηκεύσω το email με κωδικό: $uid",
                 'alert-type' => 'error'
             );
             session()->flash('notification', $notification);
             return back();
+
         }
-        // αν δεν υπάρχει ο φακελος INBOX.inProtocol τον φτιάχνω
-        if (!$oClient->getFolder('INBOX.inProtocol')) {
-            $oClient->createFolder('INBOX.inProtocol');
-        }
-        // παίρνω τον φάκελο INBOX
-        $oFolder = $oClient->getFolder('INBOX');
-        // το μήνυμα με το uid για αποθήκευση
-        $oMessage = $oFolder->query()->getMessageByUid($uid, null, null, true, true, false);
 
         // βάζω τα δεδομένα σε μεταβλητές
         if (isset($data["thema"])) {
             $thema = $data["thema"];
         } else {
-            $thema = imap_utf8($oMessage->getSubject());
-            if (!$thema) $thema = $oMessage->getSubject();
+            $thema = $mailMessage->getHeaderValue(HeaderConsts::SUBJECT);
         }
         // αλλάζω τις ημνιες στην κατάλληλη μορφή για αποθήκευση
-        $in_num = isset($data["in_num"]) ? $data["in_num"] : Carbon::parse($oMessage->getDate())->format('H:i:s');
-        $in_date = isset($data["in_date"]) ? Carbon::createFromFormat('d/m/Y', $data["in_date"])->format('Ymd') : Carbon::parse($oMessage->getDate())->format('Ymd');
+        $in_num = isset($data["in_num"]) ? $data["in_num"] : Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('H:i:s');
+        $in_date = isset($data["in_date"]) ? Carbon::createFromFormat('d/m/Y', $data["in_date"])->format('Ymd') : Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('Ymd');
         $in_arxi_ekdosis = null;
         // αν πληκτρολογήθηκε αρχή έκδοσης
         if (isset($data["in_arxi_ekdosis"])) {
@@ -1991,23 +1951,17 @@ class ProtocolController extends Controller
             // αν δεν πληκτρολογήθηκε αρχή έκδοσης παίρνω από το email το πεδίο from
             // έχει δύο μέρη ΟΝΟΜΑΤΕΠΩΝΥΜΟ & EMAIL που τα προσθέτω ΟΝΟΜΑΤΕΠΩΝΥΜΟ <EMAIL>
             // Το ΟΝΟΜΑΤΕΠΩΝΥΜΟ αν υπάρχει του αλλάζω κωδικοποίηση (αχ κακόμοιρα Ελληνικά!)
-            if ($oMessage->getFrom()[0]->personal) {
-                if (mb_detect_encoding($oMessage->getFrom()[0]->personal, 'UTF-8, ISO-8859-7', true) == 'ISO-8859-7') {
-                    $in_arxi_ekdosis = iconv("ISO-8859-7", "UTF-8//IGNORE", $oMessage->getFrom()[0]->personal);
-                } else {
-                    $in_arxi_ekdosis = $oMessage->getFrom()[0]->personal;
-                }
-                $in_arxi_ekdosis .= " <";
-            }
-            $in_arxi_ekdosis .= $oMessage->getFrom()[0]->mail;
-            if ($oMessage->getFrom()[0]->personal) {
-                $in_arxi_ekdosis .= ">";
+            if ( $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName()) {
+                    $in_arxi_ekdosis =  $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName();
+                    $in_arxi_ekdosis .= " <" .  $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() . ">";
+            }else{
+                $in_arxi_ekdosis .= $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail();
             }
         }
         // άλλα πεδία
         $in_topos_ekdosis = isset($data["in_topos_ekdosis"]) ? $data["in_topos_ekdosis"] : "";
         $in_paraliptis = isset($data["in_paraliptis"]) ? $data["in_paraliptis"] : Auth::user()->name;
-        $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($oMessage->getTextBody())), 0, 250);
+        $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($mailMessage->getTextContent())), 0, 250);
         $paratiriseis = 'παρελήφθη με email';
         $diekperaiosi = isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : "";
         $etos = Carbon::now()->format('Y');
@@ -2073,13 +2027,13 @@ class ProtocolController extends Controller
 
         if(Config::getConfigValueOf('saveEmailAs')){
             // αποθηκεύω το email σαν συνημμένο eml
-            $html = $oMessage->getHeader()->raw . $oMessage->getRawBody();
-            $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.' . Config::getConfigValueOf('saveEmailAs');
+            $html = file_get_contents('tmp/' . $uid . '.eml');
+            $filename = 'email_' . Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('Ymd_His') . '.' . Config::getConfigValueOf('saveEmailAs');
             $mimetype = 'message/rfc822';
         }else{
             // αποθηκεύω το email σαν συνημμένο html
-            $html = view('viewEmail', compact('oMessage'))->render();
-            $filename = 'email_' . Carbon::parse($oMessage->getDate())->format('Ymd_His') . '.html';
+            $html = view('viewEmail', compact('mailMessage'))->render();
+            $filename = 'email_' . Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('Ymd_His') . '.html';
             $mimetype = 'text/html';
         }
         $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
@@ -2105,28 +2059,22 @@ class ProtocolController extends Controller
             ]);
 
             // αποθηκεύω τα συνημμένα
-            $aAttachment = $oMessage->getAttachments();
             $numCreatedAttachments = 0;
             $numMissedAttachments = 0;
             foreach ($attachmentKeys as $attachmentKey) {
-                $oAttachment = $aAttachment->get($attachmentKey);
+                $oAttachment = $mailMessage->getAttachmentPart($attachmentKey);
                 if (!$oAttachment) {
                     $numMissedAttachments++;
                     continue;
                 }
                 $content = $oAttachment->getContent();
-                $mimeType = $oAttachment->getMimeType();
-                $filename = imap_utf8($oAttachment->getName());
-                if (!$filename) $filename = $oAttachment->getName();
-
+                $mimeType = $oAttachment->getHeaderValue(HeaderConsts::CONTENT_TYPE);
+                $filename = $oAttachment->getFilename();
                 // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                 $filename = $this->filter_filename($filename, false);
-
                 $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $attachmentKey . '_' . $filename;
-
                 $dir = '/arxeio/' . $fakelos . '/';
                 $savedPath = $dir . $filenameToStore;
-
                 Storage::put($savedPath, $content);
 
                 $createdAttachment = Attachment::create([
@@ -2138,6 +2086,7 @@ class ProtocolController extends Controller
                     'keep' => $keep,
                     'expires' => $expires,
                 ]);
+                
                 if ($createdAttachment) {
                     $numCreatedAttachments++;
                 }
@@ -2175,12 +2124,12 @@ class ProtocolController extends Controller
         }
         // στέλνω mail απόδειξης παραλαβής στον αποστολέα
         if ($sendReceipt) {
-            $emaildate = $oMessage->getDate();
+            $emaildate = $mailMessage->getHeader(HeaderConsts::DATE)->getDateTime()->format('d/m/Y H:i:s');
             if (!$sendReplyTo) {
-                if ($oMessage->getReplyTo()) {
-                    $sendReplyTo = $oMessage->getReplyTo()[0]->mail;
+                if ($mailMessage->getHeader(HeaderConsts::REPLY_TO) && $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getRawValue()) {
+                    $sendReplyTo = $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getAddresses()[0]->getEmail();
                 } else {
-                    $sendReplyTo = $oMessage->getFrom()[0]->mail;
+                    $sendReplyTo = $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail();
                 }
             }
             $html = view('receiptEmail', compact('protocol', 'emaildate'))->render();
@@ -2201,7 +2150,30 @@ class ProtocolController extends Controller
                 $message .= "<li>Στάλθηκε με email αποδεικτικό καταχώρισης.</li>";
             }
         }
+
         // μεταφέρω το μήνυμα στα πρωτοκολλημένα
+        $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
+        // σύνδεση στον λογαριασμό imap
+        $oClient = Client::account($defaultImapEmail);
+        try {
+            $oClient->connect();
+        } catch (\Throwable $e) {
+            report($e);
+            $notification = array(
+                'message' => "Η σύνδεση με τον λογαριασμό email απέτυχε.<br>Ελέγξτε τις ρυθμίσεις.",
+                'alert-type' => 'error'
+            );
+            session()->flash('notification', $notification);
+            return back();
+        }
+        // αν δεν υπάρχει ο φακελος INBOX.inProtocol τον φτιάχνω
+        if (!$oClient->getFolder('INBOX.inProtocol')) {
+            $oClient->createFolder('INBOX.inProtocol');
+        }
+        // παίρνω τον φάκελο INBOX
+        $oFolder = $oClient->getFolder('INBOX');
+        // το μήνυμα με το uid για αποθήκευση
+        $oMessage = $oFolder->query()->getMessageByUid($uid, null, null, true, true, false);
         $oMessage->move('INBOX.inProtocol', true);
 
         $alertType = 'success';
@@ -2240,19 +2212,20 @@ class ProtocolController extends Controller
             $collection = collect($valuesArray)->unique()->sortBy('Key')->values()->all();
             foreach ($collection as $value) {
                 if (mb_stristr($this->removeAccents($value), $this->removeAccents($term))) {
-                    $output .= '<li><a href="#" onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
+                    $output .= '<li style="cursor: pointer"><a onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
             ';
                 }
             }
         } else {
             foreach ($protocols as $protocol) {
                 $value = $protocol->$field;
-                $output .= '<li><a href="#" onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
+                $output .= '<li style="cursor: pointer"><a onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
             ';
             }
         }
         echo $output;
     }
+
 
     /**
      * Replace accented characters with non accented
@@ -2376,6 +2349,18 @@ class ProtocolController extends Controller
             $limitProtocolAccessList = 1;
         }
         return $limitProtocolAccessList;
+    }
+
+    public function readSavedEmailFromFile($messageUid){
+        // αν δεν υπάρχει το αρχείο email σταματάω
+        if(! file_exists('tmp/' . $messageUid . '.eml')) return null;
+        // διαβάζω τα περιεχόμενα του email
+        $mailParser = new MailMimeParser();
+        $handle = fopen('tmp/' . $messageUid . '.eml' , 'r');
+        $mailMessage = $mailParser->parse($handle);         // returns `Message`
+        fclose($handle);
+        return $mailMessage;
+      
     }
 
 }
