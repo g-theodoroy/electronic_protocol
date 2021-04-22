@@ -1783,7 +1783,9 @@ class ProtocolController extends Controller
                 return Carbon::parse($oMessage->getDate());
             });
           } else {
-            $aSortedMessage = $aMessage;
+            $aSortedMessage = $aMessage->sortByAsc(function ($oMessage) {
+                return Carbon::parse($oMessage->getDate());
+            });
           }
 
         // διαγραφή τυχόν προηγούμενα αποθηκευμένων email.html
