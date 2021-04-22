@@ -1780,11 +1780,11 @@ class ProtocolController extends Controller
 
         if(Config::getConfigValueOf('emailFetchOrderDesc')){
             $aSortedMessage = $aMessage->sortByDesc(function ($oMessage) {
-                return Carbon::parse($oMessage->getDate());
+                return Carbon::parse($oMessage->getDate())->timezone('UTC');
             });
           } else {
             $aSortedMessage = $aMessage->sortBy(function ($oMessage) {
-                return Carbon::parse($oMessage->getDate());
+                return Carbon::parse($oMessage->getDate())->timezone('UTC');
             });
           }
 

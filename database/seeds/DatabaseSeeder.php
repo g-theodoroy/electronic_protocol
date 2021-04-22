@@ -262,6 +262,13 @@ class DatabaseSeeder extends Seeder
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
+        DB::table('configs')->insert([
+            'key' => 'timeZone',
+            'value' => 'Europe/Athens',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
 
         
         //$this->call(KeepvaluesTableSeeder::class);

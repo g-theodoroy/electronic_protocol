@@ -99,13 +99,13 @@
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
                         <div id="in_numDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
-                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
+                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
                         <div id="in_dateDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
-                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
+                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
@@ -214,8 +214,8 @@
                         <div class="text-right">
                           <input id="uid" type="hidden" class="form-control" name="uid" value="{{$Uid}}">
                           <input id="sendReceipt{{$Uid}}" type="hidden" class="form-control" name="sendReceipt{{$Uid}}" value="0">
-                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('H:i:s') }}" >
-                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('d/m/Y') }}" >
+                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('H:i:s') }}" >
+                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('d/m/Y') }}" >
                           <input id="thema" type="hidden" class="form-control" name="thema" placeholder="thema" value="{{ $subject }}" >
                           <a href="{{ URL::to('/') }}/setEmailRead/{{$Uid}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
                           @if(! $alwaysSendReceitForEmails)
@@ -231,7 +231,7 @@
                         <div class="form-control-static col-md-1 col-sm-1  "><strong>Από:</strong></div>
                         <div class="form-control-static col-md-8 col-sm-8  ">{{ $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() }} {{$mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() ? '<' . $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() . '>' : $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() }}</div>
                         <div class="form-control-static col-md-1 col-sm-1 "><strong>Ημνία:</strong></div>
-                        <div class="form-control-static col-md-2 col-sm-2 ">{{\Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('d/m/Y H:i:s')}}</div>
+                        <div class="form-control-static col-md-2 col-sm-2 ">{{\Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('d/m/Y H:i:s')}}</div>
                       </div>
                       <div class="row bg-warning ">
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
