@@ -25,7 +25,7 @@
                       @if($aMessageCount < $aMessageNum)
                       <div class="row bg-warning">
                       <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center">
-                        <strong>{{$defaultImapEmail}}</strong> - Εμφανίζονται τα 
+                        <strong>{{$defaultImapEmail}}</strong>: {{config("imap.accounts." . $defaultImapEmail . ".username")}} - Εμφανίζονται τα 
                         <strong>{{($aMessage->currentPage()-1)* $aMessage->perPage() + 1 }}</strong> έως 
                         <strong>{{ $aMessage->currentPage()* $aMessage->perPage() > $aMessageNum ? $aMessageNum :  $aMessage->currentPage() * $aMessage->perPage() }}</strong> 
                         από <strong>{{$aMessageNum}}</strong> εισερχόμενα emails - 
