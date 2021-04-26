@@ -2226,14 +2226,14 @@ class ProtocolController extends Controller
             $collection = collect($valuesArray)->unique()->sortBy('Key')->values()->all();
             foreach ($collection as $value) {
                 if (mb_stristr($this->removeAccents($value), $this->removeAccents($term))) {
-                    $output .= '<li><a href="#" onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
+                    $output .= '<li style="cursor: pointer"><a onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
             ';
                 }
             }
         } else {
             foreach ($protocols as $protocol) {
                 $value = $protocol;
-                $output .= '<li><a href="#" onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
+                $output .= '<li style="cursor: pointer"><a onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
             ';
             }
         }
