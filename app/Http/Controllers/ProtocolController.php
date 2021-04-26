@@ -2208,33 +2208,38 @@ class ProtocolController extends Controller
     // βρίσκει τις καταχωρίσεις που ταιριάζουν με αυτά που πληκτρολογεί ο χρήστης και επιστρέφει λίστα
     public function getValues($term, $field, $id, $divId, $multi)
     {
-        $protocols = Protocol::where($field, 'like', "%" . $term . "%")->groupBy($field)->orderBy(DB::raw("count($field)"), 'DESC')->get($field)->take(10);
-        $sortedProtocols = $protocols->sortBy($field)->values()->all();
-        if (!$protocols) {
+        $protocols = Protocol::latest()->take(Config::getConfigValueOf('rowsToSearchGiaSimplirosi') ?? 1000)->pluck($field)->countBy()->sortDesc()->keys();
+        $protocols = $protocols->filter(function ($item) use ($term) {
+            return mb_stripos($item, $term) !== false;
+        })->take(Config::getConfigValueOf('rowsToShowGiaSimplirosi') ?? 10)->sort();
+        if (! $protocols) {
             return;
         }
         $output = '';
         if ($multi) {
             $valuesArray = [];
-            foreach ($sortedProtocols as $protocol) {
-                $valuesArray = array_merge($valuesArray, preg_split('/\s*,\s*/', $protocol->$field ));
+            foreach ($protocols as $protocol) {
+
+              $valuesArray = array_merge($valuesArray, preg_split('/\s*,\s*/', $protocol));
+
             }
             $collection = collect($valuesArray)->unique()->sortBy('Key')->values()->all();
             foreach ($collection as $value) {
                 if (mb_stristr($this->removeAccents($value), $this->removeAccents($term))) {
-                    $output .= '<li style="cursor: pointer"><a onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
+                    $output .= '<li><a href="#" onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
             ';
                 }
             }
         } else {
-            foreach ($sortedProtocols as $protocol) {
-                $value = $protocol->$field;
-                $output .= '<li style="cursor: pointer"><a onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
+            foreach ($protocols as $protocol) {
+                $value = $protocol;
+                $output .= '<li><a href="#" onclick="javascript:appendValue(\'' . $id . '\',\'' . $value . '\',\'' . $divId . '\',\'' . $multi . '\')">' . e($value) . '</a></li>
             ';
             }
         }
         echo $output;
     }
+
 
 
     /**
