@@ -614,21 +614,6 @@ class ProtocolController extends Controller
         $safeNewProtocolNum = Config::getConfigValueOf('safeNewProtocolNum');
         $sendEmailOnDiekperaiosiChange = Config::getConfigValueOf('sendEmailOnDiekperaiosiChange');
 
-        // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
-        $firstProtocolNum = Config::getConfigValueOf('firstProtocolNum');
-        if (Protocol::count()) {
-            if (Config::getConfigValueOf('yearInUse')) {
-                $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1;
-            } else {
-                $newprotocolnum = Protocol::last()->protocolnum ? Protocol::last()->protocolnum + 1 : 1;
-            }
-        } else {
-            if ($firstProtocolNum) {
-                $newprotocolnum = $firstProtocolNum;
-            } else {
-                $newprotocolnum = 1;
-            }
-        }
         // Αν η ρύθμιση λέι ΝΑΙ σε ασφαλή Αρ.Πρωτ δεν ελέγχω το νέο Αρ.Πρ που μόλις έφτιαξα
         // γιατί θα δοθεί αυτόματα από το σύστημα ο πρώτος διαθέσιμος
         if ($safeNewProtocolNum) {
@@ -713,6 +698,22 @@ class ProtocolController extends Controller
             $sxetiko = rtrim($data['sxetiko'], ',');
         }
 
+        // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
+        $firstProtocolNum = Config::getConfigValueOf('firstProtocolNum');
+        if (Protocol::count()) {
+            if (Config::getConfigValueOf('yearInUse')) {
+                $newprotocolnum = Protocol::whereEtos($etos)->max('protocolnum') ? Protocol::whereEtos($etos)->max('protocolnum') + 1 : 1;
+            } else {
+                $newprotocolnum = Protocol::last()->protocolnum ? Protocol::last()->protocolnum + 1 : 1;
+            }
+        } else {
+            if ($firstProtocolNum) {
+                $newprotocolnum = $firstProtocolNum;
+            } else {
+                $newprotocolnum = 1;
+            }
+        }
+        
         // αν η ρύθμιση Ασφαλής νέος Αρ.Πρ είναι ΝΑΙ
         if ($safeNewProtocolNum) {
             // εισαγωγή της εγγραφής με το νέο Αρ.Πρ που μόλις έφτιαξα
@@ -746,6 +747,10 @@ class ProtocolController extends Controller
                 'keywords' => $keywords,
                 'paratiriseis' => $data['paratiriseis']
             ]);
+
+            $saveCycleSxetiko = Config::getConfigValueOf('saveCycleSxetiko');
+            if($saveCycleSxetiko) $this->saveCycleSxetiko($protocolNewNum, $data['etos'], $sxetiko);
+    
         } catch (\Throwable $e) {
             // αν υπάρξει σφάλμα το στέλνω στο log
             // στέλνω ειδοποίηση στη session
@@ -989,6 +994,10 @@ class ProtocolController extends Controller
                 'keywords' => $keywords,
                 'paratiriseis' => $data['paratiriseis']
             ]);
+
+            $saveCycleSxetiko = Config::getConfigValueOf('saveCycleSxetiko');
+            if($saveCycleSxetiko) $this->saveCycleSxetiko($data['protocolnum'], $data['etos'], $sxetiko);
+   
         } catch (\Throwable $e) {
             // αν χτυπήσει λάθος ενημερώνω το log
             report($e);
@@ -1012,7 +1021,7 @@ class ProtocolController extends Controller
                     $savedPath = $attachment->savedPath;
                     $newPath = str_replace($oldFakelos, $data['fakelos'], $savedPath);
                     // αν υπάρχει το αρχείο
-                    if (Storage::exists($attachment->savedPath)) {
+                    if (Storage::exists($attachment->savedPath) && $newPath !== $savedPath) {
                         // το μετακινώ στον νέο φάκελο
                         Storage::move($savedPath, $newPath);
                     }
@@ -1483,9 +1492,15 @@ class ProtocolController extends Controller
                 $query->where($whereAttachmentvalues);
             });
         }
-        $protocols = $protocols->orderby('protocoldate', 'desc')->orderby('protocolnum', 'desc')->take($maxRowsInFindPage);
-        $protocols = $protocols->get();
+        $protocols = $protocols->orderby('protocoldate', 'desc')->orderby('protocolnum', 'desc');
+
         $foundProtocolsCount = $protocols->count();
+        
+        if($maxRowsInFindPage){
+            $protocols = $protocols->take($maxRowsInFindPage);
+        }
+        $protocols = $protocols->get();
+
 
         foreach ($protocols as $protocol) {
             if ($protocol->protocoldate) {
@@ -2376,6 +2391,45 @@ class ProtocolController extends Controller
         fclose($handle);
         return $mailMessage;
       
+    }
+
+    private function saveCycleSxetiko ($newProtocolNum, $etos, $sxetiko){
+        // φτιάχνω την εγγραφή αρπρ/ετος
+        $newProtocolSxetiko = "$newProtocolNum/$etos";
+        //παίρνω πίνακα με την υποβολή της φόρμας
+        $sxetiko = array_map('trim', explode(',', $sxetiko));
+
+
+        // πρέπει να είναι αριθμός/4ψηφιο έτος
+        $pattern = "/^\d+\/\d{4}/i";
+        foreach ($sxetiko as $sxet) {
+            // αν ταιριάζει με το pattern
+            if (preg_match($pattern, $sxet)) {
+                // παίρνω τον ΑρΠ και το έτος
+                $data = explode('/', $sxet);
+                // βρίσκω το Πρωτόκολλο
+                $protocol = Protocol::where('protocolnum', $data[0])->where('etos', $data[1])->first();
+                // αν δεν βρω πρωτόκολλο πάω στο επόμενο
+                if (!$protocol) continue;
+                // αν έχει ήδη σχετικά
+                if(isset($protocol->sxetiko)){
+                    // παίρνω την παλιά τιμή σε πίνακα
+                    $oldSxetiko = array_map('trim', explode(',', $protocol->sxetiko));
+                    // ενώνω παλιές τιμές και νέες και το νέο πρωτόκολλο
+                    $newSxetiko = array_unique(array_merge($oldSxetiko, array_diff($sxetiko, [$sxet]), [$newProtocolSxetiko]));
+                // αν δεν έχει σχετικά
+                }else{
+                    // νέες τιμές και το νέο πρωτόκολλο
+                    $newSxetiko = array_unique(array_merge(array_diff($sxetiko, [$sxet]), [$newProtocolSxetiko]));
+                }
+ 
+                // το κάνω string
+                $protocol->sxetiko = implode(', ', $newSxetiko);
+                // αποθηκεύω
+                $protocol->save();
+            }
+        }
+        return;
     }
 
 }

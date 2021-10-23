@@ -1,6 +1,6 @@
 <div class="panel panel-default col-md-12 col-sm-12 " id='showFindData' >
     @if($foundProtocolsCount > 0)
-    @if($maxRowsInFindPage < $foundProtocolsCount)
+    @if($maxRowsInFindPage && $maxRowsInFindPage < $foundProtocolsCount)
     <div class="row bg-warning">
         <div class="form-control-static text-center" ><strong>Η αναζήτηση επέστρεψε {{$foundProtocolsCount}} αποτελέσματα. Εμφανίζονται μόνο {{$maxRowsInFindPage}}. Εισάγετε περισσότερα κριτήρια αναζήτησης.</strong></div>
     </div>

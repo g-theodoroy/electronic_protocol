@@ -55,7 +55,7 @@ class ConfigController extends Controller
             'firstProtocolNum' => 'required|integer',
             'showRowsInPage' => 'required|integer',
             'protocolArrowStep' => 'required|integer',
-            'maxRowsInFindPage' => 'required|integer',
+            'maxRowsInFindPage' => 'nullable|integer',
             'minutesRefreshInterval' => 'required|numeric',
         ]);
 

@@ -533,7 +533,7 @@ function getValues(id, field, divId,  multi){
       url: '{{ URL::to('/') }}/getValues/' + term + '/' + field + '/' + id + '/' + divId + '/' + multi ,
       success: function(data){
         if(data){
-          var front = '<ul id="' + id + 'Ul" class="dropdown-menu" style="display:block; position:absolute; max-height:{{\App\Config::getConfigValueOf('maxRowsInFindPage')*2/3}}em; max-width: 100%; overflow:auto" >'
+          var front = '<ul id="' + id + 'Ul" class="dropdown-menu" style="display:block; position:absolute; max-height:10em; max-width: 100%; overflow:auto" >'
           var end = '</ul>'
           $('#' + divId).html(front + data + end)
           $('#' + divId).show()
