@@ -1,14 +1,17 @@
 <div class="panel panel-default col-md-12 col-sm-12 " id='showFindData' >
     @if($foundProtocolsCount > 0)
-    @if($maxRowsInFindPage && $maxRowsInFindPage < $foundProtocolsCount)
-    <div class="row bg-warning">
-        <div class="form-control-static text-center" ><strong>Η αναζήτηση επέστρεψε {{$foundProtocolsCount}} αποτελέσματα. Εμφανίζονται μόνο {{$maxRowsInFindPage}}. Εισάγετε περισσότερα κριτήρια αναζήτησης.</strong></div>
+    <div class="row bg-info">
+          <div class="form-control-static  text-center" >Η αναζήτηση επέστρεψε <strong>{{$foundProtocolsCount}}</strong> {{$foundProtocolsCount==1 ? 'αποτέλεσμα' : " αποτελέσματα"}}.</div>
     </div>
-    @else
-    <div class="row bg-success">
-        <div class="form-control-static  text-center" ><strong>Η αναζήτηση επέστρεψε {{$foundProtocolsCount}} αποτελέσματα.</strong></div>
+
+    @if ($protocols->links())
+    <div class="row">
+      <div class="col-md-12 col-sm-12 small text-center">
+          <span class="small" >{{$protocols->links()}}</span>
+      </div>
     </div>
     @endif
+
     <div class="row bg-primary">
         <div class="form-control-static col-md-1 col-sm-1 text-center " >Αρ.Πρωτ.</div>
         <div class="form-control-static col-md-1 col-sm-1  text-center " >Ημ.Πρωτ.</div>
@@ -16,6 +19,7 @@
         <div class="form-control-static col-md-3 col-sm-3  " >{{$fields[$searchField2]}}</div>
         <div class="form-control-static col-md-2 col-sm-2  " >{{$fields[$searchField3]}}</div>
     </div>
+
     @php($i=0)
     @foreach($protocols as $protocol)
     @if($i % 2)
@@ -53,7 +57,7 @@
         @if (array_key_exists($searchField3,$attachmentfields))
         <div class="col-md-2 col-sm-2 " >
           <ul class='list-inline'>
-          @foreach ($protocol->attachments()->get() as $attachment)
+          @foreach ($protocol->attachments as $attachment)
           <li>
             {!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $attachment->$searchField3) !!}
           </li>
@@ -68,7 +72,18 @@
     @endforeach
     @else
     <div class="row bg-info">
-        <div class="form-control-static  text-center"><strong>Δεν βρέθηκαν αποτελέσματα. Περιορίστε τα κριτήρια αναζήτησης.</strong></div>
+        <div class="form-control-static  text-center">Δεν βρέθηκαν αποτελέσματα. Περιορίστε τα κριτήρια αναζήτησης.</div>
     </div>
     @endif
 </div>
+
+<script>
+
+$('.pagination a').on('click', function(e) {
+  e.preventDefault();
+  let page = $(this).attr('href').split('page=')[1];
+  getFindData(page)
+});
+  
+</script>
+  

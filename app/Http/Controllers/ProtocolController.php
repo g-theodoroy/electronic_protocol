@@ -614,7 +614,7 @@ class ProtocolController extends Controller
         $safeNewProtocolNum = Config::getConfigValueOf('safeNewProtocolNum');
         $sendEmailOnDiekperaiosiChange = Config::getConfigValueOf('sendEmailOnDiekperaiosiChange');
 
-        // Αν η ρύθμιση λέι ΝΑΙ σε ασφαλή Αρ.Πρωτ δεν ελέγχω το νέο Αρ.Πρ που μόλις έφτιαξα
+       // Αν η ρύθμιση λέι ΝΑΙ σε ασφαλή Αρ.Πρωτ δεν ελέγχω το νέο Αρ.Πρ που μόλις έφτιαξα
         // γιατί θα δοθεί αυτόματα από το σύστημα ο πρώτος διαθέσιμος
         if ($safeNewProtocolNum) {
             $mustValidate = [
@@ -1495,11 +1495,8 @@ class ProtocolController extends Controller
         $protocols = $protocols->orderby('protocoldate', 'desc')->orderby('protocolnum', 'desc');
 
         $foundProtocolsCount = $protocols->count();
-        
-        if($maxRowsInFindPage){
-            $protocols = $protocols->take($maxRowsInFindPage);
-        }
-        $protocols = $protocols->get();
+      
+        $protocols = $protocols->paginate($maxRowsInFindPage);
 
 
         foreach ($protocols as $protocol) {

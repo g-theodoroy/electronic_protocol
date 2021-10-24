@@ -266,7 +266,7 @@ function chkFindOne(){
     return true;
 }
 
-function getFindData() {
+function getFindData( page=1) {
     $('#searchField1').attr('title', 'Αναζήτηση στο πεδίο ' + $('#searchField1 :selected').text())
     $('#searchField2').attr('title', 'Αναζήτηση στο πεδίο ' + $('#searchField2 :selected').text())
     $('#searchField3').attr('title', 'Αναζήτηση στο πεδίο ' + $('#searchField3 :selected').text())
@@ -315,7 +315,8 @@ function getFindData() {
         $('#showFindData').html("");
     }else{
         var querystr = '?' + $("#findform").serialize()
-        $('#showFindData').load("{{ URL::to('/getFindData') }}" + querystr)
+        if(page !== 1) querystr += '&page=' + page
+        $('#showFindData').load("{{ URL::to('/getFindData') }}" + querystr )
     }
 }
 

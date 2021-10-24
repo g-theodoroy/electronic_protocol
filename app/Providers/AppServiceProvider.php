@@ -79,6 +79,10 @@ class AppServiceProvider extends ServiceProvider
 
             $allowedEmailUsers =  Config::getConfigValueOf('allowedEmailUsers');
             View::share('allowedEmailUsers', $allowedEmailUsers);
+
+            $wideListProtocol = Config::getConfigValueOf('wideListProtocol');
+            View::share('wideListProtocol', $wideListProtocol);
+
         } catch (\Throwable $e) {
             report($e);
             // καμία ενέργεια απλά πιάνει το λάθος
