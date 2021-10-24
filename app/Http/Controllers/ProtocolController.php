@@ -1552,8 +1552,13 @@ class ProtocolController extends Controller
         if (!$wherevalues) {
             return back();
         } else {
+            // βρίσκω τον αριθμό των Πρωτοκόλλων
             $foundProtocolsCount = Protocol::where($wherevalues)->count();
-            $protocols = Protocol::where($wherevalues)->orderby('etos', 'asc')->orderby('protocolnum', 'asc')->get();
+            // διαβάζω στις ρυθμίσεις πόσα πρέπι να πάρω
+            $take = Config::getConfigValueOf('maxRowsInXlsExport');
+            // default 5000
+            if(!$take)$take = 5000;
+            $protocols = Protocol::where($wherevalues)->orderby('etos', 'asc')->orderby('protocolnum', 'asc')->take($take)->get();
         }
         foreach ($protocols as $protocol) {
             if ($protocol->protocoldate) {

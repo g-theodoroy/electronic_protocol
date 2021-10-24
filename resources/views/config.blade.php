@@ -259,6 +259,25 @@
                                         </div>
                                     </div>
 
+
+                                    <div class="panel panel-default col-md-12 col-sm-12  ">
+                                        <div class="row bg-info">
+                                            <div class="form-control-static h4 text-center">Εξαγωγή σε Excell</div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="form-control-static col-md-8 col-sm-8  col-md-offset-1 col-sm-offset-1  ">
+                                                Μέγιστος αριθμός γραμμών που εξάγονται σε Excell.
+                                            </div>
+                                            <div class="col-md-2 col-sm-2  " id="maxRowsInXlsExportdiv">
+                                                <input id="maxRowsInXlsExport" type="text" class="form-control text-center"
+                                                    name="maxRowsInXlsExport" placeholder="5000"
+                                                    value="{{ App\Config::getConfigValueOf('maxRowsInXlsExport') }}"
+                                                    title='Ρυθμίστε ανάλογα με τη διαθέσιμη μνήμη για να μην εξαντλείται και καταρρέει η php'>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="panel panel-default col-md-12 col-sm-12  ">
                                         <div class="row bg-danger">
                                             <div class="form-control-static h4 text-center">Δικαιώματα χρηστών</div>

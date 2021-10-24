@@ -214,6 +214,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('configs')->insert([
+            'key' => 'maxRowsInXlsExport',
+            'value' => 5000,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        DB::table('configs')->insert([
            'key' => 'defaultImapEmail',
            'value' => 'default',
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
