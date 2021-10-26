@@ -20,12 +20,7 @@ class Config extends Model
     }
 
     public static function getConfigValues() {
-        $confs =  Config::all();
-        $configs = [];
-        foreach($confs as $conf){
-            $configs[$conf->key] = $conf->value;
-        }
-        return $configs;
-    }
+        return  Config::pluck('value', 'key');
+     }
 
 }

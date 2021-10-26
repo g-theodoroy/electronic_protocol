@@ -172,7 +172,7 @@ function chkdelete(id, name){
                             <div class='row'>
 
                         <div class="col-md-5 col-sm-5 form-control-static">
-                            {{$u->role}}
+                            {{$u->role->role}}
                         </div>
                         <div class="col-md-2 col-sm-2 form-control-static  text-center">
                           @if($u->active)&#10004;@endif

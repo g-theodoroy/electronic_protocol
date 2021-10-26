@@ -117,7 +117,7 @@
                 </td>
                 <td class="small middle"><span class='small'>
                     <ul class='list-unstyled'>
-                        @foreach ($protocol->attachments()->get() as $attachment)
+                        @foreach ($protocol->attachments as $attachment)
 			                     @if($attachment->name)
                             <li>{{$attachment->name}}</li>
 			                     @endif
@@ -129,7 +129,7 @@
                     </span>
                 </td>
                 <td class="small middle"><span class='small'>
-                        @foreach ($protocol->attachments()->get() as $attachment)
+                        @foreach ($protocol->attachments as $attachment)
                             @if ($loop->first)
                                 @if(is_numeric($attachment->keep))
                                 {{$attachment->keep == 1 ? $attachment->keep . " χρόνo" : $attachment->keep . " χρόνια"}}
@@ -141,7 +141,7 @@
                     </span>
                 </td>
                 <td class="small middle"><span class='small'>
-                        @foreach ($protocol->attachments()->get() as $attachment)
+                        @foreach ($protocol->attachments as $attachment)
                             @if ($loop->first and $attachment->expires)
                                 {{\Carbon\Carbon::createFromFormat('Ymd', $attachment->expires)->format('d/m/Y')}}
                             @endif

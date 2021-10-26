@@ -87,7 +87,7 @@
     <body>
         <div id="app">
             <nav class="navbar navbar-default navbar-static-top">
-                <div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
+                <div class="{{ $wideListProtocol ? 'container-fluid' : 'container'}}">
                     <div class="navbar-header">
 
                         <!-- Collapsed Hamburger -->
@@ -123,7 +123,7 @@
                             @else
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ Auth::user()->name }}&nbsp;&nbsp;<b>{{ Auth::user()->role_description() }}</b>&nbsp;&nbsp;<span class="caret"></span>
+                                    {{ Auth::user()->name }}&nbsp;&nbsp;<b>{{ Auth::user()->role->role }}</b>&nbsp;&nbsp;<span class="caret"></span>
                                 </a>
 
                                 <ul class="dropdown-menu" role="menu">
@@ -132,7 +132,7 @@
                                         <a class="test" tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
                                         <ul class="dropdown-menu">
                                           <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
-                                          @if( Auth::user()->role_description() != "Αναγνώστης")
+                                          @if( Auth::user()->role->role != "Αναγνώστης")
                                           @if($defaultImapEmail)
                                           @if( ! $allowedEmailUsers || strpos($allowedEmailUsers,Auth::user()->username) !== false) 
                                           <li class="divider"></li>
@@ -142,7 +142,7 @@
                                           @endif
                                             <li class="divider"></li>
                                             <li><a  tabindex="-1" href="{{ url('/find') }}">Αναζήτηση</a></li>
-                                            @if(! in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) || (in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) && ! App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
+                                            @if(! in_array ( Auth::user()->role->role, [ "Συγγραφέας",  "Αναγνώστης"]) || (in_array ( Auth::user()->role->role, [ "Συγγραφέας",  "Αναγνώστης"]) && ! App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
                                             <li class="dropdown-submenu">
                                             <a class="test" tabindex="-1" href="{{ url('/print') }}">Εκτύπωση</a>
                                                 <ul class="dropdown-menu">
@@ -152,7 +152,7 @@
                                             </li>
                                             @endif
                                             <li><a  tabindex="-1" href="{{ url('/keep') }}">Διατήρηση</a></li>
-                                            @if(in_array ( Auth::user()->role_description(), [ "Διαχειριστής",  "Αναθέτων"]))
+                                            @if(in_array ( Auth::user()->role->role, [ "Διαχειριστής",  "Αναθέτων"]))
                                               <li class="divider"></li>
                                               <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
                                                 <ul class="dropdown-menu">
@@ -187,7 +187,7 @@
                                         </ul>
                                     </li>
 
-                                    @if(Auth::user()->role_description() == "Διαχειριστής")
+                                    @if(Auth::user()->role->role == "Διαχειριστής")
                                     <li class="dropdown-submenu">
                                         <a class="test" tabindex="-1" href="#">Διαχείριση</a>
                                         <ul class="dropdown-menu">

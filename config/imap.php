@@ -35,7 +35,7 @@ return [
     */
     'accounts' => [
 
-        'default' => [// account identifier
+        'default' => [ // account identifier
             'host'  => env('IMAP_HOST', 'localhost'),
             'port'  => env('IMAP_PORT', 993),
             'protocol'  => env('IMAP_PROTOCOL', 'imap'), //might also use imap, [pop3 or nntp (untested)]

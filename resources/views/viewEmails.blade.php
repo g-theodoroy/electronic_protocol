@@ -5,7 +5,7 @@
   use ZBateson\MailMimeParser\Header\HeaderConsts;
 @endphp
 
-<div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
+<div class="{{ $wideListProtocol ? 'container-fluid' : 'container'}}">
     <div class="row">
         <div class="col-md-12 col-sm-12 ">
            <div class="panel panel-default">
@@ -29,10 +29,10 @@
                         <strong>{{($aMessage->currentPage()-1)* $aMessage->perPage() + 1 }}</strong> έως 
                         <strong>{{ $aMessage->currentPage()* $aMessage->perPage() > $aMessageNum ? $aMessageNum :  $aMessage->currentPage() * $aMessage->perPage() }}</strong> 
                         από <strong>{{$aMessageNum}}</strong> εισερχόμενα emails - 
-                        ταξινόμηση <strong>{{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
+                        ταξινόμηση <strong>{{ $emailFetchOrderDesc ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @else
                       <div class="row bg-success">
-                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εισερχόμενα emails: {{count($aMessage)}}  - ταξινόμηση {{App\Config::getConfigValueOf('emailFetchOrderDesc') ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
+                      <div class="form-control-static col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center"><strong>{{$defaultImapEmail}} - Εισερχόμενα emails: {{count($aMessage)}}  - ταξινόμηση {{ $emailFetchOrderDesc  ? 'φθίνουσα' : 'αύξουσα' }}</strong></div>
                       @endif
                       @else
                       <div class="row bg-info">
@@ -99,13 +99,13 @@
                             <strong>Αριθ.<br>Εισερχ.</strong>
                         </div>
                         <div id="in_numDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_num') ? ' has-error' : '' }}">
-                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
+                            <input id="in_num" type="text" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('H:i:s') }}" title='3. Αριθμός εισερχομένου εγγράφου' >
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Ημνία<br>Εισερχ.</strong>
                         </div>
                         <div id="in_dateDiv" class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
-                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
+                            <input id="in_date" type="text" class="form-control datepicker text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('d/m/Y') }}" title='5. Χρονολογία εισερχομένου εγγράφου'>
                         </div>
                         <div class="col-md-1 col-sm-1 small text-center">
                             <strong>Τόπος<br>Έκδοσης</strong>
@@ -214,8 +214,8 @@
                         <div class="text-right">
                           <input id="uid" type="hidden" class="form-control" name="uid" value="{{$Uid}}">
                           <input id="sendReceipt{{$Uid}}" type="hidden" class="form-control" name="sendReceipt{{$Uid}}" value="0">
-                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('H:i:s') }}" >
-                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('d/m/Y') }}" >
+                          <input id="in_num" type="hidden" class="form-control text-center" name="in_num" placeholder="in_num" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('H:i:s') }}" >
+                          <input id="in_date" type="hidden" class="form-control text-center" name="in_date" placeholder="in_date" value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('d/m/Y') }}" >
                           <input id="thema" type="hidden" class="form-control" name="thema" placeholder="thema" value="{{ $subject }}" >
                           <a href="{{ URL::to('/') }}/setEmailRead/{{$Uid}}" class="" role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1 > <img src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
                           @if(! $alwaysSendReceitForEmails)
@@ -231,7 +231,7 @@
                         <div class="form-control-static col-md-1 col-sm-1  "><strong>Από:</strong></div>
                         <div class="form-control-static col-md-8 col-sm-8  ">{{ $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() }} {{$mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getName() ? '<' . $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() . '>' : $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() }}</div>
                         <div class="form-control-static col-md-1 col-sm-1 "><strong>Ημνία:</strong></div>
-                        <div class="form-control-static col-md-2 col-sm-2 ">{{\Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone(App\Config::getConfigValueOf('timeZone'))->format('d/m/Y H:i:s')}}</div>
+                        <div class="form-control-static col-md-2 col-sm-2 ">{{\Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('d/m/Y H:i:s')}}</div>
                       </div>
                       <div class="row bg-warning ">
                         <div class="form-control-static col-md-1 col-sm-1"><strong>Θέμα:</strong></div>
@@ -419,7 +419,7 @@ function getValues(id, field, divId,  multi){
       url: '{{ URL::to('/') }}/getValues/' + term + '/' + field + '/' + id + '/' + divId + '/' + multi ,
       success: function(data){
         if(data){
-          var front = '<ul id="' + id + 'Ul" class="dropdown-menu" style="display:block; position:absolute; max-height:{{\App\Config::getConfigValueOf('maxRowsInFindPage')*2/3}}em; max-width: 100%; overflow:auto" >'
+          var front = '<ul id="' + id + 'Ul" class="dropdown-menu" style="display:block; position:absolute; max-height:10em; max-width: 100%; overflow:auto" >'
           var end = '</ul>'
           $('#' + divId).html(front + data + end)
           $('#' + divId).show()
@@ -479,7 +479,7 @@ function sendEmailTo(id){
 }
 
 function formValidate(uid){
-    var validate = {{ App\Config::getConfigValueOf('protocolValidate') ? 'true' : 'false'}}
+    var validate = {{ $protocolValidate ? 'true' : 'false'}}
 
     var thema = $("#frm" + uid ).find('input[name="thema"]').val().trim()
     var fakelos = $('#fakelos'+ uid).val()

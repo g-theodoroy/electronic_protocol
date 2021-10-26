@@ -30,11 +30,8 @@ class UserController extends Controller
      */
     public function index(User $user)
     {
-        $users = User::orderBy('name')->paginate(Config::getConfigValueOf('showRowsInPage'));
+        $users = User::with('role')->orderBy('name')->paginate(Config::getConfigValueOf('showRowsInPage'));
 
-        foreach ($users as $u){
-            $u['role'] = user::find($u['id'])->role->role;
-        }
 
         $roles = Role::all()->sortby('role');
 

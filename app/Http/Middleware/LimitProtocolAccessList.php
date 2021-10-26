@@ -19,7 +19,7 @@ class LimitProtocolAccessList
     {
 
         $user = $request->user();
-        if ( Config::getConfigValueOf('limitProtocolAccessList') && in_array($user->role_description(), ["Συγγραφέας",  "Αναγνώστης"])){
+        if ( Config::getConfigValueOf('limitProtocolAccessList') && in_array($user->role->role, ["Συγγραφέας",  "Αναγνώστης"])){
             return redirect()->back();
         }
 

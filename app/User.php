@@ -35,10 +35,6 @@ class User extends Authenticatable
     }
 
 
-    public function role_description(){
-        return User::role()->first()->role;
-    }
-
     public static function my_active_users(){
         // return User::where('role_id', '!=',   Role::whereRole('Αναγνώστης')->first()->id)->wherenotNull('active')->orderby('name')->get();
         return User::wherenotNull('active')->orderby('name')->get();

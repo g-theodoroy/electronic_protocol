@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
+<div class="{{ $wideListProtocol ? 'container-fluid' : 'container'}}">
     <div class="row">
         <div class="col-md-12 col-md-offset-0">
             <div class="panel panel-default">
@@ -229,7 +229,7 @@
                         </div>
                         <div class='col-md-1 col-sm-1 small' style='overflow:hidden'>
                             <ul class='list-unstyled'>
-                                @foreach ($protocol->attachments()->get() as $attachment)
+                                @foreach ($protocol->attachments as $attachment)
                                     <li>
                                       @if ($attachment->name)
                                         <a href='{{ URL::to('/') }}/download/{{$attachment->id}}' target="_blank"  title='Λήψη {{ $attachment->name }}'>@if(strlen($attachment->name)> 13){{ mb_substr($attachment->name,0,3, "utf-8") }}...{{ mb_substr($attachment->name,-7,7, "utf-8") }}@else{{$attachment->name}}@endif</a>
@@ -244,7 +244,7 @@
                                 @endforeach
                             </ul>
                             <hr>
-                            @foreach ($protocol->attachments()->get() as $attachment)
+                            @foreach ($protocol->attachments as $attachment)
                                 @if ($loop->first)
                                     @if(is_numeric($attachment->keep))
                                     <span title='Διατηρηση: {{$attachment->keep == 1 ? $attachment->keep . " χρόνo" : $attachment->keep . " χρόνια"}}'>
@@ -258,7 +258,7 @@
                                 @endif
                             @endforeach
                             <br>
-                            @foreach ($protocol->attachments()->get() as $attachment)
+                            @foreach ($protocol->attachments as $attachment)
                                 @if ($loop->first and $attachment->expires)
                                     <span title='Διατήρηση έως {{\Carbon\Carbon::createFromFormat('Ymd', $attachment->expires)->format('d/m/Y')}}'>
                                     {{\Carbon\Carbon::createFromFormat('Ymd', $attachment->expires)->format('d/m/Y')}}

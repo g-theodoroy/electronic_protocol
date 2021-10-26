@@ -25,7 +25,7 @@ textarea[readonly].inout{
 
 </style>
 
-<div class="{{ App\Config::getConfigValueOf('wideListProtocol') ? 'container-fluid' : 'container'}}">
+<div class="{{ $wideListProtocol ? 'container-fluid' : 'container'}}">
     <div class="row">
         <div class="col-md-12 ">
             <div class="panel panel-default">
@@ -53,7 +53,7 @@ textarea[readonly].inout{
                         </div>
                         <div class="col-md-1 col-sm-1  form-control-static  text-center">
                             <a href="javascript:chkfind()" class="active" role="button" title="Αναζήτηση" > <img src="{{ URL::to('/') }}/images/find.ico" height=25 / ></a></td>
-                            @if(! in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) || (in_array ( Auth::user()->role_description(), [ "Συγγραφέας",  "Αναγνώστης"]) && ! App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
+                            @if(! in_array ( Auth::user()->role->role, [ "Συγγραφέας",  "Αναγνώστης"]) || (in_array ( Auth::user()->role->role, [ "Συγγραφέας",  "Αναγνώστης"]) && ! App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
                             <a href="{{ URL::to('/print') }}" class="" role="button" title="Εκτύπωση" > <img src="{{ URL::to('/') }}/images/print.png" height=25 /></a>
                             @endif
                         </div>
@@ -857,7 +857,7 @@ function anathesiSe(){
             location.reload()
         },
          error: function (data) {
-            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Δεν κατέστη δυνατή η ανάθεση του πρωτοκόλλου<br>" + data.responseText +"&nbsp;</center>")
+            toastr.error("<center><h4>Λάθος !!!</h4><hr></center>Δεν κατέστη δυνατή η ανάθεση του πρωτοκόλλου<br>&nbsp;</center>")
         }
     });
 

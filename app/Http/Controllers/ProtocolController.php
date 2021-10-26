@@ -109,20 +109,21 @@ class ProtocolController extends Controller
         $fakeloi = Keepvalue::orderBy(DB::raw("SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-3)+0<>0 DESC, SUBSTR(`fakelos`,3,LENGTH(`fakelos`)-(3))+0, `fakelos`"))->select('fakelos', 'describe')->get();
 
         // διαβάζω τις ρυθμίσεις
-        $newetos = Config::getConfigValueOf('yearInUse') ? Config::getConfigValueOf('yearInUse') : Carbon::now()->format('Y');
-        $showUserInfo = Config::getConfigValueOf('showUserInfo');
-        $firstProtocolNum = Config::getConfigValueOf('firstProtocolNum');
-        $protocolArrowStep = Config::getConfigValueOf('protocolArrowStep');
-        $allowWriterUpdateProtocol = Config::getConfigValueOf('allowWriterUpdateProtocol');
-        $allowWriterUpdateProtocolTimeInMinutes = Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes') ? Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes'): 0 ;
-        $protocolValidate = Config::getConfigValueOf('protocolValidate');
-        $diavgeiaUrl = Config::getConfigValueOf('diavgeiaUrl');
-        $allowUserChangeKeepSelect = Config::getConfigValueOf('allowUserChangeKeepSelect');
-        $allowListValuesMatchingInput = Config::getConfigValueOf('allowListValuesMatchingInput');
+        $settings = Config::getConfigValues();
+        $newetos = $settings['yearInUse']  ?? Config::getConfigValueOf('yearInUse') ??  Carbon::now()->format('Y');
+        $showUserInfo = $settings['showUserInfo'] ?? Config::getConfigValueOf('showUserInfo');
+        $firstProtocolNum = $settings['firstProtocolNum'] ?? Config::getConfigValueOf('firstProtocolNum');
+        $protocolArrowStep = $settings['protocolArrowStep'] ?? Config::getConfigValueOf('protocolArrowStep');
+        $allowWriterUpdateProtocol = $settings['allowWriterUpdateProtocol'] ?? Config::getConfigValueOf('allowWriterUpdateProtocol');
+        $allowWriterUpdateProtocolTimeInMinutes = $settings['allowWriterUpdateProtocolTimeInMinutes']  ?? Config::getConfigValueOf('allowWriterUpdateProtocolTimeInMinutes')  ?? 0 ;
+        $protocolValidate = $settings['protocolValidate'] ?? Config::getConfigValueOf('protocolValidate');
+        $diavgeiaUrl = $settings['diavgeiaUrl'] ?? Config::getConfigValueOf('diavgeiaUrl');
+        $allowUserChangeKeepSelect = $settings['allowUserChangeKeepSelect'] ?? Config::getConfigValueOf('allowUserChangeKeepSelect');
+        $allowListValuesMatchingInput = $settings['allowListValuesMatchingInput'] ?? Config::getConfigValueOf('allowListValuesMatchingInput');
 
         // βρίσκω το νέο αριθμό πρωτοκόλλου
         if (Protocol::count()) {
-            if (Config::getConfigValueOf('yearInUse')) {
+            if ($settings['yearInUse'] ?? Config::getConfigValueOf('yearInUse') ) {
                 $newprotocolnum = Protocol::whereEtos($newetos)->max('protocolnum') ? Protocol::whereEtos($newetos)->max('protocolnum') + 1 : 1;
             } else {
                 $newprotocolnum = Protocol::last()->protocolnum ? Protocol::last()->protocolnum + 1 : 1;
@@ -249,7 +250,7 @@ class ProtocolController extends Controller
             }
         }
         // 2 αν ο χρήστης είναι Συγγραφέας ή Αναθέτων
-        if (in_array(Auth::user()->role_description(), ["Συγγραφέας",  "Αναθέτων"])) {
+        if (in_array(Auth::user()->role->role, ["Συγγραφέας",  "Αναθέτων"])) {
             // αν είναι παλιό πρωτόκολλο (έχει id) ΕΠΕΞΕΡΓΑΣΙΑ ΠΡΩΤΟΚΟΛΛΟΥ
             if ($protocol->id) {
                 // αν η μεταβλητή είναι 0 ή null δηλαδή δεν επιτρέπεται τροποποίηση από Συγγραφείς
@@ -396,7 +397,7 @@ class ProtocolController extends Controller
 
         // Μόνο Διαχειριστής και Αναθέτων μπορούν να αναθέσουν Διεκπεραίωση σε χρήστη
         $forbidenChangeDiekperaiosiSelect = 1;
-        if (in_array(Auth::user()->role_description(), ["Διαχειριστής",  "Αναθέτων"])) {
+        if (in_array(Auth::user()->role->role, ["Διαχειριστής",  "Αναθέτων"])) {
             $forbidenChangeDiekperaiosiSelect = null;
         }
 
@@ -436,7 +437,7 @@ class ProtocolController extends Controller
                 }
                 // εάν υπάρχουν commits
                 if ($commits) {
-                    if (Auth::user()->role_description() == "Διαχειριστής") {
+                    if (Auth::user()->role->role == "Διαχειριστής") {
                         $message = 'Έγιναν τροποποιήσεις στον κώδικα του Ηλ.Πρωτοκόλλου στο Github.<br><br>Αν επιθυμείτε <a href=\"https://github.com/g-theodoroy/electronic_protocol/commits/master\" target=\"_blank\"><u> εξετάστε τον κώδικα</u></a> και ενημερώστε την εγκατάστασή σας.<br><br>Για να μην εμφανίζεται το παρόν μήνυμα καντε κλικ στο menu Διαχείριση->Ενημερώθηκε.';
                     } else {
                         $message = 'Έγιναν τροποποιήσεις στον κώδικα του Ηλ.Πρωτοκόλλου στο Github.<br><br>Ενημερώστε το Διαχειριστή.';
@@ -470,15 +471,16 @@ class ProtocolController extends Controller
     {
         // βρίσκω τους Συγγραφείς, Αναθέτοντες και Διαχειριστές
         $writers_admins = User::get_writers_and_admins();
+        $settings = Config::getConfigValues();
         // διαβάζω από τις ρυθμίσεις τα λεπτά για την αυτόματη ανανέωση
-        $refreshInterval = Config::getConfigValueOf('minutesRefreshInterval') * 60;
+        $refreshInterval = ($settings['minutesRefreshInterval'] ?? Config::getConfigValueOf('minutesRefreshInterval') )  * 60 ;
         // διαβάζω από τις ρυθμίσεις αν πρέπει να ειδοποιήσω για ενημερώσεις
         $needsUpdate = false;
         if (strpos(request()->headers->get('referer'), 'login')) {
-            $needsUpdate = Config::getConfigValueOf('needsUpdate');
+            $needsUpdate = $settings['needsUpdate'] ?? Config::getConfigValueOf('needsUpdate') ;
         }
-        $diavgeiaUrl = Config::getConfigValueOf('diavgeiaUrl');
-        $showUserInfo = Config::getConfigValueOf('showUserInfo');
+        $diavgeiaUrl = $settings['diavgeiaUrl'] ?? Config::getConfigValueOf('diavgeiaUrl');
+        $showUserInfo = $settings['showUserInfo'] ?? Config::getConfigValueOf('showUserInfo');
 
         // βρίσκω τους όλους ενεργούς χρήστες
         $activeusers = Active::users()->mostRecent()->get();
@@ -497,7 +499,7 @@ class ProtocolController extends Controller
         //      f => Διεκπεραιώθηκαν
         $protocoltitle = 'Πρωτόκολλο';
         $user2show = '';
-        $protocols = Protocol::orderby('etos', 'desc')->orderby('protocolnum', 'desc');
+        $protocols = Protocol::with('attachments')->orderby('etos', 'desc')->orderby('protocolnum', 'desc');
         if (!$userId) {
             // φιλτραρω τα πρωτόκολλα για το χρήστη
             if ($this->limitProtocolAccessList()) {
@@ -538,7 +540,11 @@ class ProtocolController extends Controller
             }
         }
         // παίρνω τα πρωτόκολλα σε σελίδες με αριθμό πρωτοκόλλων σύμφωνα με τις ρυθμίσεις
-        $protocols = $protocols->paginate(Config::getConfigValueOf('showRowsInPage'));
+        $protocols = $protocols->paginate($settings['showRowsInPage'] ?? Config::getConfigValueOf('showRowsInPage'));
+
+        $fakelosDescription = Keepvalue::all()->pluck('describe', 'fakelos');
+
+        
         // αλλάζω τη μορφή στις ημερομηνίες και παίρνω την περιγραφή του φακέλου Φ.
         foreach ($protocols as $protocol) {
             if ($protocol->protocoldate) {
@@ -553,8 +559,8 @@ class ProtocolController extends Controller
             if ($protocol->diekp_date) {
                 $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
             }
-            if ($protocol->fakelos and Keepvalue::whereFakelos($protocol->fakelos)->first()) {
-                $protocol->describe .= Keepvalue::whereFakelos($protocol->fakelos)->first()->describe;
+            if ($protocol->fakelos ) {
+                $protocol->describe .= $fakelosDescription[$protocol->fakelos] ?? '';
             }
             if ($protocol->sxetiko) {
                 $sxetiko = explode(', ', $protocol->sxetiko);
@@ -1499,12 +1505,13 @@ class ProtocolController extends Controller
         $protocols = $protocols->paginate($maxRowsInFindPage);
 
 
+        $userNames = User::pluck('name', 'id');
         foreach ($protocols as $protocol) {
             if ($protocol->protocoldate) {
                 $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
             }
             if ($protocol->diekperaiosi) {
-                $protocol->diekperaiosi = User::where('id', ltrim($protocol->diekperaiosi, $diekpStr))->first('name')->name ?? null;
+                $protocol->diekperaiosi = $userNames[ltrim($protocol->diekperaiosi, $diekpStr)] ?? null;
             }
         }
 
@@ -1689,7 +1696,7 @@ class ProtocolController extends Controller
         if (!$wherevalues) {
             return back();
         } else {
-            $protocols = Protocol::has('attachments')->where($wherevalues)->orderby('protocolnum', 'asc')->get();
+            $protocols = Protocol::has('attachments')->with('attachments')->where($wherevalues)->orderby('protocolnum', 'asc')->get();
         }
         foreach ($protocols as $protocol) {
             if ($protocol->protocoldate) {
@@ -1743,23 +1750,29 @@ class ProtocolController extends Controller
         $imap_page = request('imap_page') ?? 1;
         // διαβάζω τις ρυθμίσεις
         $writers_admins = User::get_writers_and_admins();
-        $allowUserChangeKeepSelect = Config::getConfigValueOf('allowUserChangeKeepSelect');
-        $emailNumFetch = Config::getConfigValueOf('emailNumFetch');
-        $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
-        $daysToCheckEmailBack = Config::getConfigValueOf('daysToCheckEmailBack');
+        $settings = Config::getConfigValues();
+        $allowUserChangeKeepSelect = $settings['allowUserChangeKeepSelect'] ?? Config::getConfigValueOf('allowUserChangeKeepSelect');
+        $emailNumFetch = $settings['emailNumFetch'] ?? Config::getConfigValueOf('emailNumFetch');
+        $defaultImapEmail = $settings['defaultImapEmail'] ?? Config::getConfigValueOf('defaultImapEmail');
+        $daysToCheckEmailBack = $settings['daysToCheckEmailBack'] ?? Config::getConfigValueOf('daysToCheckEmailBack');
         $sinceDate = Carbon::now()->subDays($daysToCheckEmailBack)->format('d-m-Y');
-        $alwaysShowFakelosInViewEmails = Config::getConfigValueOf('alwaysShowFakelosInViewEmails');
-        $alwaysSendReceitForEmails = Config::getConfigValueOf('alwaysSendReceitForEmails');
-        $allowListValuesMatchingInput = Config::getConfigValueOf('allowListValuesMatchingInput');
+        $alwaysShowFakelosInViewEmails = $settings['alwaysShowFakelosInViewEmails'] ?? Config::getConfigValueOf('alwaysShowFakelosInViewEmails');
+        $alwaysSendReceitForEmails = $settings['alwaysSendReceitForEmails'] ?? Config::getConfigValueOf('alwaysSendReceitForEmails');
+        $allowListValuesMatchingInput = $settings['allowListValuesMatchingInput'] ?? Config::getConfigValueOf('allowListValuesMatchingInput');
+        $timeZone = $settings['timeZone'] ?? Config::getConfigValueOf('timeZone');
+        $emailFetchOrderDesc = $settings['emailFetchOrderDesc'] ?? Config::getConfigValueOf('emailFetchOrderDesc');
+        $protocolValidate  = $settings['protocolValidate'] ?? Config::getConfigValueOf('protocolValidate');
+
+
         // Μόνο Διαχειριστής και Αναθέτων μπορούν να αναθέσουν Διεκπεραίωση σε χρήστη
         $forbidenChangeDiekperaiosiSelect = 1;
-        if (in_array(Auth::user()->role_description(), ["Διαχειριστής",  "Αναθέτων"])) {
+        if (in_array(Auth::user()->role->role, ["Διαχειριστής",  "Αναθέτων"])) {
             $forbidenChangeDiekperaiosiSelect = null;
         }
 
         // παίρνω τα ΠΡΩΤΑ ή ΤΕΛΕΥΤΑΙΑ μηνύματα  με βάση τις ρυθμίσεις
         // emailFetchOrderDesc == 1 => ΤΕΛΕΥΤΑΙΑ
-        if (Config::getConfigValueOf('emailFetchOrderDesc')) {
+        if ($emailFetchOrderDesc) {
             config(['imap.options.fetch_order' => 'desc']);
         }
 
@@ -1795,7 +1808,7 @@ class ProtocolController extends Controller
         $aMessage = $oFolder->query()->since($sinceDate)->paginate($emailNumFetch, $imap_page);
         $aMessageCount = $aMessage->count();
 
-        if(Config::getConfigValueOf('emailFetchOrderDesc')){
+        if($emailFetchOrderDesc){
             $aSortedMessage = $aMessage->sortByDesc(function ($oMessage) {
                 return Carbon::parse($oMessage->getDate())->timezone('UTC');
             });
@@ -1837,7 +1850,7 @@ class ProtocolController extends Controller
             Storage::disk('tmp')->put($savedPath, $contentRaw);
         }
         session()->put('imap_page', $imap_page);
-        return view('viewEmails', compact('aMessage', 'aSortedMessage', 'aMessageNum', 'aMessageCount', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput', 'imap_page'));
+        return view('viewEmails', compact('aMessage', 'aSortedMessage', 'aMessageNum', 'aMessageCount', 'defaultImapEmail', 'fakeloi', 'allowUserChangeKeepSelect', 'years', 'words', 'alwaysShowFakelosInViewEmails', 'forbidenChangeDiekperaiosiSelect', 'writers_admins', 'emailFilePaths', 'alwaysSendReceitForEmails', 'allowListValuesMatchingInput', 'imap_page', 'timeZone', 'emailFetchOrderDesc', 'protocolValidate'));
     }
 
     // εμφάνιση του συνημμένου αρχείου
@@ -1880,16 +1893,16 @@ class ProtocolController extends Controller
             session()->flash('notification', $notification);
             return back();
         }
-        // αν δεν υπάρχει ο φάκελος INBOX.beenRead τον φτιάχνω
-        if (!$oClient->getFolder('INBOX.beenRead')) {
-            $oClient->createFolder('INBOX.beenRead');
+        // αν δεν υπάρχει ο φάκελος INBOX/beenRead τον φτιάχνω
+        if (!$oClient->getFolder('INBOX/beenRead')) {
+            $oClient->createFolder('INBOX/beenRead');
         }
 
         $oFolder = $oClient->getFolder('INBOX');
         $oMessage = $oFolder->query()->getMessageByUid($messageUid, null, null, false, false, false);
         if ($oMessage) {
             // μεταφέρω το μήνυμα στα διαβασμένα
-            $oMessage->move('INBOX.beenRead', true);
+            $oMessage->move('INBOX/beenRead', true);
             // ενημερώνω τον χρήστη
             $notification = array(
                 'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
@@ -2193,15 +2206,15 @@ class ProtocolController extends Controller
             session()->flash('notification', $notification);
             return back();
         }
-        // αν δεν υπάρχει ο φακελος INBOX.inProtocol τον φτιάχνω
-        if (!$oClient->getFolder('INBOX.inProtocol')) {
-            $oClient->createFolder('INBOX.inProtocol');
+        // αν δεν υπάρχει ο φακελος INBOX/inProtocol τον φτιάχνω
+        if (!$oClient->getFolder('INBOX/inProtocol')) {
+            $oClient->createFolder('INBOX/inProtocol');
         }
         // παίρνω τον φάκελο INBOX
         $oFolder = $oClient->getFolder('INBOX');
         // το μήνυμα με το uid για αποθήκευση
         $oMessage = $oFolder->query()->getMessageByUid($uid, null, null, true, true, false);
-        $oMessage->move('INBOX.inProtocol', true);
+        $oMessage->move('INBOX/inProtocol', true);
 
         $alertType = 'success';
         if ($numMissedAttachments) {
@@ -2377,7 +2390,7 @@ class ProtocolController extends Controller
 
     public static function limitProtocolAccessList(){
         $limitProtocolAccessList = 0;
-        if (Config::getConfigValueOf('limitProtocolAccessList') && in_array(Auth::user()->role_description(), ["Συγγραφέας",  "Αναγνώστης"])) {
+        if (Config::getConfigValueOf('limitProtocolAccessList') && in_array(Auth::user()->role->role, ["Συγγραφέας",  "Αναγνώστης"])) {
             $limitProtocolAccessList = 1;
         }
         return $limitProtocolAccessList;
