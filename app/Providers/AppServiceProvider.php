@@ -9,6 +9,7 @@ use App\Config;
 use Swift_SmtpTransport;
 use Swift_Mailer;
 use Illuminate\Mail\Mailer;
+use Illuminate\Pagination\Paginator;
 
 ;
 
@@ -57,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Paginator::useBootstrap();
+
         error_reporting(E_ALL ^ E_NOTICE);
         try {
             View::share('myActiveUsers', User::my_active_users());
