@@ -52,7 +52,7 @@ class ConfigController extends Controller
 
         $this->validate(request(), [
             'ipiresiasName' => 'required|max:255',
-            'yearInUse' => 'sometimes|integer|digits:4',
+            'yearInUse' => 'nullable|sometimes|integer|digits:4',
             'firstProtocolNum' => 'required|integer',
             'showRowsInPage' => 'required|integer',
             'protocolArrowStep' => 'required|integer',

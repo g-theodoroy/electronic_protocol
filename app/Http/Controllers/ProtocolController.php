@@ -110,7 +110,8 @@ class ProtocolController extends Controller
 
         // διαβάζω τις ρυθμίσεις
         $settings = Config::getConfigValues();
-        $newetos = $settings['yearInUse']  ?? Config::getConfigValueOf('yearInUse') ??  Carbon::now()->format('Y');
+        $newetos = $settings['yearInUse']  ?? Config::getConfigValueOf('yearInUse');
+        if (!$newetos) $newetos =  Carbon::now()->format('Y');
         $showUserInfo = $settings['showUserInfo'] ?? Config::getConfigValueOf('showUserInfo');
         $firstProtocolNum = $settings['firstProtocolNum'] ?? Config::getConfigValueOf('firstProtocolNum');
         $protocolArrowStep = $settings['protocolArrowStep'] ?? Config::getConfigValueOf('protocolArrowStep');
@@ -654,12 +655,12 @@ class ProtocolController extends Controller
         // παίρνω τις ρυθμίσεις [Έλεγχοι & περιορισμοί κατά την καταχώριση]
         // αν είναι true (1)
         if ($protocolValidate) {
-
+            $str = $etos < $currentEtos ? 'παρελθόν' : 'μέλλον';
             // έλεγχος για το έτος πρωτοκόλλησης (αλλαγή χρόνου)
             $validator = Validator::make(request()->all(), [
                 'etos' => "in:$currentEtos",
             ], [
-                'etos.in' => "Δεν μπορείτε να καταχωρίσετε Νέο Πρωτόκολλο στο παρελθόν έτος $etos.<br><br>Αλλάξτε στις ρυθμίσεις εφαρμογής το ''Ενεργό έτος πρωτοκόλλησης'' είτε σε:<br>-> <b>$currentEtos</b> για να ξεκινήσετε από το 1<br>-> <b>κενό</b> για τον επόμενο Αρ.Πρωτ.<br>&nbsp;",
+                'etos.in' => "Δεν μπορείτε να καταχωρίσετε Νέο Πρωτόκολλο στο $str έτος $etos.<br><br>Αλλάξτε στις ρυθμίσεις εφαρμογής το ''Ενεργό έτος πρωτοκόλλησης'' είτε σε:<br>-> <b>$currentEtos</b> για να ξεκινήσετε από το 1<br>-> <b>κενό</b> για τον επόμενο Αρ.Πρωτ.<br>&nbsp;",
             ])->validate();
 
 

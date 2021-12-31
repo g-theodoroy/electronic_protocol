@@ -92,4 +92,8 @@ class Protocol extends Model
     	return $this->hasMany('App\Attachment','protocol_id');
     }
 
+    public static function last()
+    {
+        return self::latest()->first();
+    }
 }
