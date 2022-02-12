@@ -103,7 +103,7 @@ return [
     |
     */
     'options' => [
-        'delimiter' => '/',
+        //'delimiter' => '/',
         'fetch' => \Webklex\PHPIMAP\IMAP::FT_UID,
         'fetch_body' => true,
         'fetch_attachment' => true,
