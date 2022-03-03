@@ -2,26 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Keepvalue;
-use App\Config;
-use App\Protocol;
-use App\Attachment;
-use App\User;
-use App\Role;
-use Storage;
-use Carbon\Carbon;
+use DB;
 use URL;
 use Auth;
-use Illuminate\Validation\Rule;
-use Validator;
-use DB;
 use Active;
-use Illuminate\Support\Facades\Mail;
-use Webklex\IMAP\Facades\Client;
+use Storage;
+use App\Role;
+use App\User;
+use Validator;
+use App\Config;
+use App\Protocol;
+use App\Keepvalue;
+use Carbon\Carbon;
+use App\Attachment;
+use Illuminate\Http\Request;
 use App\Exports\ProtocolExport;
+use Illuminate\Validation\Rule;
+use Webklex\IMAP\Facades\Client;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-
 use ZBateson\MailMimeParser\Message;
 use ZBateson\MailMimeParser\MailMimeParser;
 use ZBateson\MailMimeParser\Header\HeaderConsts;

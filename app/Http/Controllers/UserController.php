@@ -3,21 +3,21 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use App\User;
 use App\Role;
+use App\User;
 use App\Config;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
 class UserController extends Controller
 {
-     /**
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
-     public function __construct()
-     {
+    public function __construct()
+    {
         $this->middleware('auth');
         $this->middleware('web');
         $this->middleware('admin:home');
@@ -59,7 +59,7 @@ class UserController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'required|min:6|confirmed',
             'role_id' => 'required',
-            ]);
+        ]);
 
 
         $data = request()->all();
@@ -72,16 +72,15 @@ class UserController extends Controller
             'role_id' => $data['role_id'],
             'password' => bcrypt($data['password']),
             'active' => $active
-            ]);
+        ]);
 
         $notification = array(
             'message' => 'Επιτυχημένη καταχώριση.',
             'alert-type' => 'success'
-            );
-        session()->flash('notification',$notification);
+        );
+        session()->flash('notification', $notification);
 
         return back();
-
     }
 
     public function update($id)
@@ -89,35 +88,35 @@ class UserController extends Controller
         $data = request()->all();
         $active = $data['active'] == "on" ? 1 : null;
 
-        $validatevalues =[
-        'name' => 'required|max:255',
-        'username' => "required|max:255|unique:users,username,$id,id",
-        'email' => 'required|email|max:255',
-        'role_id' => 'required'
+        $validatevalues = [
+            'name' => 'required|max:255',
+            'username' => "required|max:255|unique:users,username,$id,id",
+            'email' => 'required|email|max:255',
+            'role_id' => 'required'
         ];
-        $updatevalues=[
-        'name' => $data['name'],
-        'username' => $data['username'],
-        'email' => $data['email'],
-        'active' => $active
+        $updatevalues = [
+            'name' => $data['name'],
+            'username' => $data['username'],
+            'email' => $data['email'],
+            'active' => $active
         ];
 
-        if (request()->password ){
+        if (request()->password) {
             $validatevalues['password'] = 'required|min:6|confirmed';
             $updatevalues['password'] = bcrypt($data['password']);
         }
 
 
-       // βρίσκω πόσοι είναι οι admin
+        // βρίσκω πόσοι είναι οι admin
         $user = new User;
-        $admin_count = $user ->get_num_of_admins();
+        $admin_count = $user->get_num_of_admins();
 
         // βρίσκω τον id του admin
         $role = new Role;
         $admin_id = $role->get_admin_id();
 
         // αν είναι πάνω από 1 admin ενημερώνω
-        if ($admin_count >1 ){
+        if ($admin_count > 1) {
             $updatevalues['role_id'] = $data['role_id'];
         }
 
@@ -125,7 +124,7 @@ class UserController extends Controller
         $old_role_id = $user->find($id)->role_id;
         // αν είναι μονο ένας admin και ο χρήστης
         // που θα ενημερωθεί δεν είναι αυτός ενημερώνω
-        if ($admin_count == 1 and $old_role_id != $admin_id){
+        if ($admin_count == 1 and $old_role_id != $admin_id) {
             $updatevalues['role_id'] = $data['role_id'];
         }
 
@@ -133,8 +132,8 @@ class UserController extends Controller
             $notification = array(
                 'message' => 'Πρέπει να υπάρχει τουλάχιστον ένας ενεργός χρήστης με το Ρόλο <b>\"Διαχειριστής\"</b>',
                 'alert-type' => 'error'
-                );
-            session()->flash('notification',$notification);
+            );
+            session()->flash('notification', $notification);
 
             return back();
         }
@@ -146,11 +145,10 @@ class UserController extends Controller
         $notification = array(
             'message' => 'Επιτυχημένη ενημέρωση.',
             'alert-type' => 'success'
-            );
-        session()->flash('notification',$notification);
+        );
+        session()->flash('notification', $notification);
 
         return back();
-
     }
 
 
@@ -158,20 +156,18 @@ class UserController extends Controller
     public function delete($user)
     {
 
-        User::destroy ($user);
+        User::destroy($user);
 
-        if (Role::where('role','Διαχειριστής')->has('users')->count() == 0){
+        if (Role::where('role', 'Διαχειριστής')->has('users')->count() == 0) {
             $file = storage_path('conf/.denyregister');
-            if (file_exists($file ))unlink($file);
+            if (file_exists($file)) unlink($file);
         }
 
-        if (Auth::id() == $user || User::count() == 0 ){
+        if (Auth::id() == $user || User::count() == 0) {
             Auth::logout();
             return redirect('/');
         }
 
         return redirect('users');
-
     }
-
 }
