@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.4|^8.0",
+        "ajaxray/php-watermark": "dev-master",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "joshrainwater/active-users": "dev-master",
@@ -16,6 +17,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.0",
         "maatwebsite/excel": "^3.1",
+        "phpoffice/phpword": "^0.18.3",
         "webklex/laravel-imap": "^2.2.5",
         "zbateson/mail-mime-parser": "^1.3"
     },

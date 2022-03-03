@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Exports\ProtocolExport;
 use Illuminate\Validation\Rule;
 use Webklex\IMAP\Facades\Client;
+use Ajaxray\PHPWatermark\Watermark;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use ZBateson\MailMimeParser\Message;
@@ -768,6 +769,12 @@ class ProtocolController extends Controller
             // επιστρέφω πίσω
             return redirect("home");
         }
+        // δημιουργία στάμπας ΑΡ.Πρωτ.
+        $putStamp = Config::getConfigValueOf('putStamp');
+        $stampDone = false;
+        if ($protocol && $putStamp) {
+            $stampDone = $this->createStamp($protocol);
+        }
 
         // εισαγωγή συνημμένων εγγράφων
         $filescount = 3 * $data['file_inputs_count'];
@@ -791,9 +798,13 @@ class ProtocolController extends Controller
                     // φτιάχνω το όνομα Αρ.Πρ + Ημνια.Πρ
                     $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $filename;
                     // τον φάκελο arxeio + Φ.
-                    $dir = '/arxeio/' . request()->fakelos . '/';
+                    $dir = 'arxeio/' . request()->fakelos;
                     // αποθηκεύω το αρχείο και παίρνω το path αποθήκευσης
-                    $savedPath = $file->storeas($dir, $filenameToStore);
+                    if ($stampDone && $putStamp) {
+                        $savedPath = $this->putStamp($dir, $filenameToStore, $file, null);
+                    } else {
+                        $savedPath = $file->storeas($dir, $filenameToStore);
+                    }
                 }
                 if ($data['keep'] and is_numeric($data['keep'])) {
                     // αν είναι η διατήρηση αριθμός πρόσθέτω χρόνια
@@ -827,6 +838,8 @@ class ProtocolController extends Controller
                 }
             }
         }
+        // διαγράφω τη στάμπα
+        if (file_exists('arPr.png')) unlink('arPr.png');
 
         // αν πρέπει να στείλω email στον Διεκπεραιωτή $sendEmailTo = user.id
         // και οι ρυθμίσεις λένα να στέλνω email σε ανάθεση
@@ -1035,6 +1048,12 @@ class ProtocolController extends Controller
             }
         }
 
+        // δημιουργία στάμπας ΑΡ.Πρωτ.
+        $putStamp = Config::getConfigValueOf('putStamp');
+        $stampDone = false;
+        if ($protocol && $putStamp) {
+            $stampDone = $this->createStamp($protocol);
+        }
 
         // αποθηκεύω τα συνημμένα αρχεία
         $filescount = 3 * $data['file_inputs_count'];
@@ -1056,9 +1075,13 @@ class ProtocolController extends Controller
                     // φτιάχνω το όνομα αποθήκευσης
                     $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $filename;
                     // τον φάκελο αποθήκευσης
-                    $dir = '/arxeio/' . request()->fakelos . '/';
+                    $dir = 'arxeio/' . request()->fakelos;
                     // αποθηκεύω και παίρνω το path
-                    $savedPath = $file->storeas($dir, $filenameToStore);
+                    if ($stampDone && $putStamp) {
+                        $savedPath = $this->putStamp($dir, $filenameToStore, $file, null);
+                    } else {
+                        $savedPath = $file->storeas($dir, $filenameToStore);
+                    }
                 }
                 if ($data['keep'] and is_numeric($data['keep'])) {
                     // αν η διατήρηση είναι αριθμός
@@ -1092,6 +1115,9 @@ class ProtocolController extends Controller
                 }
             }
         }
+        // διαγράφω τη στάμπα
+        if (file_exists('arPr.png')) unlink('arPr.png');
+
         // αν έχω id του Διεκπεραιωτή και επιτρέπεται από τις ρυθμίσεις στέλνω email στον Διεκπεραιωτή
         $message = '';
         if ($sendEmailTo && $sendEmailOnDiekperaiosiChange) {
@@ -2055,10 +2081,17 @@ class ProtocolController extends Controller
         }
         // ετοιμάζω το τελικό μήνυμα
         if ($protocolCreated) {
-            $message = "Το email καταχωρίστηκε.";
+            $message = "Το email καταχωρίστηκε.<br><br>Αρ.Πρωτ: <strong>" . $protocolCreated->protocolnum . " / " . Carbon::createFromFormat('Ymd', $protocolCreated->protocoldate)->format('d-m-Y') . "</strong><br><br>";
         }
 
         $protocol = $protocolCreated;
+
+        // δημιουργία στάμπας ΑΡ.Πρωτ.
+        $putStamp = Config::getConfigValueOf('putStamp');
+        $stampDone = false;
+        if ($protocol && $putStamp) {
+            $stampDone = $this->createStamp($protocol);
+        }
 
         if (Config::getConfigValueOf('saveEmailAs')) {
             // αποθηκεύω το email σαν συνημμένο eml
@@ -2072,8 +2105,8 @@ class ProtocolController extends Controller
             $mimetype = 'text/html';
         }
         $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
-        $dir = $fakelos ? '/arxeio/' . $fakelos . '/' : '/arxeio/emails/';
-        $savedPath = $dir . $filenameToStore;
+        $dir = $fakelos ? 'arxeio/' . $fakelos  : 'arxeio/emails';
+        $savedPath = "$dir/$filenameToStore";
         Storage::put($savedPath, $html);
         $expires = null;
         if ($keep and is_numeric($keep)) {
@@ -2108,9 +2141,15 @@ class ProtocolController extends Controller
                 // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                 $filename = $this->filter_filename($filename, false);
                 $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $attachmentKey . '_' . $filename;
-                $dir = '/arxeio/' . $fakelos . '/';
-                $savedPath = $dir . $filenameToStore;
-                Storage::put($savedPath, $content);
+                $dir = 'arxeio/' . $fakelos;
+
+                // αποθηκεύω το αρχείο και παίρνω το path αποθήκευσης
+                if ($stampDone && $putStamp) {
+                    $savedPath = $this->putStamp($dir, $filenameToStore, null, $content);
+                } else {
+                    $savedPath = "$dir/$filenameToStore";
+                    Storage::put($savedPath, $content);
+                }
 
                 $createdAttachment = Attachment::create([
                     'protocol_id' => $protocol->id,
@@ -2126,7 +2165,11 @@ class ProtocolController extends Controller
                     $numCreatedAttachments++;
                 }
             }
+            // διαγράφω τη στάμπα
+            if (file_exists('arPr.png')) unlink('arPr.png');
         } catch (\Throwable $e) {
+            // διαγράφω τη στάμπα
+            if (file_exists('arPr.png')) unlink('arPr.png');
             report($e);
             $notification = array(
                 'message' => 'Υπήρξε κάποιο πρόβλημα στην καταχώριση των συνημμένων αρχείων<br>Ελέγξτε αν καταχωρίστηκαν όλα σωστά.<br>' . $e->getMessage(),
@@ -2440,5 +2483,121 @@ class ProtocolController extends Controller
             }
         }
         return;
+    }
+
+    public function createStamp($protocol)
+    {
+        $ipiresia =  Config::getConfigValueOf('ipiresiasName');
+        $protocolNum = $protocol->protocolnum;
+        $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d-m-Y');
+        // κείμενο στάμπας
+        $txt = "$ipiresia\nΑρ.Πρ: $protocolNum / $date";
+
+        $font = "fonts/copyfonts.com_arial-greek.ttf";
+        $font_size = config('stamp.font_size');
+
+        // βρίσκω το πλάτος και το ύψος του τετραγώνου
+        $type_space = imagettfbbox($font_size, 0, $font, $txt);
+        $w = abs($type_space[4] - $type_space[0]) + 10;
+        $h = abs($type_space[5] - $type_space[1]) + 10;
+
+        try {
+            $img = imagecreate($w, $h);
+            // (B) SET COLORS
+            $textColor = imagecolorallocate($img, config('stamp.txtR'), config('stamp.txtG'), config('stamp.txtB'));
+            $borderColor = imagecolorallocate($img, config('stamp.brdR'), config('stamp.brdG'), config('stamp.brdB'));
+            $bgColor = imagecolorallocate($img, config('stamp.bgR'), config('stamp.bgG'), config('stamp.bgB'));
+            // το κάνω από λευκό διάφανο
+            if (config('stamp.transparent')) imagecolortransparent($img, $bgColor);
+            // (C) EMPTY RECTANGLE
+            imagefilledrectangle($img, 0, 0, $w, $h, $bgColor);
+            // (C) BORDERS GRAY
+            imagerectangle($img, 0, 0, $w - 1, $h - 1, $borderColor);
+            // (D) WRITE TEXT
+            // imagettftext(IMAGE, FONT SIZE, ANGLE, X, Y, COLOR, FONT, TEXT)
+            imagettftext($img, $font_size, 0, 5, 5 + $font_size, $textColor, $font, $txt);
+
+            imagepng($img, "arPr.png");
+            imagedestroy($img); // OPTIONAL});
+        } catch (\Throwable $e) {
+            return false;
+        }
+        return true;
+    }
+
+    public function putStamp($dir, $filenameToStore, $file = null,  $content = null)
+    {
+        if ($file) {
+            // το αρχείο έρχεται από το χρήστη
+            $savedPath = $file->storeas($dir, $filenameToStore);
+            // βρίσκω το mimetype
+            $mimeType = $file->getMimeType();
+        }
+        if ($content) {
+            // το αρχείο έρχεται από το email
+            $savedPath = "$dir/$filenameToStore";
+            Storage::put($savedPath, $content);
+            // ορίζω το mimeType με βάση την κατάληξη του αρχείου pdf ή docx
+            if (substr($filenameToStore, -3) == 'pdf') $mimeType = 'application/pdf';
+            if (substr($filenameToStore, -4) == 'docx') $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+        // ορίζω τα mimeTypes σε μεταβλητές
+        $docx = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        $pdf = 'application/pdf';
+
+        if ($mimeType == $pdf) {
+            try {
+                copy(storage_path("app/$savedPath"), "pdfToStamp.pdf");
+                // γράφω στο pdf
+                $watermark = new Watermark("pdfToStamp.pdf");
+                // Watermark with Image
+                $watermark->withImage('arPr.png')
+                    ->setPosition(config('stamp.position.pdf'))
+                    ->setStyle(Watermark::STYLE_IMG_DISSOLVE)
+                    ->setOffset(config('stamp.wrapDistanceRight'), config('stamp.wrapDistanceTop'))
+                    ->setOpacity(.8)
+                    ->write();
+                rename("pdfToStamp.pdf", storage_path("app/$savedPath"));
+            } catch (\Throwable $e) {
+                if ($file) {
+                    $savedPath = $file->storeas($dir, $filenameToStore);
+                }
+                if ($content) {
+                    $savedPath = $dir . $filenameToStore;
+                    Storage::put($savedPath, $content);
+                }
+            }
+        }
+        if ($mimeType == $docx) {
+            try {
+                $phpWord = \PhpOffice\PhpWord\IOFactory::load(storage_path("app/$savedPath"));
+                // Get the initial Section of header and add watermark image to it
+                $section = $phpWord->getSection(0);
+                $header = $section->addHeader();
+                $header->addWatermark('arPr.png', array(
+                    'positioning' => 'absolute',
+                    'posHorizontal'  => config('stamp.position.docx'),
+                    'posHorizontalRel' => 'page',
+                    'posVerticalRel' => 'page',
+                    'wrapDistanceTop' => config('stamp.wrapDistanceTop'),
+                    'wrapDistanceRight' => config('stamp.wrapDistanceRight'),
+                    'wrappingStyle' => 'behind',
+                    'height' => 25
+                ));
+                // write the output file
+                $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+                $objWriter->save("output.docx");
+                rename("output.docx", storage_path("app/$savedPath"));
+            } catch (\Throwable $e) {
+                if ($file) {
+                    $savedPath = $file->storeas($dir, $filenameToStore);
+                }
+                if ($content) {
+                    $savedPath = $dir . $filenameToStore;
+                    Storage::put($savedPath, $content);
+                }
+            }
+        }
+        return $savedPath;
     }
 }

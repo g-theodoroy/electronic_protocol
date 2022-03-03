@@ -68,7 +68,7 @@ class Protocol extends Model
     protected $fillable = [
         'user_id',
         'protocolnum',
-        'protocoldate', 
+        'protocoldate',
         'etos',
         'fakelos',
         'thema',
@@ -88,8 +88,9 @@ class Protocol extends Model
         'paratiriseis'
     ];
 
-        public function attachments(){
-    	return $this->hasMany('App\Attachment','protocol_id');
+    public function attachments()
+    {
+        return $this->hasMany('App\Attachment', 'protocol_id');
     }
 
     public static function last()
