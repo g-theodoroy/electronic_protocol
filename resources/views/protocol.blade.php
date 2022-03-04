@@ -152,15 +152,11 @@
                                                 @if ($fakelos['fakelos'] == $protocol->fakelos)
                                                     <option value='{{ $fakelos['fakelos'] }}'
                                                         title='{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}'
-                                                        style="white-space: pre-wrap; width: 500px;" selected>
-                                                        {{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}
-                                                    </option>
+                                                        style="white-space: pre-wrap; width: 500px;" selected>{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}</option>
                                                 @else
                                                     <option value='{{ $fakelos['fakelos'] }}'
                                                         title='{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}'
-                                                        style="white-space: pre-wrap; width: 500px;">
-                                                        {{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}
-                                                    </option>
+                                                        style="white-space: pre-wrap; width: 500px;">{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}</option>
                                                 @endif
                                             @endforeach
                                         </select>
