@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^7.4|^8.0",
-        "ajaxray/php-watermark": "dev-master",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "joshrainwater/active-users": "dev-master",
