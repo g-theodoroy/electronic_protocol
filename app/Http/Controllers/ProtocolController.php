@@ -17,14 +17,13 @@ use Carbon\Carbon;
 use App\Attachment;
 use Illuminate\Http\Request;
 use App\Exports\ProtocolExport;
-use Illuminate\Validation\Rule;
 use Webklex\IMAP\Facades\Client;
-use Ajaxray\PHPWatermark\Watermark;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use ZBateson\MailMimeParser\Message;
 use ZBateson\MailMimeParser\MailMimeParser;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
+use Yasapurnama\DocumentWatermark\WatermarkFactory;
 
 //use Illuminate\Support\Facades\Log;
 //Log::info('test');
@@ -2493,7 +2492,7 @@ class ProtocolController extends Controller
         // κείμενο στάμπας
         $txt = "$ipiresia\nΑρ.Πρ: $protocolNum / $date";
 
-        $font = "fonts/copyfonts.com_arial-greek.ttf";
+        $font = config('stamp.font');
         $font_size = config('stamp.font_size');
 
         // βρίσκω το πλάτος και το ύψος του τετραγώνου
@@ -2548,16 +2547,25 @@ class ProtocolController extends Controller
         if ($mimeType == $pdf) {
             try {
                 copy(storage_path("app/$savedPath"), "pdfToStamp.pdf");
-                // γράφω στο pdf
-                $watermark = new Watermark("pdfToStamp.pdf");
-                // Watermark with Image
-                $watermark->withImage('arPr.png')
-                    ->setPosition(config('stamp.position.pdf'))
-                    ->setStyle(Watermark::STYLE_IMG_DISSOLVE)
-                    ->setOffset(config('stamp.wrapDistanceRight'), config('stamp.wrapDistanceTop'))
-                    ->setOpacity(.8)
-                    ->write();
-                rename("pdfToStamp.pdf", storage_path("app/$savedPath"));
+
+                $pdfWatermark  = WatermarkFactory::load('pdfToStamp.pdf')
+                ->outputFile('stampedPdf.pdf')
+                ->setImage('arPr.png')
+                ->opacity(config('stamp.opacity'));
+                if (config('stamp.section') == 'header') {
+                    $pdfWatermark = $pdfWatermark->sectionHeader();
+                } else {
+                    $pdfWatermark = $pdfWatermark->sectionFooter();
+                }
+                if (config('stamp.align') == 'left') {
+                    $pdfWatermark = $pdfWatermark->alignLeft(config('stamp.x'), config('stamp.y'));
+                } else {
+                    $pdfWatermark = $pdfWatermark->alignRight(config('stamp.x'), config('stamp.y'));
+                }
+                $pdfWatermark = $pdfWatermark->generate();
+
+                rename("stampedPdf.pdf", storage_path("app/$savedPath"));
+                if (file_exists('pdfToStamp.pdf')) unlink('pdfToStamp.pdf');
             } catch (\Throwable $e) {
                 if ($file) {
                     $savedPath = $file->storeas($dir, $filenameToStore);
@@ -2570,24 +2578,27 @@ class ProtocolController extends Controller
         }
         if ($mimeType == $docx) {
             try {
-                $phpWord = \PhpOffice\PhpWord\IOFactory::load(storage_path("app/$savedPath"));
-                // Get the initial Section of header and add watermark image to it
-                $section = $phpWord->getSection(0);
-                $header = $section->addHeader();
-                $header->addWatermark('arPr.png', array(
-                    'positioning' => 'absolute',
-                    'posHorizontal'  => config('stamp.position.docx'),
-                    'posHorizontalRel' => 'page',
-                    'posVerticalRel' => 'page',
-                    'wrapDistanceTop' => config('stamp.wrapDistanceTop'),
-                    'wrapDistanceRight' => config('stamp.wrapDistanceRight'),
-                    'wrappingStyle' => 'behind',
-                    'height' => 25
-                ));
-                // write the output file
-                $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-                $objWriter->save("output.docx");
-                rename("output.docx", storage_path("app/$savedPath"));
+                copy(storage_path("app/$savedPath"), "docxToStamp.docx");
+                $wordWatermark = WatermarkFactory::load('docxToStamp.docx')
+                ->outputFile('stampedDocx.docx')
+                ->setImage('arPr.png');
+                if (config('stamp.section') == 'header') {
+                    $wordWatermark =  $wordWatermark->sectionHeader();
+                } else {
+                    $wordWatermark =  $wordWatermark->sectionFooter();
+                }
+                if (config('stamp.align') == 'left') {
+                    $wordWatermark =  $wordWatermark->alignLeft(config('stamp.x'), config('stamp.y'));
+                } else {
+                    $wordWatermark =  $wordWatermark->alignRight(config('stamp.x'), config('stamp.y'));
+                }
+                if (config('stamp.onlyFirstPage')) {
+                    $wordWatermark =  $wordWatermark->onlyFirstPage();
+                }
+                $wordWatermark =  $wordWatermark->generate();
+
+                rename("stampedDocx.docx", storage_path("app/$savedPath"));
+                if (file_exists('docxToStamp.docx')) unlink('docxToStamp.docx');
             } catch (\Throwable $e) {
                 if ($file) {
                     $savedPath = $file->storeas($dir, $filenameToStore);
