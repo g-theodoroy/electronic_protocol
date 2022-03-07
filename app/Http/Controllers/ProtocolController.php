@@ -2492,7 +2492,15 @@ class ProtocolController extends Controller
         // κείμενο στάμπας
         $txt = "$ipiresia\nΑρ.Πρ: $protocolNum / $date";
 
+        /**
+         * Στα win 10 Ελληνικά υπάρχει πρόβλημα με το path των font
+         * είναι θέμα του path των windows και της βιβλιοθήκης php-gd2.dll
+         * αν σας χτυπάει αλλάξτε τις δύο επόμενες γραμμές κώδικα
+         * κάνοντας την 1η σχόλιο και τη δεύτερη ενεργή
+         **/
         $font = config('stamp.font');
+        //$font = mb_convert_encoding(realpath(config('stamp.font')), 'iso-8859-7', 'utf-8');
+
         $font_size = config('stamp.font_size');
 
         // βρίσκω το πλάτος και το ύψος του τετραγώνου
