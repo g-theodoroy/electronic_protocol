@@ -692,8 +692,11 @@
             seconds = parseInt(timer % 60, 10)
         
             //minutes = minutes < 10 ? "0" + minutes : minutes seconds=seconds < 10 ? "0" + seconds : seconds
-                display.textContent='Δυνατότητα επεξεργασίας: ' + minutes + ":" + seconds + ' λεπτά' if (--timer < 0) {
-                window.location.reload() } }, 1000) } @endif
+                display.textContent='Δυνατότητα επεξεργασίας: ' + minutes + ":" + seconds + ' λεπτά' 
+                if (--timer < 0) {
+                    window.location.reload() } }, 1000) 
+                } 
+        @endif
 
         window.onload = function() {
             @if ($time2update > 0)
