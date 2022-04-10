@@ -1773,7 +1773,7 @@ class ProtocolController extends Controller
         $writers_admins = User::get_writers_and_admins();
         $settings = Config::getConfigValues();
         $allowUserChangeKeepSelect = $settings['allowUserChangeKeepSelect'] ?? Config::getConfigValueOf('allowUserChangeKeepSelect');
-        $emailNumFetch = $settings['emailNumFetch'] ?? Config::getConfigValueOf('emailNumFetch');
+        $emailNumFetch = $settings['emailNumFetch'] ?? Config::getConfigValueOf('emailNumFetch') ?? 1;
         $defaultImapEmail = $settings['defaultImapEmail'] ?? Config::getConfigValueOf('defaultImapEmail');
         $daysToCheckEmailBack = $settings['daysToCheckEmailBack'] ?? Config::getConfigValueOf('daysToCheckEmailBack');
         $sinceDate = Carbon::now()->subDays($daysToCheckEmailBack)->format('d-m-Y');
@@ -1826,7 +1826,7 @@ class ProtocolController extends Controller
         // παίρνω τον αριθμό των μηνυμάτων από sinceDate και μετά
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
         // παίρνω τα μηνύματα από sinceDate και μετά
-        $aMessage = $oFolder->query()->since($sinceDate)->paginate($emailNumFetch, $imap_page);
+        $aMessage = $oFolder->query()->since($sinceDate)->paginate($per_page = $emailNumFetch, $page = $imap_page, $page_name = 'imap_page');
         $aMessageCount = $aMessage->count();
 
         if ($emailFetchOrderDesc) {
@@ -1840,15 +1840,22 @@ class ProtocolController extends Controller
         }
 
         // διαγραφή τυχόν προηγούμενα αποθηκευμένων email.html
-        $files = Storage::disk('tmp')->files();
-        Storage::disk('tmp')->delete($files);
+        Storage::disk('tmp')->deleteDirectory('u' . Auth()->user()->id);
 
         $emailFilePaths = array();
         // για κάθε μήνυμα
         foreach ($aMessage as $oMessage) {
-            $mailMessage = Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
+            $contentRaw = null;
+            try {
+                $contentRaw = $oMessage->getHeader()->raw . $oMessage->getRawBody();
+            } catch (\Throwable $e) {
+                continue;
+            }
+            if (!$contentRaw) continue;
+            //info($contentRaw);
+            $mailMessage = Message::from($contentRaw);
             $Uid = $oMessage->getUid();
-            $dir = '';
+            $dir = 'u' . Auth()->user()->id;
             // αν έχει σώμα html το αποθηκεύω
             if (strlen($mailMessage->getHtmlContent())) {
                 // περιεχόμενο HTML
@@ -1857,7 +1864,7 @@ class ProtocolController extends Controller
                 $content = preg_replace('/charset=[\s\S]+?"/', 'charset=utf-8"', $content);
                 // φτιάχνω φάκελο και όνομα αρχείου /tmp/$Uid.html
                 $filenameToStore = "$Uid.html";
-                $savedPath = $dir . $filenameToStore;
+                $savedPath = "$dir/$filenameToStore";
                 // αποθηκεύω το email στο /public/tmp
                 Storage::disk('tmp')->put($savedPath, $content);
                 // κρατάω σε πίνακα το path
@@ -1865,9 +1872,8 @@ class ProtocolController extends Controller
             }
             // αποθηκεύω το email σαν eml για να μη το ξανακατεβάζω
             $filenameToStore = "$Uid.eml";
-            $savedPath = $dir . $filenameToStore;
-            $contentRaw = $oMessage->getHeader()->raw . $oMessage->getRawBody();
-            // αποθηκεύω το email στο /public/tmp
+            $savedPath = "$dir/$filenameToStore";
+            // αποθηκεύω το email στο /public/tmp/u[id χρήστη]
             Storage::disk('tmp')->put($savedPath, $contentRaw);
         }
         session()->put('imap_page', $imap_page);
@@ -2434,11 +2440,12 @@ class ProtocolController extends Controller
 
     public function readSavedEmailFromFile($messageUid)
     {
+        $dir = 'tmp/u' . Auth()->user()->id . '/';
         // αν δεν υπάρχει το αρχείο email σταματάω
-        if (!file_exists('tmp/' . $messageUid . '.eml')) return null;
+        if (!file_exists($dir . $messageUid . '.eml')) return null;
         // διαβάζω τα περιεχόμενα του email
         $mailParser = new MailMimeParser();
-        $handle = fopen('tmp/' . $messageUid . '.eml', 'r');
+        $handle = fopen($dir . $messageUid . '.eml', 'r');
         $mailMessage = $mailParser->parse($handle);         // returns `Message`
         fclose($handle);
         return $mailMessage;
