@@ -99,9 +99,7 @@
                                                     @foreach ($fakeloi as $fakelos)
                                                         <option value='{{ $fakelos['fakelos'] }}'
                                                             title='{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}'
-                                                            style="white-space: pre-wrap; width: 500px;">
-                                                            {{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}
-                                                        </option>
+                                                            style="white-space: pre-wrap; width: 500px;">{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

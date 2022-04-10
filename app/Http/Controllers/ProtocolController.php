@@ -2100,7 +2100,7 @@ class ProtocolController extends Controller
 
         if (Config::getConfigValueOf('saveEmailAs')) {
             // αποθηκεύω το email σαν συνημμένο eml
-            $html = file_get_contents('tmp/' . $uid . '.eml');
+            $html = $this->readSavedEmailFromFile($uid);
             $filename = 'email_' . Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('Ymd_His') . '.' . Config::getConfigValueOf('saveEmailAs');
             $mimetype = 'message/rfc822';
         } else {
