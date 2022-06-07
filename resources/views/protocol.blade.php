@@ -130,6 +130,10 @@
                                     <div class="col-md-1 col-sm-1 text-center  form-control-static ">
                                         <a href="{{ URL::to('/') }}/home" class="active" role="button"
                                             title="Νέο"> <img src="{{ URL::to('/') }}/images/addnew.ico" height=25 /></a>
+                                        @if($protocol->id) 
+                                        <a href="{{ url('/home') }}{{ $protocol->id ? '/' . $protocol->id . '/1' : '' }}" class="active" role="button"
+                                            title="Αντιγραφή ως Νέο"> <img src="{{ URL::to('/') }}/images/copy-stamp.png" height=25 /></a>
+                                        @endif
                                         <a href="javascript:formSubmit()" class="{{ $submitVisible }}" role="button"
                                             title="Αποθήκευση"> <img src="{{ URL::to('/') }}/images/save.ico"
                                                 height=25 /></a>

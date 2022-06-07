@@ -93,8 +93,17 @@ class ProtocolController extends Controller
     }
 
 
-    public function index(Protocol $protocol)
+    public function index(Protocol $protocol, $copyAsNew = null)
     {
+
+        if($copyAsNew){
+            $protocol->id = null;
+            $protocol->etos = null;
+            $protocol->protocolnum = null;
+            $protocol->protocoldate = null;
+                }
+
+
         // αν δεν είναι νέο πρωτόκολλο και οι συγγραφείς περιορίζονται στη λίστα διεκπεραιωσης
         if ($this->limitProtocolAccessList()) {
             // αν δεν είναι νέο πρωτόκολλο και οι συγγραφείς περιορίζονται στη λίστα διεκπεραιωσης και δεν έχει καταχωριστεί από το χρήστη
@@ -161,6 +170,8 @@ class ProtocolController extends Controller
         $newprotocoldate = Carbon::now()->format('d/m/Y');
         $class = 'bg-info';
         $protocoltitle = 'Νέο Πρωτόκολλο';
+        if($copyAsNew) $protocoltitle = 'Αντιγραφή ως Νέο Πρωτόκολλο';
+
         $protocolUser = '';
         if ($protocol->etos) {
             $newetos = $protocol->etos;

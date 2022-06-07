@@ -69,9 +69,16 @@
             @else
                 <div class="col-md-2 col-sm-2 ">{!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $protocol->$searchField3) !!}</div>
             @endif
-            <div class="col-md-1 col-sm-1 text-center"><a href="{{ URL::to('/') }}/home/{{ $protocol->id }}"
+            <div class="col-md-1 col-sm-1 text-center">
+                <a href="{{ URL::to('/') }}/home/{{ $protocol->id }}"
                     class="" role="button" title="Μετάβαση"> <img
-                        src="{{ URL::to('/') }}/images/open.png" height="20" /></a></div>
+                    src="{{ URL::to('/') }}/images/open.png" height="20" />
+                </a>
+                <a href="{{ URL::to('/') }}/home/{{ $protocol->id }}/1"
+                    class="" role="button" title="Αντιγραφή ως Νέο"> <img
+                    src="{{ URL::to('/') }}/images/copy-stamp.png" height="20" />
+                </a>
+            </div>
 </div>
 @php($i++)
 @endforeach

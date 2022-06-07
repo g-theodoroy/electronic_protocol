@@ -128,6 +128,9 @@
                                     <a href="{{ URL::to('/') }}/home/{{ $protocol->id }}" class=""
                                         role="button" title="Μετάβαση"> <img src="{{ URL::to('/') }}/images/open.png"
                                             height="15" /></a>
+                                    <a href="{{ URL::to('/') }}/home/{{ $protocol->id }}/1" class=""
+                                        role="button" title="Αντιγραφή ως Νέο"> <img src="{{ URL::to('/') }}/images/copy-stamp.png"
+                                            height="15" /></a>
                                     <span title='Αυξων Αριθμός'>
                                         <strong>{{ $protocol->protocolnum }}</strong>
                                         <hr>

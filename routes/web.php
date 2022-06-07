@@ -59,7 +59,7 @@ Route::get('/home', 'ProtocolController@index');
 Route::get('/chkForUpdates', 'ProtocolController@chkForUpdates');
 Route::get('/home/list', 'ProtocolController@indexList');
 Route::get('/home/list/{filter?}/{userId?}', 'ProtocolController@indexList');
-Route::get('/home/{protocol}', 'ProtocolController@index');
+Route::get('/home/{protocol}/{copyAsNew?}', 'ProtocolController@index');
 Route::get('getFileInputs/{num}', 'ProtocolController@getFileInputs');
 Route::get('getKeep4Fakelos/{fakelos}', 'ProtocolController@getKeep4Fakelos');
 
