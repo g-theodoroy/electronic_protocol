@@ -1148,25 +1148,13 @@ class ProtocolController extends Controller
         $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         // παίρνω το περιεχόμενο του μηνύματος
         $html = view('diekperaiosiMail', compact('protocol', 'diekperaiotis', 'date'))->render();
-        // ρυθμίσεις για τον 2ο (εναλλακτικό) mailer
-        $configuration = [
-            'smtp_host'    => config('intra-mail.host'),
-            'smtp_port'    => config('intra-mail.port'),
-            'smtp_username'  => config('intra-mail.username'),
-            'smtp_password'  => config('intra-mail.password'),
-            'smtp_encryption'  => config('intra-mail.encryption'),
-
-            'from_email'    => config('intra-mail.from.address'),
-            'from_name'    => config('intra-mail.from.name'),
-        ];
-        // φτιάχνω τον mailer και στέλνω το mail
-        $mailer = app()->makeWith('user.mailer', $configuration);
-        $mailer->send([], [], function ($message) use ($emailTo, $html) {
+        // χρήση του 2ο (εναλλακτικό) mailer
+         Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html) {
             $message->subject("Ανάθεση Πρωτοκόλλου για Διεκπεραίωση");
             $message->setBody($html, 'text/html');
             $message->to($emailTo);
         });
-        if (!count($mailer->failures())) {
+        if (!count(Mail::failures())) {
             // προσθέτω στις παρατηρήσεις ότι στάλθηκε email στον διεκπεραιωτή
             $emaildate = Carbon::now()->format('d/m/Y H:m:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
@@ -1188,25 +1176,14 @@ class ProtocolController extends Controller
         $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         // παίρνω το περιεχόμενο του μηνύματος
         $html = view('diekpInformMail', compact('protocol', 'diekperaiotis', 'date'))->render();
-        // ρυθμίσεις για τον 2ο (εναλλακτικό) mailer
-        $configuration = [
-            'smtp_host'    => config('intra-mail.host'),
-            'smtp_port'    => config('intra-mail.port'),
-            'smtp_username'  => config('intra-mail.username'),
-            'smtp_password'  => config('intra-mail.password'),
-            'smtp_encryption'  => config('intra-mail.encryption'),
+        // χρήση του 2ο (εναλλακτικό) mailer
+        Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html) {
 
-            'from_email'    => config('intra-mail.from.address'),
-            'from_name'    => config('intra-mail.from.name'),
-        ];
-        // φτιάχνω τον mailer και στέλνω το mail
-        $mailer = app()->makeWith('user.mailer', $configuration);
-        $mailer->send([], [], function ($message) use ($emailTo, $html) {
             $message->subject("Ενημέρωση για Πρωτόκολλο");
             $message->setBody($html, 'text/html');
             $message->to($emailTo);
         });
-        if (!count($mailer->failures())) {
+        if (!count(Mail::failures())) {
             // προσθέτω στις παρατηρήσεις ότι στάλθηκε email στον διεκπεραιωτή
             $emaildate = Carbon::now()->format('d/m/Y H:m:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
