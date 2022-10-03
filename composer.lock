@@ -4,62 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7f20592e6dafb1ee9cb66592475fb28b",
+    "content-hash": "d677ed09204e1bc9ba37d5307530ef68",
     "packages": [
-        {
-            "name": "ajaxray/php-watermark",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ajaxray/php-watermark.git",
-                "reference": "c713ef4999062aebdf6eb66a54e6736afa094c30"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ajaxray/php-watermark/zipball/c713ef4999062aebdf6eb66a54e6736afa094c30",
-                "reference": "c713ef4999062aebdf6eb66a54e6736afa094c30",
-                "shasum": ""
-            },
-            "require": {
-                "ext-fileinfo": "*",
-                "php": "^7.4 | ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "9.*",
-                "satooshi/php-coveralls": "*"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Ajaxray\\PHPWatermark\\": "src/Ajaxray/PHPWatermark/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anis Uddin Ahmad",
-                    "email": "anis.programmer@gmail.com"
-                }
-            ],
-            "description": "Add text or image watermark on images.",
-            "homepage": "https://github.com/ajaxray/php-watermark",
-            "keywords": [
-                "image",
-                "image-manipulation",
-                "imagemagick-watermark",
-                "imagemagick-wrapper",
-                "watermark"
-            ],
-            "support": {
-                "issues": "https://github.com/ajaxray/php-watermark/issues",
-                "source": "https://github.com/ajaxray/php-watermark/tree/master"
-            },
-            "time": "2021-11-02T18:36:50+00:00"
-        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.1.1",
@@ -799,16 +745,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.1.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "089edd38f5b8abba6cb01567c2a8aaa47cec4c72"
+                "reference": "69568e4293f4fa993f3b0e51c9723e1e17c41379"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/089edd38f5b8abba6cb01567c2a8aaa47cec4c72",
-                "reference": "089edd38f5b8abba6cb01567c2a8aaa47cec4c72",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/69568e4293f4fa993f3b0e51c9723e1e17c41379",
+                "reference": "69568e4293f4fa993f3b0e51c9723e1e17c41379",
                 "shasum": ""
             },
             "require": {
@@ -822,17 +768,21 @@
                 "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4.1",
+                "bamarni/composer-bin-plugin": "^1.8.1",
                 "http-interop/http-factory-tests": "^0.9",
-                "phpunit/phpunit": "^8.5.8 || ^9.3.10"
+                "phpunit/phpunit": "^8.5.29 || ^9.5.23"
             },
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
             "type": "library",
             "extra": {
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
+                },
                 "branch-alias": {
-                    "dev-master": "2.1-dev"
+                    "dev-master": "2.4-dev"
                 }
             },
             "autoload": {
@@ -894,7 +844,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.1.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.4.1"
             },
             "funding": [
                 {
@@ -910,7 +860,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-06T17:43:30+00:00"
+            "time": "2022-08-28T14:45:39+00:00"
         },
         {
             "name": "joshrainwater/active-users",
@@ -969,33 +919,33 @@
         },
         {
             "name": "laminas/laminas-escaper",
-            "version": "2.9.0",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-escaper.git",
-                "reference": "891ad70986729e20ed2e86355fcf93c9dc238a5f"
+                "reference": "58af67282db37d24e584a837a94ee55b9c7552be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-escaper/zipball/891ad70986729e20ed2e86355fcf93c9dc238a5f",
-                "reference": "891ad70986729e20ed2e86355fcf93c9dc238a5f",
+                "url": "https://api.github.com/repos/laminas/laminas-escaper/zipball/58af67282db37d24e584a837a94ee55b9c7552be",
+                "reference": "58af67282db37d24e584a837a94ee55b9c7552be",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.3 || ~8.0.0 || ~8.1.0"
+                "ext-ctype": "*",
+                "ext-mbstring": "*",
+                "php": "^7.4 || ~8.0.0 || ~8.1.0"
             },
             "conflict": {
                 "zendframework/zend-escaper": "*"
             },
             "require-dev": {
+                "infection/infection": "^0.26.6",
                 "laminas/laminas-coding-standard": "~2.3.0",
-                "phpunit/phpunit": "^9.3",
-                "psalm/plugin-phpunit": "^0.12.2",
-                "vimeo/psalm": "^3.16"
-            },
-            "suggest": {
-                "ext-iconv": "*",
-                "ext-mbstring": "*"
+                "maglnet/composer-require-checker": "^3.8.0",
+                "phpunit/phpunit": "^9.5.18",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.22.0"
             },
             "type": "library",
             "autoload": {
@@ -1027,7 +977,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2021-09-02T17:10:53+00:00"
+            "time": "2022-03-08T20:15:36+00:00"
         },
         {
             "name": "laravel/framework",
@@ -6120,6 +6070,99 @@
             "time": "2021-03-09T10:59:23+00:00"
         },
         {
+            "name": "yasapurnama/document-watermark",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yasapurnama/document-watermark.git",
+                "reference": "e8085140181f1cf801c817c4bfc4ba7ce933df07"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yasapurnama/document-watermark/zipball/e8085140181f1cf801c817c4bfc4ba7ce933df07",
+                "reference": "e8085140181f1cf801c817c4bfc4ba7ce933df07",
+                "shasum": ""
+            },
+            "require": {
+                "phpoffice/phpword": "^0.18.2",
+                "yasapurnama/php-shellrotation": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yasapurnama\\DocumentWatermark\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "I Putu Bagus Purnama Yasa",
+                    "email": "yasapurnama@gmail.com"
+                }
+            ],
+            "description": "Generate text watermark on PDF and Word documents with PHP",
+            "keywords": [
+                "markpdf",
+                "pdf-watermark",
+                "php-watermark",
+                "text",
+                "watermark",
+                "word-watermark"
+            ],
+            "support": {
+                "issues": "https://github.com/yasapurnama/document-watermark/issues",
+                "source": "https://github.com/yasapurnama/document-watermark/tree/v1.0.1"
+            },
+            "time": "2022-03-07T14:19:47+00:00"
+        },
+        {
+            "name": "yasapurnama/php-shellrotation",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yasapurnama/php-shellrotation.git",
+                "reference": "a50b533160ad37fabc6cba99eb05219454d3f1f8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yasapurnama/php-shellrotation/zipball/a50b533160ad37fabc6cba99eb05219454d3f1f8",
+                "reference": "a50b533160ad37fabc6cba99eb05219454d3f1f8",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yasapurnama\\PhpShellRotation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Purnama Yasa",
+                    "email": "yasapurnama@gmail.com"
+                }
+            ],
+            "description": "PHP shell rotation",
+            "keywords": [
+                "exist",
+                "function",
+                "php",
+                "rotate",
+                "shell"
+            ],
+            "support": {
+                "issues": "https://github.com/yasapurnama/php-shellrotation/issues",
+                "source": "https://github.com/yasapurnama/php-shellrotation/tree/v1.0.0"
+            },
+            "time": "2022-01-25T13:42:36+00:00"
+        },
+        {
             "name": "zbateson/mail-mime-parser",
             "version": "1.3.3",
             "source": {
@@ -9050,7 +9093,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "ajaxray/php-watermark": 20,
         "joshrainwater/active-users": 20
     },
     "prefer-stable": true,
@@ -9059,5 +9101,5 @@
         "php": "^7.4|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
