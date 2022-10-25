@@ -529,22 +529,29 @@
                                     </div>
                                 </div>
                                 <div id="keepdiv" class="row hidden">
-                                    <div class="col-md-4 col-sm-4 small form-control-static">
+                                    <div class="col-md-5 col-sm-5 small form-control-static">
                                         <strong>Επιλέξτε αρχείο {!! ini_get('upload_max_filesize') ? '<span class="bg-primary padding-xs">έως ' . ini_get('upload_max_filesize') . '</span>' : '' !!}<br>ή πληκτρολογείστε ΑΔΑ</strong>
                                     </div>
+                                    <div class="col-md-2 col-sm-2 small text-center form-control-static">
+                                        @if(App\Config::getConfigValueOf('putStamp'))
+                                        <strong>όχι εγγραφή Αρ.Πρ.&nbsp;</strong>
+                                        <input type="checkbox"  id="explicityNoStamp" name="explicityNoStamp" title="Nα μη γραφεί στα συνημμένα ο Αρ.Πρωτοκόλλου">
+                                        @endif
+                                    </div>
+
                                     @if ($allowUserChangeKeepSelect)
-                                        <div class="col-md-4 col-sm-4 small text-right form-control-static">
+                                        <div class="col-md-2 col-sm-2 small text-right form-control-static">
                                             <strong>Χρόνος διατήρησης</strong>
                                         </div>
-                                        <div class="col-md-4 col-sm-4">
+                                        <div class="col-md-3 col-sm-3">
                                             <select id="keep" class="form-control small selectpicker" name="keep"
                                                 title='Χρόνος Διατήρησης'>
                                             @else
-                                                <div class="col-md-4 col-sm-4 small text-right form-control-static"
+                                                <div class="col-md-2 col-sm-2 small text-right form-control-static"
                                                     title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
                                                     <strong>Χρόνος διατήρησης</strong>
                                                 </div>
-                                                <div class="col-md-4 col-sm-4"
+                                                <div class="col-md-3 col-sm-3"
                                                     title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
                                                     <select id="keep" class="form-control small selectpicker"
                                                         data-value="{{ $keepval }}"

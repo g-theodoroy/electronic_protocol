@@ -58,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             report($e);
             // καμία ενέργεια απλά πιάνει το λάθος
-        // γιατί χτύπαγε στη δημιουργία των πινάκων με php artisan:migrate
+      	    // γιατί χτύπαγε στη δημιουργία των πινάκων με php artisan:migrate
         }
     }
 }

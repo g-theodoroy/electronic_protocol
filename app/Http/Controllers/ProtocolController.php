@@ -781,6 +781,8 @@ class ProtocolController extends Controller
         }
         // δημιουργία στάμπας ΑΡ.Πρωτ.
         $putStamp = Config::getConfigValueOf('putStamp');
+        // έλεγχος αν ο χρήστης δεν επιθυμεί στάμπα
+        if (isset($data['explicityNoStamp']))  $putStamp = false;
         $stampDone = false;
         if ($protocol && $putStamp) {
             $stampDone = $this->createStamp($protocol);
@@ -825,14 +827,17 @@ class ProtocolController extends Controller
                 }
                 try {
                     // δημιουργία συνημμένου
-                    Attachment::create([
-                        'protocol_id' => $protocol_id,
-                        'ada' => $data["ada$i"],
-                        'name' => $filename,
-                        'mimeType' => $mimeType,
-                        'savedPath' => $savedPath,
-                        'keep' => $data['keep'],
-                        'expires' => $expires,
+                    Attachment::updateOrCreate(
+                        [
+                            'protocol_id' => $protocol_id,
+                            'ada' => $data["ada$i"],
+                            'name' => $filename,
+                            'mimeType' => $mimeType,
+                            'savedPath' => $savedPath,
+                        ],
+                        [
+                            'keep' => $data['keep'],
+                            'expires' => $expires,
                     ]);
                 } catch (\Throwable $e) {
                     // αν υπάρχει λάθος το γράφω στο log
@@ -1060,6 +1065,8 @@ class ProtocolController extends Controller
 
         // δημιουργία στάμπας ΑΡ.Πρωτ.
         $putStamp = Config::getConfigValueOf('putStamp');
+        // έλεγχος αν ο χρήστης δεν επιθυμεί στάμπα
+        if (isset($data['explicityNoStamp']))  $putStamp = false;
         $stampDone = false;
         if ($protocol && $putStamp) {
             $stampDone = $this->createStamp($protocol);
@@ -1102,14 +1109,17 @@ class ProtocolController extends Controller
                 }
                 // αποθήκευση συνημμένου στη ΒΔ
                 try {
-                    Attachment::create([
-                        'protocol_id' => $id,
-                        'ada' => $data["ada$i"],
-                        'name' => $filename,
-                        'mimeType' => $mimeType,
-                        'savedPath' => $savedPath,
-                        'keep' => $data['keep'],
-                        'expires' => $expires,
+                    Attachment::updateOrCreate(
+                        [
+                            'protocol_id' => $id,
+                            'ada' => $data["ada$i"],
+                            'name' => $filename,
+                            'mimeType' => $mimeType,
+                            'savedPath' => $savedPath,
+                        ],
+                        [
+                            'keep' => $data['keep'],
+                            'expires' => $expires,
                     ]);
                 } catch (\Throwable $e) {
                     // σε λάθος στέλνω στο log
@@ -1245,6 +1255,7 @@ class ProtocolController extends Controller
         // αν υπάρχει το αρχείο
         if (Storage::exists($attachment->savedPath)) {
             // το μετακινώ στον Κάδο Ανακύκλωσης
+            if (Storage::exists($trashPath)) Storage::delete($trashPath);
             Storage::move($savedPath, $trashPath);
         }
         // διαγράφω την καταχώριση στη ΒΔ (softDelete)
@@ -2081,6 +2092,8 @@ class ProtocolController extends Controller
 
         // δημιουργία στάμπας ΑΡ.Πρωτ.
         $putStamp = Config::getConfigValueOf('putStamp');
+        // έλεγχος αν ο χρήστης δεν επιθυμεί στάμπα
+        if (isset($data['explicityNoStamp']))  $putStamp = false;
         $stampDone = false;
         if ($protocol && $putStamp) {
             $stampDone = $this->createStamp($protocol);
@@ -2109,15 +2122,19 @@ class ProtocolController extends Controller
         }
 
         try {
-            Attachment::create([
-                'protocol_id' => $protocol->id,
-                'ada' => null,
-                'name' => $filename,
-                'mimeType' => $mimetype,
-                'savedPath' => $savedPath,
-                'keep' => $keep,
-                'expires' => $expires,
-            ]);
+            Attachment::updateOrCreate(
+                [
+                    'protocol_id' => $protocol->id,
+                    'name' => $filename,
+                    'mimeType' => $mimetype,
+                    'savedPath' => $savedPath,
+                ],
+                [
+                    'ada' => null,
+                    'keep' => $data['keep'],
+                    'expires' => $expires,
+                ]
+            );
 
             // αποθηκεύω τα συνημμένα
             $numCreatedAttachments = 0;
@@ -2144,15 +2161,20 @@ class ProtocolController extends Controller
                     Storage::put($savedPath, $content);
                 }
 
-                $createdAttachment = Attachment::create([
-                    'protocol_id' => $protocol->id,
-                    'ada' => null,
-                    'name' => $filename,
-                    'mimeType' => $mimeType,
-                    'savedPath' => $savedPath,
-                    'keep' => $keep,
-                    'expires' => $expires,
-                ]);
+                $createdAttachment = Attachment::updateOrCreate(
+                    [
+                        'protocol_id' => $protocol->id,
+                        'name' => $filename,
+                        'mimeType' => $mimeType,
+                        'savedPath' => $savedPath,
+                    ],
+                    [
+                        'ada' => null,
+                        'keep' => $data['keep'],
+                        'expires' => $expires,
+                    ]
+                );
+
 
                 if ($createdAttachment) {
                     $numCreatedAttachments++;
