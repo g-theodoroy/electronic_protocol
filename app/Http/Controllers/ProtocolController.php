@@ -805,7 +805,7 @@ class ProtocolController extends Controller
                     $filename = $file->getClientOriginalName();
                     // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                     $filename = $this->filter_filename($filename, false);
-                    // τον τύπο mimetype του αρχείου
+                    // τον τύπο mimeType του αρχείου
                     $mimeType = $file->getMimeType();
                     // φτιάχνω το όνομα Αρ.Πρ + Ημνια.Πρ
                     $filenameToStore = request()->protocolnum . '-' . Carbon::createFromFormat('d/m/Y', request()->protocoldate)->format('Ymd') . '_' . $filename;
@@ -2103,12 +2103,12 @@ class ProtocolController extends Controller
             // αποθηκεύω το email σαν συνημμένο eml
             $html = $this->readSavedEmailFromFile($uid);
             $filename = 'email_' . Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('Ymd_His') . '.' . Config::getConfigValueOf('saveEmailAs');
-            $mimetype = 'message/rfc822';
+            $mimeType = 'message/rfc822';
         } else {
             // αποθηκεύω το email σαν συνημμένο html
             $html = view('viewEmail', compact('mailMessage'))->render();
             $filename = 'email_' . Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->format('Ymd_His') . '.html';
-            $mimetype = 'text/html';
+            $mimeType = 'text/html';
         }
         $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $filename;
         $dir = $fakelos ? 'arxeio/' . $fakelos  : 'arxeio/emails';
@@ -2126,12 +2126,12 @@ class ProtocolController extends Controller
                 [
                     'protocol_id' => $protocol->id,
                     'name' => $filename,
-                    'mimeType' => $mimetype,
+                    'mimeType' => $mimeType,
                     'savedPath' => $savedPath,
                 ],
                 [
                     'ada' => null,
-                    'keep' => $data['keep'],
+                    'keep' => $keep,
                     'expires' => $expires,
                 ]
             );
@@ -2170,7 +2170,7 @@ class ProtocolController extends Controller
                     ],
                     [
                         'ada' => null,
-                        'keep' => $data['keep'],
+                        'keep' => $keep,
                         'expires' => $expires,
                     ]
                 );
@@ -2554,7 +2554,7 @@ class ProtocolController extends Controller
         if ($file) {
             // το αρχείο έρχεται από το χρήστη
             $savedPath = $file->storeas($dir, $filenameToStore);
-            // βρίσκω το mimetype
+            // βρίσκω το mimeType
             $mimeType = $file->getMimeType();
         }
         if ($content) {
