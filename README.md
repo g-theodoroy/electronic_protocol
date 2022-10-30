@@ -269,50 +269,7 @@ sudo systemctl restart apache2.service
 http://localhost/protocol
 
 
-## Εγκατάσταση σε Windows 7 και νεότερα με το phpdesktop
 
-Σχετικό βίντεο: https://youtu.be/e79OPKagz9A
-
-Χάρη στη εξαιρετική δουλειά του cztomczak με το phpdesktop μπορεί στα windows να τρέξει η php σαν desktop εφαρμογή χρησιμοποιώντας τον chrome. https://github.com/cztomczak/phpdesktop
-
-Το Ηλεκτρονικό Πρωτόκολλο προσαρμόστηκε και ρυθμίστηκε. Κατεβάστε το συμπιεσμένο αρχείο zip από τον παρακάτω σύνδεσμο:
-
-https://github.com/g-theodoroy/electronic_protocol/releases
-
-Τρέξτε το αρχείο **electronic_protocol.exe**
-
-
-## Εγκατάσταση σε linux με το phpdesktop
-
-Χάρη στη εξαιρετική δουλειά του cztomczak με το phpdesktop μπορεί στα linux να τρέξει η php σαν desktop εφαρμογή χρησιμοποιώντας τον chrome. https://github.com/cztomczak/phpdesktop/releases/tag/linux-v72.0
-
-Κατεβάστε και χρησιμοποιείστε το Ηλ. Πρωτόκολλο σαν εφαρμογή desktop σε linux.
-
-https://github.com/g-theodoroy/electronic_protocol/releases
-
-Τρέξτε το αρχείο **electronic-protocol**
-
-**ΠΡΟΣΟΧΗ:**
-
-Φροντίστε ο φάκελος storage να είναι προσβάσιμος και εγγράψιμος από όλους.
-
-Κάντε το αρχείο ```php-cgi``` εκτελέσιμο με την εντολή ```chmod +x php-cgi```.
-
-**Παρατήρηση**: Παρατήρησα ότι το build στο Archlinux δεν δουλεύει σε Debian - Ubuntu. Στην αρχειοθήκη υπάρχει php-cgi για Debian - Ubuntu. Αν στη διανομή σας δεν δουλεύει αφού κάνετε τα παραπάνω τότε θα πρέπει να "χτίσετε" την php-cgi για τη διανομή σας, ακολουθώντας τις παρακάτω οδηγίες:
-
-Κατεβάστε από το https://www.php.net/downloads.php τα αρχεία της Php και αποσυμπιέστε τα σε ένα φάκελο. Πηγαίνετε με το τερματικό στον φάκελο και τρέξτε τις παρακάτω εντολές.
-
-```
-php_dir=$(pwd)
-
-./configure --prefix=${php_dir}/dist-install --exec-prefix=${php_dir}/dist-install-exec-prefix --with-openssl --with-imap --with-imap-ssl --with-kerberos
-
-make
-```
-Αντιγράψτε το αρχείο ```sapi/cgi/php-cgi``` στον φάκελο του phpdesktop.
-
-#
-# Εναλλακτικές λύσεις
 
 ## Λειτουργικό σύστημα Windows με εγκατεστημένο Xampp, Wamp, ...
 
@@ -432,16 +389,49 @@ Alias /protocol "C:\protocol\public"
 Include "conf/alias/*"
 ```
 
+
+
 ### Ρυθμίσεις
+
 
 
 #### Ρύθμιση php
 
+Στο αρχείο **C:\xampp\php\php.ini** και στις γραμμές 915 και κάτω
+
+ενεργοποιείστε τις ακόλουθες extensions διαγράφοντας το **;** μπροστά από την κάθε γραμμή
+
+extension=gd
+
+extension=imap
+
+extension=mbstring
+
+
+**Αν δουλέυουμε με sqlite σαν ΒΔ**
+
+extension=pdo_sqlite
+
+extension=sqlite3
+
+
+**Αν δουλέυουμε με mysql σαν ΒΔ**
+
+extension=pdo_mysql
+
+extension=mysqli 
+
+
+
+#### Ρύθμιση mysql
 
 Εκκινήστε το Xampp και τους servers apache και mysql 
 
 Ανοίξτε το πρόγραμμα  phpMyAdmin του Xampp και δημιουργήστε την βάση δεδομένων που μόλις ονομάσατε (πχ: protocol)
 
+
+
+#### Εγκατάσταση βιβλιοθηκών
 
 Ανοίξτε την κονσόλα των Windows: πρόγραμμα **Cmd**. Μεταβείτε στον φάκελο που έχετε βάλει το Ηλ.Πρωτόκολλο (πχ protocol).
 ```
