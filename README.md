@@ -78,6 +78,7 @@ https://www.5balloons.info/install-laravel-5-7-xampp-windows/
 Θα πρέπει να ενεργοποιηθούν στο ```php.ini``` οι ακόλουθες extentions:
 
 ```
+extension=gd
 extension=fileinfo
 extension=imap
 extension=mbstring
@@ -178,12 +179,12 @@ https://myaccount.google.com/lesssecureapps
 
 
 
-### Ενδεικτικά σας παρουσιάζω αναλυτικά τις ενέργειες που πρέπει να γίνουν για εγκατάσταση σε Ubuntu 18.04
+### Ενδεικτικά σας παρουσιάζω αναλυτικά τις ενέργειες που πρέπει να γίνουν για εγκατάσταση σε Ubuntu 22.04
 
 
-## Εγκατάσταση σε Ubuntu 18.04
+## Εγκατάσταση σε Ubuntu 22.04
 
-Ενημερώθηκε 7 Απρ 2019. Μπορείτε να δείτε σχετικό βίντεο: https://www.youtube.com/watch?v=7x3zE0tEaLI
+Ενημερώθηκε 19 Νοε 2022
 
 #### Ενημέρωση του συστήματος
 ```
@@ -191,18 +192,17 @@ sudo apt update
 sudo apt upgrade
 ```
 
-#### Εγκατάσταση apache, php kai sqlite3
+#### Εγκατάσταση apache, php, sqlite3 ...
 ```
-sudo apt install apache2 sqlite3
+sudo apt install mc apache2 libapache2-mod-php sqlite3 curl git -y
 
-sudo apt install php libapache2-mod-php php-mbstring php-xmlrpc php-soap php-gd php-xml php-cli php-zip php-sqlite3
-sudo apt-get install php-imap php-mcrypt
+sudo apt install php php-sqlite3 php-imap  php-dev php-zip php-curl php-pear php-mbstring php-mysql php-gd php-xml  -y
 ```
 
 #### Ρύθμιση της php (php.ini) για το laravel
-αντικαταστείστε τις αγκύλες [έκδοση της php] με τον αντίστοιχο αριθμό (**7.2** σήμερα, 7 Απρ 2019)
+αντικαταστείστε τις αγκύλες [έκδοση της php] με τον αντίστοιχο αριθμό (**8.1** σήμερα, 19 Νοε 2022)
 ```
-sudo gedit /etc/php/[έκδοση της php]/apache2/php.ini
+sudo nano /etc/php/[έκδοση της php]/apache2/php.ini
 ```
 αλλάζουμε τις τιμές των παρακάτω παραμέτρων ως εξής:
 
@@ -210,12 +210,8 @@ memory_limit = 256M
 
 upload_max_filesize = 64M
 
-cgi.fix_pathinfo=0
-
-
 #### Εγκατάσταση composer
 ```
-sudo apt install curl git
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 ```
 
@@ -236,7 +232,7 @@ sudo chmod -R 755 /opt/protocol/
 #### Δημιουργία του αρχείου με τη ρύθμιση alias
 ```
 sudo mkdir /etc/apache2/alias
-sudo gedit /etc/apache2/alias/protocol.conf
+sudo nano /etc/apache2/alias/protocol.conf
 ```
 Γράφουμε στο αρχείο ```protocol.conf``` τα παρακάτω:
 ```
@@ -252,7 +248,7 @@ Alias /protocol "/opt/protocol/public"
 
 #### Ρύθμιση του apache να διαβάσει το αρχείο protocol.conf
 ```
-sudo gedit /etc/apache2/apache2.conf
+sudo nano /etc/apache2/apache2.conf
 ```
 Προσθήκη στο τέλος
 ```
@@ -262,13 +258,59 @@ Include "alias/*"
 #### Ρύθμιση και επανεκκίνηση apache
 ```
 sudo a2enmod rewrite
-sudo systemctl restart apache2.service
+sudo systemctl restart apache2
 ```
 
 #### Το Ηλ. Πρωτόκολλο είναι προσβάσιμο στον υπερσύνδεσμο
 http://localhost/protocol
 
 
+#### Χρήση και ρύθμιση της mariaDB (mysql)
+
+```
+sudo apt install mariadb-server
+sudo systemctl enable mariadb --now
+sudo mysql_secure_installation
+sudo systemctl restart mariadb
+
+
+mysql -u root -p
+
+create database protocol;
+grant all privileges on protocol.* to 'protocol_user'@'localhost' identified by '12345678';
+flush privileges;
+exit;
+
+```
+
+#### Ρυθμίσεις Πρωτοκόλλου για mariaDB (mysql)
+
+
+```
+cd /opt/protocol/
+
+sudo nano .env
+```
+
+Τροποποιούμε στο αρχείο ```.env``` τα παρακάτω:
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=protocol
+DB_USERNAME=protocol_user
+DB_PASSWORD=12345678
+```
+
+Γέμισμα της ΒΔ
+
+```
+sudo php artisan migrate --seed
+sudo systemctl restart apache2
+
+sudo rm /opt/protocol/storage/conf/.denyregister
+
+```
 
 
 ## Λειτουργικό σύστημα Windows με εγκατεστημένο Xampp, Wamp, ...
