@@ -92,6 +92,11 @@ class ProtocolController extends Controller
         $this->middleware('limitList', ['only' => ['printprotocols', 'printAttachments']]);
     }
 
+    private function diekperaiosiConcatRawStr(){
+        if(config('database.default') == 'sqlite') return "`diekperaiosi` || ','";
+        return "CONCAT(`diekperaiosi`, ',')";
+    }
+
 
     public function index(Protocol $protocol, $copyAsNew = null)
     {
@@ -515,14 +520,14 @@ class ProtocolController extends Controller
             // φιλτραρω τα πρωτόκολλα για το χρήστη
             if ($this->limitProtocolAccessList()) {
                 $protocols = $protocols->where(function ($query) {
-                    $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                    $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                 });
             }
             if ($filter == 'd') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->whereNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->whereNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο προς Διεκπεραίωση';
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->wherenotNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->wherenotNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο Διεκπεραιώθηκε';
             }
         } elseif (User::whereId($userId)->count() and $filter) {
@@ -532,10 +537,10 @@ class ProtocolController extends Controller
                 $user2show = User::whereId($userId)->first('name')->name;
             }
             if ($filter == 'd') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . $userId . ",%")->whereNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . $userId . ",%")->whereNull('diekp_date');
                 $protocoltitle = "$user2show, προς Διεκπεραίωση";
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . $userId . ",%")->wherenotNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . $userId . ",%")->wherenotNull('diekp_date');
                 $protocoltitle = "$user2show, Διεκπεραιώθηκε";
             } else {
                 $protocols = $protocols->where('user_id', $userId);
@@ -543,10 +548,10 @@ class ProtocolController extends Controller
             }
         } else {
             if ($filter == 'd') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . "%")->whereNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . "%")->whereNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, προς Διεκπεραίωση";
             } elseif ($filter == 'f') {
-                $protocols = $protocols->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . "%")->wherenotNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . "%")->wherenotNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
             }
         }
@@ -1271,11 +1276,11 @@ class ProtocolController extends Controller
             // φιλτραρω τα πρωτόκολλα για το χρήστη
             if ($limitProtocolAccessList) {
                 $count = Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->where(function ($query) {
-                    $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                    $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                 })->count();
                 if ($count) {
                     $protocol_id = Protocol::whereEtos($etos)->where('protocolnum', $protocolnum)->where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                        $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                     })->first()->id;
                     return redirect("home/$protocol_id");
                 }
@@ -1289,7 +1294,7 @@ class ProtocolController extends Controller
             if ($step == 'b') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                        $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                     })->where(function ($query) use ($protocolnum, $etos) {
                         $query->where([['protocolnum', '<', $protocolnum], ['etos', $etos]])->orwhere('etos', "<", $etos);
                     })->orderby('etos', 'DESC')->orderby('protocolnum', 'DESC')->take(1)->get('id');
@@ -1303,7 +1308,7 @@ class ProtocolController extends Controller
             } elseif ($step == 'f') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                        $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                     })->where(function ($query) use ($protocolnum, $etos) {
                         $query->where([['protocolnum', '>', $protocolnum], ['etos', $etos]])->orwhere('etos', ">", $etos);
                     })->orderby('etos', 'ASC')->orderby('protocolnum', 'ASC')->take(1)->get('id');
@@ -1317,7 +1322,7 @@ class ProtocolController extends Controller
             } elseif ($step == 'bb') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                        $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                     })->where(function ($query) use ($protocolnum, $etos) {
                         $query->where([['protocolnum', '<', $protocolnum], ['etos', $etos]])->orwhere('etos', "<", $etos);
                     })->orderby('etos', 'DESC')->orderby('protocolnum', 'DESC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
@@ -1331,7 +1336,7 @@ class ProtocolController extends Controller
             } elseif ($step == 'ff') {
                 if ($limitProtocolAccessList) {
                     $protocol_id = Protocol::where(function ($query) {
-                        $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                        $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                     })->where(function ($query) use ($protocolnum, $etos) {
                         $query->where([['protocolnum', '>', $protocolnum], ['etos', $etos]])->orwhere('etos', ">", $etos);
                     })->orderby('etos', 'ASC')->orderby('protocolnum', 'ASC')->skip(Config::getConfigValueOf('protocolArrowStep') - 1)->take(1)->get('id');
@@ -1503,7 +1508,7 @@ class ProtocolController extends Controller
             // φιλτράρω τα μηνύματα. Επιτρέπονται μόνο όσα είναι για διεκπεραίωση - ενημέρωση - δημιουργήθηκαν από αυτούς
             if ($this->limitProtocolAccessList()) {
                 $protocols = $protocols->where(function ($query) {
-                    $query->where(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw("CONCAT(`diekperaiosi`, ',')"), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+                    $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
                 });
             }
             $protocols = $protocols->where($wherevalues);
