@@ -880,7 +880,7 @@ class ProtocolController extends Controller
         // αν έχει συμπληρωθεί email για αποστολή απόδειξης παραλαβής
         if ($reply_to_email) {
             // φτιάχνω τα δεδομένα
-            $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+            $emaildate = Carbon::now()->format('d/m/Y H:i:s');
             $protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
             $sendReplyTo = $reply_to_email;
             $html = view('receiptProtocol', compact('protocol', 'protocoldate'))->render();
@@ -1182,7 +1182,7 @@ class ProtocolController extends Controller
         });
         if (!count(Mail::failures())) {
             // προσθέτω στις παρατηρήσεις ότι στάλθηκε email στον διεκπεραιωτή
-            $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+            $emaildate = Carbon::now()->format('d/m/Y H:i:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
             $parMessage .= "$emaildate email διεκπεραίωσης σε $diekperaiotis";
             //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
@@ -1211,7 +1211,7 @@ class ProtocolController extends Controller
         });
         if (!count(Mail::failures())) {
             // προσθέτω στις παρατηρήσεις ότι στάλθηκε email στον διεκπεραιωτή
-            $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+            $emaildate = Carbon::now()->format('d/m/Y H:i:s');
             $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
             $parMessage .= "$emaildate email ενημέρωσης σε $diekperaiotis";
             //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
@@ -1559,7 +1559,7 @@ class ProtocolController extends Controller
     {
 
         $etos = Config::getConfigValueOf('yearInUse');
-        $datetime = Carbon::now()->format('d/m/Y H:m:s');
+        $datetime = Carbon::now()->format('d/m/Y H:i:s');
         $target = request('target');
 
         $wherevalues = [];
@@ -1620,14 +1620,14 @@ class ProtocolController extends Controller
             $protocol->protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         }
 
-        $datetime = Carbon::now()->format('d/m/Y H:m:s');
+        $datetime = Carbon::now()->format('d/m/Y H:i:s');
         return view('receipt', compact('protocol', 'datetime'));
     }
 
     public function receiptToEmail(Request $request)
     {
         $protocol = Protocol::where('id', $request->id)->first();
-        $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+        $emaildate = Carbon::now()->format('d/m/Y H:i:s');
         $protocoldate = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         $sendReplyTo = $request->email;
         $html = view('receiptProtocol', compact('protocol', 'protocoldate'))->render();
@@ -1653,7 +1653,7 @@ class ProtocolController extends Controller
     public function setDiekpDate(Request $request)
     {
         $diekp_date = Carbon::createFromFormat('d/m/Y', $request->diekp_date)->format('Ymd');
-        $now = Carbon::now()->format('d/m/Y H:m:s');
+        $now = Carbon::now()->format('d/m/Y H:i:s');
         $paratiriseis = Protocol::whereId($request->id)->first()->paratiriseis;
         $parMessage = $paratiriseis ? $paratiriseis . ', ' : '';
         $parMessage .= "$now διεκπεραιώθηκε από " . Auth::user()->name;
@@ -1696,7 +1696,7 @@ class ProtocolController extends Controller
     {
 
         $etos = Config::getConfigValueOf('yearInUse');
-        $datetime = Carbon::now()->format('d/m/Y H:m:s');
+        $datetime = Carbon::now()->format('d/m/Y H:i:s');
 
         $wherevalues = [];
 
@@ -2239,7 +2239,7 @@ class ProtocolController extends Controller
             });
             if (!count(Mail::failures())) {
                 // προσθέτω στις παρατηρήσεις ότι στάλθηκε απόδειξη παραλαβής με email
-                $emaildate = Carbon::now()->format('d/m/Y H:m:s');
+                $emaildate = Carbon::now()->format('d/m/Y H:i:s');
                 $parMessage = $protocol->paratiriseis ? $protocol->paratiriseis . ', ' : '';
                 $parMessage .= "$emaildate απόδειξη παραλαβής σε $sendReplyTo";
                 //$parMessage = mb_strlen($parMessage) > 250 ? mb_substr($parMessage, 0, 250) . ' ...' : $parMessage;
