@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
 use App\User;
 use App\Config;
-use Illuminate\Mail\Mailer;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        //
     }
 
     /**
@@ -44,9 +44,6 @@ class AppServiceProvider extends ServiceProvider
             }
             View::share('titleColorStyle', $titleColorStyle);
             $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
-            if (! extension_loaded('imap')) {
-                $defaultImapEmail = null;
-            }
             View::share('defaultImapEmail', $defaultImapEmail);
 
             $allowedEmailUsers =  Config::getConfigValueOf('allowedEmailUsers');

@@ -17,10 +17,7 @@ class ProtocolEmail
      */
     public function handle($request, Closure $next)
     {
-        // αν η βιβλιοθήκη imap δεν είναι φορτωμένη δεν προχωράω
-        if (!extension_loaded('imap')) {
-            return redirect()->back();
-        }
+
         // αν ο λογαριασμός είναι κενός δεν προχωράω
         $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
         if (!$defaultImapEmail) {

@@ -59,20 +59,20 @@
                                 {{ csrf_field() }}
 
                                 <div class="row {{ $class }}">
-                                    <div class="col-md-1 col-sm-1 ">
-                                        <input id="find" type="text" class="form-control text-center asd" name="find"
-                                            title="Αναζήτηση" placeholder="" value="{{ old('find') ? old('find') : '' }}"
-                                            tabindex=-1>
-                                    </div>
                                     <div class="col-md-1 col-sm-1  form-control-static  text-center">
-                                        <a href="javascript:chkfind()" class="active" role="button"
-                                            title="Αναζήτηση"> <img src="{{ URL::to('/') }}/images/find.ico"
-                                                height=25 /></a></td>
                                         @if (!in_array(Auth::user()->role->role, ['Συγγραφέας', 'Αναγνώστης']) || (in_array(Auth::user()->role->role, ['Συγγραφέας', 'Αναγνώστης']) && !App\Http\Controllers\ProtocolController::limitProtocolAccessList()))
                                             <a href="{{ URL::to('/print') }}" class="" role="button"
                                                 title="Εκτύπωση"> <img src="{{ URL::to('/') }}/images/print.png"
                                                     height=25 /></a>
                                         @endif
+                                        <a href="javascript:chkfind()" class="active" role="button"
+                                            title="Αναζήτηση"> <img src="{{ URL::to('/') }}/images/find.ico"
+                                                height=25 /></a></td>
+                                    </div>
+                                    <div class="col-md-1 col-sm-1 ">
+                                        <input id="find" type="text" class="form-control text-center asd" name="find"
+                                            title="Αναζήτηση" placeholder="" value="{{ old('find') ? old('find') : '' }}"
+                                            tabindex=-1>
                                     </div>
 
                                     <div class="col-md-7 col-sm-7 ">

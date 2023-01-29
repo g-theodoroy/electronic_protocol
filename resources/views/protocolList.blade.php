@@ -27,6 +27,8 @@
                         <div class="panel panel-default col-md-12 col-sm-12 col-xs-12  ">
                             <div class='row'>
                                 <div class="col-md-3 col-sm-3 form-control-static">
+                                    <a href="{{ URL::to('/find') }}" class="active" role="button" title="Αναζήτηση"> 
+                                        <img src="{{ URL::to('/') }}/images/find.ico" height=30 /></a>
                                     <a href="{{ URL::to('/') }}/home/list" class="active" role="button"
                                         title="Ανανέωση τώρα"> <img src="{{ URL::to('/') }}/images/refresh.png"
                                             height=30 /></a>

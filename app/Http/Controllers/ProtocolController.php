@@ -1750,10 +1750,6 @@ class ProtocolController extends Controller
         if (!$defaultImapEmail) {
             return null;
         }
-        // αν η βιβλιοθήκη imap δεν είναι φορτωμένη δεν προχωράω
-        if (!extension_loaded('imap')) {
-            return null;
-        }
         // φορτώνω τον πελάτη (λογαριασμό)
         $oClient = Client::account($defaultImapEmail);
         try {
@@ -1763,8 +1759,11 @@ class ProtocolController extends Controller
             report($e);
             return 0;
         }
+        if (!$oClient->getFolder(config('imapFolders.inbox'))) {
+            $oClient->createFolder(config('imapFolders.inbox'));
+        }
         // επιλέγω τον φάκελο INBOX
-        $oFolder = $oClient->getFolder('INBOX');
+        $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
         // αριθμός μηνυμάτων από $sinceDate και μετά
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
         return $aMessageNum;
@@ -1825,7 +1824,11 @@ class ProtocolController extends Controller
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
         // σύνδεση στον φάκελο INBOX
-        $oFolder = $oClient->getFolder('INBOX');
+        if (!$oClient->getFolder(config('imapFolders.inbox'))) {
+            $oClient->createFolder(config('imapFolders.inbox'));
+        }
+        // επιλέγω τον φάκελο INBOX
+        $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
         // σειρά ταξινόμησης μηνυμάτων στον imap server πριν τα κατεβάσω
         // παίρνω τον αριθμό των μηνυμάτων από sinceDate και μετά
         $aMessageNum = $oFolder->query()->since($sinceDate)->count();
@@ -1857,7 +1860,7 @@ class ProtocolController extends Controller
             }
             if (!$contentRaw) continue;
             //info($contentRaw);
-            $mailMessage = Message::from($contentRaw);
+            $mailMessage = Message::from($contentRaw, false);
             $Uid = $oMessage->getUid();
             $dir = 'u' . Auth()->user()->id;
             // αν έχει σώμα html το αποθηκεύω
@@ -1908,9 +1911,6 @@ class ProtocolController extends Controller
         if (!$defaultImapEmail) {
             return back();
         }
-        if (!extension_loaded('imap')) {
-            return back();
-        }
 
         $oClient = Client::account($defaultImapEmail);
         try {
@@ -1925,15 +1925,19 @@ class ProtocolController extends Controller
             return back();
         }
         // αν δεν υπάρχει ο φάκελος INBOX.beenRead τον φτιάχνω
-        if (!$oClient->getFolder('INBOX.beenRead')) {
-            $oClient->createFolder('INBOX.beenRead');
+        if (!$oClient->getFolder(config('imapFolders.beenRead'))) {
+            $oClient->createFolder(config('imapFolders.beenRead'));
         }
 
-        $oFolder = $oClient->getFolder('INBOX');
+        if (!$oClient->getFolder(config('imapFolders.inbox'))) {
+            $oClient->createFolder(config('imapFolders.inbox'));
+        }
+        // επιλέγω τον φάκελο INBOX
+        $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
         $oMessage = $oFolder->query()->getMessageByUid($messageUid, null, null, false, false, false);
         if ($oMessage) {
             // μεταφέρω το μήνυμα στα διαβασμένα
-            $oMessage->move('INBOX.beenRead', true);
+            $oMessage->move(config('imapFolders.beenRead'), true);
             // ενημερώνω τον χρήστη
             $notification = array(
                 'message' => "Το μήνυμα μεταφέρθηκε στα Αναγνωσμένα",
@@ -2151,8 +2155,10 @@ class ProtocolController extends Controller
                     continue;
                 }
                 $content = $oAttachment->getContent();
-                $mimeType = $oAttachment->getHeaderValue(HeaderConsts::CONTENT_TYPE);
+                $mimeType = $oAttachment->getContentType();
                 $filename = $oAttachment->getFilename();
+ 
+
                 // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                 $filename = $this->filter_filename($filename, false);
                 $filenameToStore = $protocol->protocolnum . '-' . $protocol->protocoldate . '_' . $attachmentKey . '_' . $filename;
@@ -2265,14 +2271,17 @@ class ProtocolController extends Controller
             return back();
         }
         // αν δεν υπάρχει ο φακελος INBOX.inProtocol τον φτιάχνω
-        if (!$oClient->getFolder('INBOX.inProtocol')) {
-            $oClient->createFolder('INBOX.inProtocol');
+        if (!$oClient->getFolder(config('imapFolders.inProtocol'))) {
+            $oClient->createFolder(config('imapFolders.inProtocol'));
         }
-        // παίρνω τον φάκελο INBOX
-        $oFolder = $oClient->getFolder('INBOX');
+        if (!$oClient->getFolder(config('imapFolders.inbox'))) {
+            $oClient->createFolder(config('imapFolders.inbox'));
+        }
+        // επιλέγω τον φάκελο INBOX
+        $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
         // το μήνυμα με το uid για αποθήκευση
         $oMessage = $oFolder->query()->getMessageByUid($uid, null, null, true, true, false);
-        $oMessage->move('INBOX.inProtocol', true);
+        $oMessage->move(config('imapFolders.inProtocol'), true);
 
         $alertType = 'success';
         if ($numMissedAttachments) {
@@ -2567,8 +2576,13 @@ class ProtocolController extends Controller
             $savedPath = "$dir/$filenameToStore";
             Storage::put($savedPath, $content);
             // ορίζω το mimeType με βάση την κατάληξη του αρχείου pdf ή docx
-            if (substr($filenameToStore, -3) == 'pdf') $mimeType = 'application/pdf';
-            if (substr($filenameToStore, -4) == 'docx') $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            if (substr($filenameToStore, -3) == 'pdf'){
+                $mimeType = 'application/pdf';
+            } elseif (substr($filenameToStore, -4) == 'docx') {
+                $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            } else{
+                $mimeType = null;
+            }
         }
         // ορίζω τα mimeTypes σε μεταβλητές
         $docx = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
