@@ -1361,6 +1361,7 @@ class ProtocolController extends Controller
     {
         if (Storage::exists($attachment->savedPath)) {
             $content = Storage::get($attachment->savedPath);
+            ob_end_clean();
             return response($content)
                 ->header('Content-Type', $attachment->mimeType)
                 ->header('Content-Disposition', "filename=" . $attachment->name);
@@ -1900,6 +1901,7 @@ class ProtocolController extends Controller
         // παίρνω το όνομα του αρχείου
         $filename = $oAttachment->getFilename();
         // το στέλνω για εμφάνιση
+        ob_end_clean();
         return response($content)
             ->header('Content-Type', $oAttachment->getContentType())
             ->header('Content-Disposition', "filename=" . $filename);
