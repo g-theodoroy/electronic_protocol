@@ -54,66 +54,67 @@
                                 </div>
                             </div>
 
-                            <div class='row  bg-primary'>&nbsp;</div>
-                            <div class='row bg-primary'>
+                            <div data-spy="affix" data-offset-top="240" >
+                                <div class='row  bg-primary'>&nbsp;</div>
+                                <div class='row bg-primary'>
 
-                                <div class='col-md-1 col-sm-1'>
-                                    <br>
-                                    <strong>Αυξ.Αριθ</strong>
-                                    <hr>
-                                    <strong>Ημνία</strong>
-                                </div>
-                                <div class='col-md-5 col-sm-5'>
-                                    <div class='row'>
-                                        <div class='col-md-5 col-sm-5'>
-                                            <strong>Αρ./Ημ.Εισερχ.</strong>
-                                            <hr>
-                                            <strong>&#x2727;Τόπος Έκδοσης</strong>
-                                            <hr>
-                                            <strong>&#x2726;Αρχή Έκδοσης</strong>
-                                        </div>
-                                        <div class='col-md-7 col-sm-7'>
-                                            <strong>Θέμα</strong>
-                                            <hr>
-                                            <strong>&#x2727;Περίλ.Εισερχ.</strong>
-                                            <hr>
-                                            <strong>&#x2726;Παραλήπτης</strong>
+                                    <div class='col-md-1 col-sm-1'>
+                                        <br>
+                                        <strong>Αυξ.Αριθ</strong>
+                                        <hr>
+                                        <strong>Ημνία</strong>
+                                    </div>
+                                    <div class='col-md-5 col-sm-5'>
+                                        <div class='row'>
+                                            <div class='col-md-5 col-sm-5'>
+                                                <strong>Αρ./Ημ.Εισερχ.</strong>
+                                                <hr>
+                                                <strong>&#x2727;Τόπος Έκδοσης</strong>
+                                                <hr>
+                                                <strong>&#x2726;Αρχή Έκδοσης</strong>
+                                            </div>
+                                            <div class='col-md-7 col-sm-7'>
+                                                <strong>Θέμα</strong>
+                                                <hr>
+                                                <strong>&#x2727;Περίλ.Εισερχ.</strong>
+                                                <hr>
+                                                <strong>&#x2726;Παραλήπτης</strong>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class='col-md-5 col-sm-5'>
-                                    <div class='row'>
-                                        <div class='col-md-5 col-sm-5'>
-                                            <strong>Ημ.Εξερχ.</strong>
-                                            <hr>
-                                            <strong>&#x2727;Απευθύνεται</strong>
-                                            <hr>
-                                            <strong>&#x2726;Περίλ.Εξερχ.</strong>
-                                        </div>
-                                        <div class='col-md-3 col-sm-3'>
-                                            <br>
-                                            <strong>Διεκπεραίωση</strong>
-                                            <hr>
-                                            <strong>&#x2727;Ημ.Διεκπ.</strong>
-                                        </div>
-                                        <div class='col-md-4 col-sm-4'>
-                                            <strong>Φάκελος</strong>
-                                            <hr>
-                                            <strong>&#x2727;Σχετ.αριθμοί</strong>
-                                            <hr>
-                                            <strong>&#x2726;Παρατηρήσεις</strong>
+                                    <div class='col-md-5 col-sm-5'>
+                                        <div class='row'>
+                                            <div class='col-md-5 col-sm-5'>
+                                                <strong>Ημ.Εξερχ.</strong>
+                                                <hr>
+                                                <strong>&#x2727;Απευθύνεται</strong>
+                                                <hr>
+                                                <strong>&#x2726;Περίλ.Εξερχ.</strong>
+                                            </div>
+                                            <div class='col-md-3 col-sm-3'>
+                                                <br>
+                                                <strong>Διεκπεραίωση</strong>
+                                                <hr>
+                                                <strong>&#x2727;Ημ.Διεκπ.</strong>
+                                            </div>
+                                            <div class='col-md-4 col-sm-4'>
+                                                <strong>Φάκελος</strong>
+                                                <hr>
+                                                <strong>&#x2727;Σχετ.αριθμοί</strong>
+                                                <hr>
+                                                <strong>&#x2726;Παρατηρήσεις</strong>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class='col-md-1 col-sm-1'>
+                                        <strong>Συνημμένα</strong>
+                                        <hr>
+                                        <strong>Διατήρηση</strong><br>
+                                        <strong>Διατηρ.έως</strong>
+                                    </div>
                                 </div>
-                                <div class='col-md-1 col-sm-1'>
-                                    <strong>Συνημμένα</strong>
-                                    <hr>
-                                    <strong>Διατήρηση</strong><br>
-                                    <strong>Διατηρ.έως</strong>
-                                </div>
+                                <div class='row  bg-primary'>&nbsp;</div>
                             </div>
-                            <div class='row  bg-primary'>&nbsp;</div>
-
 
                             @php($i = 1)
                             @foreach ($protocols as $protocol)
@@ -380,4 +381,20 @@
         </script>
     @endif
 
+    <style>
+    @media (min-width: 768px) {
+        .affix {
+            top:0px;
+            position: fixed;
+            left:47px;
+            right:47px;
+            z-index:777;
+        }
+    }
+    @media (max-width: 767px) {
+        .affix {
+            position: static;
+        }
+    }
+    </style>
 @endsection
