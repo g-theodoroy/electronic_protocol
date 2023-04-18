@@ -26,6 +26,32 @@ https://www.youtube.com/watch?v=Xl6qhbJWTGs
 https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 
 #
+
+# Γρήγορη εγκατάσταση και εκτέλεση με Docker
+
+Ο πιο εύκολος και γρήγορος τρόπος εγκατάστασης και εκτέλεσης είναι με τη χρήση του docker, ακολουθώντας τα παρακάτω βήματα:
+
+- Εγκατάσταση του [Docker](https://docs.docker.com/get-docker/)
+- Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git```)
+- Δημιουργία αρχείου ```.env``` (από πρότυπο ```.env-docker```)
+- Τρέξιμο των παρακάτω εντολών:
+- ```docker run --rm -v $(pwd):/app composer install --no-dev --ignore-platform-req=ext-gd```
+(για εγκατάσταση των εξαρτήσεων του composer)
+- ```docker compose up -d``` (για να τρέξει το σύστημα στο background (daemon))
+- ```docker compose exec app php artisan key:generate``` (για δημιουργία νέου κλειδιού στο laravel)
+- ```docker compose exec app php artisan migrate:refresh --seed``` (για δημιουργία πινάκων στη βάση)
+
+Αυτό ήταν!
+Το σύστημα είναι πλέον έτοιμο να δουλέψει στη διεύθυνση: ```http://localhost```
+
+Για να "κατεβάσουμε" την εφαρμογή, γράφουμε: ```docker compose down```.
+
+**ΠΑΡΑΤΗΡΗΣΕΙΣ**: 
+- Με τον παραπάνω τρόπο η εφαρμογή είναι πλήρως λειτουργική και το μόνο που εγκαθιστούμε στο σύστημα είναι το Docker. Δε χρειάζεται εγκατάσταση Laravel, Web server, βάσης, ούτε παραμετροποίηση αυτών. Συνεπώς, η μέθοδος αυτή προτείνεται και για γρήγορη δοκιμή.
+- Αν θέλουμε να τρέξει η εφαρμογή σε άλλο port (όχι το 80), αλλάζουμε την παράμετρο APP_PORT στο .env
+- Λόγω της φύσης του docker, ενδείκνυται εγκατάσταση με τη μέθοδο αυτή *σε σύστημα με λειτουργικό Linux*.
+
+#
 # Εγκατάσταση
 
 Για την εγκατάσταση του framework laravel υπάρχουν διαθέσιμοι αρκετοί οδηγοί στο υπερκείμενο:
