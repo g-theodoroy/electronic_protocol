@@ -32,7 +32,7 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 Ο πιο εύκολος και γρήγορος τρόπος εγκατάστασης και εκτέλεσης είναι με τη χρήση του docker, ακολουθώντας τα παρακάτω βήματα:
 
 - Εγκατάσταση του [Docker](https://docs.docker.com/get-docker/)
-- Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git```)
+- Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git``` και είσοδος στο folder ```electronic_protocol```)
 - Δημιουργία αρχείου ```.env``` (από πρότυπο ```.env-docker```)
 - Τρέξιμο των παρακάτω εντολών:
 - ```docker run --rm -v $(pwd):/app composer install --no-dev --ignore-platform-req=ext-gd```
@@ -44,10 +44,11 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 Αυτό ήταν!
 Το σύστημα είναι πλέον έτοιμο να δουλέψει στη διεύθυνση: ```http://localhost```
 
-Για να "κατεβάσουμε" την εφαρμογή, γράφουμε: ```docker compose down```.
+
 
 **ΠΑΡΑΤΗΡΗΣΕΙΣ**: 
 - Με τον παραπάνω τρόπο η εφαρμογή είναι πλήρως λειτουργική και το μόνο που εγκαθιστούμε στο σύστημα είναι το Docker. Δε χρειάζεται εγκατάσταση Laravel, Web server, βάσης, ούτε παραμετροποίηση αυτών. Συνεπώς, η μέθοδος αυτή προτείνεται και για γρήγορη δοκιμή.
+- Τα παραπάνω εκτελούνται μόνο την πρώτη φορά. Η εφαρμογή στο εξής θα "σηκώνεται" με κάθε restart. Αν για κάποιο λόγο δεν "ανέβει", εκτελούμε ```docker compose up -d``` στο φάκελο που βρίσκεται το ```docker-compose.yml```. Για να "κατεβάσουμε" την εφαρμογή, γράφουμε: ```docker compose down```.
 - Αν θέλουμε να τρέξει η εφαρμογή σε άλλο port (όχι το 80), αλλάζουμε την παράμετρο APP_PORT στο .env
 - Λόγω της φύσης του docker, ενδείκνυται εγκατάσταση με τη μέθοδο αυτή *σε σύστημα με λειτουργικό Linux*.
 
