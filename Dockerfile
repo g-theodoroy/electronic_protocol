@@ -14,14 +14,9 @@ RUN docker-php-ext-install gd
 
 WORKDIR /var/www/html
 
-COPY . /var/www/html
-
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer 
-
 # Copy existing application directory permissions
 COPY --chown=www-data:www-data . /var/www
 
-
 EXPOSE 9000
 
-CMD ["php-fpm", "-R"]
+CMD ["php-fpm"]

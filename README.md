@@ -40,6 +40,7 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 - ```docker compose up -d``` (για να τρέξει το σύστημα στο background (daemon))
 - ```docker compose exec app php artisan key:generate``` (για δημιουργία νέου κλειδιού στο laravel)
 - ```docker compose exec app php artisan migrate:refresh --seed``` (για δημιουργία πινάκων στη βάση)
+- ```docker compose exec app php artisan config:cache``` (για ανανέωση cache)
 
 Αυτό ήταν!
 Το σύστημα είναι πλέον έτοιμο να δουλέψει στη διεύθυνση: ```http://localhost```
@@ -50,6 +51,7 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 - Με τον παραπάνω τρόπο η εφαρμογή είναι πλήρως λειτουργική και το μόνο που εγκαθιστούμε στο σύστημα είναι το Docker. Δε χρειάζεται εγκατάσταση Laravel, Web server, βάσης, ούτε παραμετροποίηση αυτών. Συνεπώς, η μέθοδος αυτή προτείνεται και για γρήγορη δοκιμή.
 - Τα παραπάνω εκτελούνται μόνο την πρώτη φορά. Η εφαρμογή στο εξής θα "σηκώνεται" με κάθε restart. Αν για κάποιο λόγο δεν "ανέβει", εκτελούμε ```docker compose up -d``` στο φάκελο που βρίσκεται το ```docker-compose.yml```. Για να "κατεβάσουμε" την εφαρμογή, γράφουμε: ```docker compose down```.
 - Αν θέλουμε να τρέξει η εφαρμογή σε άλλο port (όχι το 80), αλλάζουμε την παράμετρο APP_PORT στο .env
+- Αν χρησιμοποιούμε παλιότερη έκδοση του docker, αντικαθιστούμε το ```docker compose``` με ```docker-compose``` παντού.
 - Λόγω της φύσης του docker, ενδείκνυται εγκατάσταση με τη μέθοδο αυτή *σε σύστημα με λειτουργικό Linux*.
 
 #
