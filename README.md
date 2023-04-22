@@ -29,7 +29,20 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 
 # Γρήγορη εγκατάσταση και εκτέλεση με Docker
 
-Ο πιο εύκολος και γρήγορος τρόπος εγκατάστασης και εκτέλεσης είναι με τη χρήση του docker, ακολουθώντας τα παρακάτω βήματα:
+Ο πιο εύκολος και γρήγορος τρόπος εγκατάστασης και εκτέλεσης είναι με τη χρήση του docker:
+
+### Ο γρήγορος αυτοματοποιημένος τρόπος
+
+- Εγκατάσταση του [Docker](https://docs.docker.com/get-docker/)
+- Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git``` και είσοδος στο folder ```electronic_protocol```)
+- Μεταβολή αρχείου ```.env-docker```
+#### α) Σε Debian/Ubuntu και λοιπά linuxοειδή
+- ```chmod +x docker-install.sh```
+- ```./docker-install.sh```
+#### β) Σε Windows
+- ```docker-install.bat```
+
+### Ο manual τρόπος
 
 - Εγκατάσταση του [Docker](https://docs.docker.com/get-docker/)
 - Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git``` και είσοδος στο folder ```electronic_protocol```)
@@ -53,6 +66,7 @@ https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 - Αν θέλουμε να τρέξει η εφαρμογή σε άλλο port (όχι το 80), αλλάζουμε την παράμετρο APP_PORT στο .env
 - Αν χρησιμοποιούμε παλιότερη έκδοση του docker, αντικαθιστούμε το ```docker compose``` με ```docker-compose``` παντού.
 - Λόγω της φύσης του docker, ενδείκνυται εγκατάσταση με τη μέθοδο αυτή *σε σύστημα με λειτουργικό Linux*.
+Φυσικά παίζει και σε Windows με *Docker desktop* (βλ. παραπάνω), αλλά θέλει γερό μηχάνημα και πολύ γερά νεύρα γιατί το docker desktop είναι βαρύ και ασήκωτο!
 
 #
 # Εγκατάσταση
