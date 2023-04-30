@@ -26,6 +26,49 @@ https://www.youtube.com/watch?v=Xl6qhbJWTGs
 https://drive.google.com/file/d/0B2ACFOVDi2ORWmZjUGNmQTNpVlk/view?usp=sharing
 
 #
+
+# Γρήγορη εγκατάσταση και εκτέλεση με Docker
+
+Ο πιο εύκολος και γρήγορος τρόπος εγκατάστασης και εκτέλεσης είναι με τη χρήση του docker:
+
+### Ο γρήγορος αυτοματοποιημένος τρόπος
+
+- Εγκατάσταση του [Docker](https://docs.docker.com/get-docker/)
+- Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git``` και είσοδος στο folder ```electronic_protocol```)
+- Μεταβολή αρχείου ```.env-docker```
+#### α) Σε Debian/Ubuntu και λοιπά linuxοειδή
+- ```chmod +x docker-install.sh```
+- ```./docker-install.sh```
+#### β) Σε Windows
+- ```docker-install.bat```
+
+### Ο manual τρόπος
+
+- Εγκατάσταση του [Docker](https://docs.docker.com/get-docker/)
+- Κλωνοποίηση του repo (```git clone https://github.com/g-theodoroy/electronic_protocol.git``` και είσοδος στο folder ```electronic_protocol```)
+- Δημιουργία αρχείου ```.env``` (από πρότυπο ```.env-docker```)
+- Τρέξιμο των παρακάτω εντολών:
+- ```docker run --rm -v $(pwd):/app composer install --no-dev --ignore-platform-req=ext-gd```
+(για εγκατάσταση των εξαρτήσεων του composer)
+- ```docker compose up -d``` (για να τρέξει το σύστημα στο background (daemon))
+- ```docker compose exec app php artisan key:generate``` (για δημιουργία νέου κλειδιού στο laravel)
+- ```docker compose exec app php artisan migrate:refresh --seed``` (για δημιουργία πινάκων στη βάση)
+- ```docker compose exec app php artisan config:cache``` (για ανανέωση cache)
+
+Αυτό ήταν!
+Το σύστημα είναι πλέον έτοιμο να δουλέψει στη διεύθυνση: ```http://localhost```
+
+
+
+**ΠΑΡΑΤΗΡΗΣΕΙΣ**: 
+- Με τον παραπάνω τρόπο η εφαρμογή είναι πλήρως λειτουργική και το μόνο που εγκαθιστούμε στο σύστημα είναι το Docker. Δε χρειάζεται εγκατάσταση Laravel, Web server, βάσης, ούτε παραμετροποίηση αυτών. Συνεπώς, η μέθοδος αυτή προτείνεται και για γρήγορη δοκιμή.
+- Τα παραπάνω εκτελούνται μόνο την πρώτη φορά. Η εφαρμογή στο εξής θα "σηκώνεται" με κάθε restart. Αν για κάποιο λόγο δεν "ανέβει", εκτελούμε ```docker compose up -d``` στο φάκελο που βρίσκεται το ```docker-compose.yml```. Για να "κατεβάσουμε" την εφαρμογή, γράφουμε: ```docker compose down```.
+- Αν θέλουμε να τρέξει η εφαρμογή σε άλλο port (όχι το 80), αλλάζουμε την παράμετρο APP_PORT στο .env
+- Αν χρησιμοποιούμε παλιότερη έκδοση του docker, αντικαθιστούμε το ```docker compose``` με ```docker-compose``` παντού.
+- Λόγω της φύσης του docker, ενδείκνυται εγκατάσταση με τη μέθοδο αυτή *σε σύστημα με λειτουργικό Linux*.
+Φυσικά παίζει και σε Windows με *Docker desktop* (βλ. παραπάνω), αλλά θέλει γερό μηχάνημα και πολύ γερά νεύρα γιατί το docker desktop είναι βαρύ και ασήκωτο!
+
+#
 # Εγκατάσταση
 
 Για την εγκατάσταση του framework laravel υπάρχουν διαθέσιμοι αρκετοί οδηγοί στο υπερκείμενο:
