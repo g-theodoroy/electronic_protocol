@@ -78,6 +78,7 @@ class Protocol extends Model
         'in_arxi_ekdosis',
         'in_paraliptis',
         'diekperaiosi',
+        'diekp_eos',
         'in_perilipsi',
         'out_date',
         'diekp_date',

@@ -46,7 +46,7 @@
                                     </div>
                                     <div
                                         class="form-control-static text-right col-md-2 col-sm-2  col-md-offset-3 col-sm-offset-3">
-                                        <a href="{{ URL::to('/home/list') }}" class="" role="button"
+                                        <a href="{{ URL::to(config('landing-page.page.' . auth()->user()->role_id)) }}" class="" role="button"
                                             title="Πρωτόκολλο"> <img src="{{ URL::to('/') }}/images/protocol.png"
                                                 height="30" /></a>
                                     </div>

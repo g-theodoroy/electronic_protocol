@@ -57,7 +57,7 @@ Route::get('keep/del/{keepvalue}', 'KeepvalueController@delete');
 
 Route::get('/home', 'ProtocolController@index');
 Route::get('/chkForUpdates', 'ProtocolController@chkForUpdates');
-Route::get('/home/list', 'ProtocolController@indexList');
+Route::get('/home/list', 'ProtocolController@indexList')->middleware(['redirectAfterLogin']);
 Route::get('/home/list/{filter?}/{userId?}', 'ProtocolController@indexList');
 Route::get('/home/{protocol}/{copyAsNew?}', 'ProtocolController@index');
 Route::get('getFileInputs/{num}', 'ProtocolController@getFileInputs');

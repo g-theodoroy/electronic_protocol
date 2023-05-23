@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'writer' => \App\Http\Middleware\MustBeWriterOrAdmin::class,
         'email' => \App\Http\Middleware\ProtocolEmail::class,
         'limitList' => \App\Http\Middleware\LimitProtocolAccessList::class,
+        'redirectAfterLogin' => \App\Http\Middleware\RedirectAfterLogin::class,
     ];
 }

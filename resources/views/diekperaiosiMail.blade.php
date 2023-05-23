@@ -38,6 +38,12 @@
             <td>Διεκπεραίωση:</td>
             <td>{{ $diekperaiotis }}</td>
         </tr>
+        @if($diekp_eos)
+        <tr>
+            <td>Διεκπεραίωση έως:</td>
+            <td>{{ $diekp_eos }}</td>
+        </tr>
+        @endif
         <tr>
             <td>Αναθέτων:</td>
             <td>{{ Auth::user()->name }}</td>

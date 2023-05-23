@@ -99,7 +99,7 @@
                         </button>
 
                         <!-- Branding Image -->
-                        <a class="navbar-brand" href="{{ url('/home/list') }}">
+                        <a class="navbar-brand" href="{{ Auth::user() ? url(config('landing-page.page.' . Auth::user()->role_id)) : ''  }}">
                             {{ config('app.name', 'Ηλ. Πρωτόκολλο') }}&nbsp;&nbsp;&nbsp;{{isset($ipiresiasName)?$ipiresiasName:''}}
                         </a>
                     </div>
@@ -129,7 +129,7 @@
                                 <ul class="dropdown-menu" role="menu">
 
                                     <li class="dropdown-submenu">
-                                        <a class="test" tabindex="-1" href="{{ url('/home/list') }}">Πρωτόκολλο</a>
+                                        <a class="test" tabindex="-1" href="{{ Auth::user() ? url(config('landing-page.page.' . Auth::user()->role_id)) : '' }}">Πρωτόκολλο</a>
                                         <ul class="dropdown-menu">
                                           <li><a  tabindex="-1" href="{{ url('/home') }}">Νέο</a></li>
                                           @if( Auth::user()->role->role != "Αναγνώστης")
@@ -161,12 +161,21 @@
                                                     @endforeach
                                                 </ul>
                                               </li>
-                                              <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list/d') }}">προς Διεκπ/ση</a>
+                                              <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list/d') }}">προς Διεκπερ/ση</a>
                                                 <ul class="dropdown-menu">
                                                   <li><a  tabindex="-1" href="{{ url('/home/list/d/a') }}">Όλοι οι χρήστες</a></li>
                                                   <li class="divider"></li>
                                                   @foreach($myActiveUsers as $myAU)
                                                     <li><a  tabindex="-1" href="{{ url('/home/list/d/') }}/{{$myAU->id}}">{{$myAU->name}}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                              </li>
+                                              <li class="dropdown-submenu"><a  tabindex="-1" href="{{ url('/home/list/d') }}">προς Ενημέρωση</a>
+                                                <ul class="dropdown-menu">
+                                                  <li><a  tabindex="-1" href="{{ url('/home/list/e/a') }}">Όλοι οι χρήστες</a></li>
+                                                  <li class="divider"></li>
+                                                  @foreach($myActiveUsers as $myAU)
+                                                    <li><a  tabindex="-1" href="{{ url('/home/list/e/') }}/{{$myAU->id}}">{{$myAU->name}}</a></li>
                                                     @endforeach
                                                 </ul>
                                               </li>
@@ -181,7 +190,8 @@
                                               </li>
                                             @endif
                                               <li class="divider"></li>
-                                              <li><a  tabindex="-1" href="{{ url('/home/list/d') }}"> προς Διεκπ/ση</a></li>
+                                              <li><a  tabindex="-1" href="{{ url('/home/list/d') }}"> προς Διεκπερ/ση</a></li>
+                                              <li><a  tabindex="-1" href="{{ url('/home/list/e') }}"> προς Ενημέρωση</a></li>
                                               <li><a  tabindex="-1" href="{{ url('/home/list/f') }}">Διεκπεραιώθηκε</a></li>
 
                                         </ul>

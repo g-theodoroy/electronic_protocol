@@ -36,22 +36,24 @@ use Yasapurnama\DocumentWatermark\WatermarkFactory;
             $table->integer('protocoldate')->required()->unsigned();
             $table->integer('etos')->unsigned()->required();
             $table->string('fakelos')->nullable();
-            $table->string('thema')->required();
+            $table->string('thema')->nullable();
             $table->string('in_num')->nullable();
             $table->integer('in_date')->unsigned()->nullable();
             $table->string('in_topos_ekdosis')->nullable();
             $table->string('in_arxi_ekdosis')->nullable();
             $table->string('in_paraliptis')->nullable();
             $table->string('diekperaiosi')->nullable();
+            $table->integer('diekp_eos')->unsigned()->nullable();
             $table->string('in_perilipsi')->nullable();
             $table->integer('out_date')->unsigned()->nullable();
+            $table->integer('diekp_date')->unsigned()->nullable();
+            $table->string('sxetiko')->nullable();
             $table->string('out_to')->nullable();
             $table->string('out_perilipsi')->nullable();
             $table->string('keywords')->nullable();
-            $table->string('paratiriseis')->nullable();
-            $table->string('flags')->nullable();
+            $table->text('paratiriseis')->nullable();
             $table->timestamps();
-
+            $table->unique(array('protocolnum', 'etos'));
 
 */
 
@@ -76,7 +78,14 @@ class ProtocolController extends Controller
         'name' => 'Όνομα συνημμένου',
         'ada' => 'ΑΔΑ'
     ];
-
+    protected $protocolExtraSortFields = [
+        'protocolnum' => 'Αθξ.Αριθ.',
+        'protocoldate' => 'Ημνία',
+        'in_date' => 'Ημνία Εισερχ.',
+        'out_date' => 'Ημνία Εξερχ.',
+        'diekp_eos' => 'Διεκπ. έως',
+        'diekp_date' => 'Ημνία Διεκπ.'
+    ];
 
     /**
      * Create a new controller instance.
@@ -194,6 +203,10 @@ class ProtocolController extends Controller
         $out_date = null;
         if ($protocol->out_date) {
             $out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
+        }
+        $diekp_eos = null;
+        if ($protocol->diekp_eos) {
+            $diekp_eos = Carbon::createFromFormat('Ymd', $protocol->diekp_eos)->format('d/m/Y');
         }
         $diekp_date = null;
         if ($protocol->diekp_date) {
@@ -430,7 +443,7 @@ class ProtocolController extends Controller
         $years = Keepvalue::whereNotNull('keep')->select('keep')->distinct()->orderby('keep', 'asc')->get();
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
 
-        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible', 'delVisible', 'readonly', 'readerVisible', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo', 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput', 'headReadonly', 'inReadonly', 'outReadonly', 'diekpDateReadonly'));
+        return view('protocol', compact('fakeloi', 'protocol', 'newetos', 'newprotocolnum', 'newprotocoldate', 'in_date', 'out_date', 'diekp_eos', 'diekp_date', 'class', 'protocoltitle', 'protocolArrowStep', 'submitVisible', 'delVisible', 'readonly', 'readerVisible', 'years', 'words', 'keepval', 'allowUserChangeKeepSelect', 'diavgeiaUrl', 'activeusers2show', 'showUserInfo', 'newprotocolnumvisible', 'protocolUser', 'time2update', 'writers_admins', 'forbidenChangeDiekperaiosiSelect', 'allowListValuesMatchingInput', 'headReadonly', 'inReadonly', 'outReadonly', 'diekpDateReadonly'));
     }
 
     public function chkForUpdates()
@@ -480,7 +493,7 @@ class ProtocolController extends Controller
                 }
             }
         }
-        return redirect('/home/list');
+        return redirect(config('landing-page.page.' . auth()->user()->role_id));
     }
 
     public function indexList($filter = null, $userId = null)
@@ -508,6 +521,30 @@ class ProtocolController extends Controller
                 $activeusers2show[] = $actuser['user']['name'];
             }
         }
+
+        // αρχικοποιώ το field και sort με default τιμές
+        $field = 'protocolnum';
+        $sort = 'desc';
+
+        // Παίρνω το query
+        // Αν έχει έρθει το field
+        if($_GET['field'] ?? false){
+            $field = $_GET['field'];
+            $sort = $_GET['sort'] ?? 'asc';
+            // ελέγχω ότι υπάρχει στα fields του πίνακα protocols
+            // αλλιώς επαναφέρω τα default
+            if(!array_key_exists( $field, array_merge($this->protocolfields, $this->protocolExtraSortFields ))){
+                $field = 'protocolnum';
+                $sort = 'desc';
+            }else{
+                // εντάξει το field - έλεγχος του σορταρίσματος
+                if (!in_array($sort, ['asc', 'desc'])) {
+                    $sort = 'asc';
+                } 
+            }
+        }
+
+
         // Παίρνω τα Πρωτόκολλα που θα εμφανίσω
         // όλα ή του χρήστη
         // ή με βάση το φίλτρο
@@ -515,7 +552,7 @@ class ProtocolController extends Controller
         //      f => Διεκπεραιώθηκαν
         $protocoltitle = 'Πρωτόκολλο';
         $user2show = '';
-        $protocols = Protocol::with('attachments')->orderby('etos', 'desc')->orderby('protocolnum', 'desc');
+        $protocols = Protocol::with('attachments')->orderby('etos', 'desc')->orderby($field, $sort);
         if (!$userId) {
             // φιλτραρω τα πρωτόκολλα για το χρήστη
             if ($this->limitProtocolAccessList()) {
@@ -526,6 +563,9 @@ class ProtocolController extends Controller
             if ($filter == 'd') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->whereNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο προς Διεκπεραίωση';
+            } elseif ($filter == 'e') {
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%");
+                $protocoltitle = 'Πρωτόκολλο προς Ενημέρωση';
             } elseif ($filter == 'f') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->wherenotNull('diekp_date');
                 $protocoltitle = 'Πρωτόκολλο Διεκπεραιώθηκε';
@@ -539,6 +579,9 @@ class ProtocolController extends Controller
             if ($filter == 'd') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . $userId . ",%")->whereNull('diekp_date');
                 $protocoltitle = "$user2show, προς Διεκπεραίωση";
+            } elseif ($filter == 'e') {
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . $userId . ",%");
+                $protocoltitle = "$user2show, προς Ενημέρωση";
             } elseif ($filter == 'f') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . $userId . ",%")->wherenotNull('diekp_date');
                 $protocoltitle = "$user2show, Διεκπεραιώθηκε";
@@ -550,16 +593,24 @@ class ProtocolController extends Controller
             if ($filter == 'd') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . "%")->whereNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, προς Διεκπεραίωση";
+            } elseif ($filter == 'e') {
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . "%")->wherenotNull('diekp_date');
+                $protocoltitle = "Όλοι οι χρήστες, προς Ενημέρωση";
             } elseif ($filter == 'f') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . "%")->wherenotNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, Διεκπεραιώθηκε";
             }
         }
+
+
+
+
         // παίρνω τα πρωτόκολλα σε σελίδες με αριθμό πρωτοκόλλων σύμφωνα με τις ρυθμίσεις
         $protocols = $protocols->paginate($settings['showRowsInPage'] ?? Config::getConfigValueOf('showRowsInPage'));
 
         $fakelosDescription = Keepvalue::all()->pluck('describe', 'fakelos');
 
+        $now = Carbon::now()->format('Ymd');
 
         // αλλάζω τη μορφή στις ημερομηνίες και παίρνω την περιγραφή του φακέλου Φ.
         foreach ($protocols as $protocol) {
@@ -571,6 +622,20 @@ class ProtocolController extends Controller
             }
             if ($protocol->out_date) {
                 $protocol->out_date = Carbon::createFromFormat('Ymd', $protocol->out_date)->format('d/m/Y');
+            }
+
+            $deadLineClass = '';
+            if($protocol->diekp_eos){
+                $deadLineDif = $protocol->diekp_eos - $now;
+                if ($deadLineDif < 1) $deadLineClass = 'bg-danger';
+                if ($deadLineDif < 3 && $deadLineDif > 0) $deadLineClass = 'bg-warning';
+                if ($deadLineDif < 6 && $deadLineDif > 2) $deadLineClass = 'bg-info';
+                if($protocol->diekp_date) $deadLineClass = '';
+            }
+            $protocol->deadLineClass = $deadLineClass;
+
+            if ($protocol->diekp_eos) {
+                $protocol->diekp_eos = Carbon::createFromFormat('Ymd', $protocol->diekp_eos)->format('d/m/Y');
             }
             if ($protocol->diekp_date) {
                 $protocol->diekp_date = Carbon::createFromFormat('Ymd', $protocol->diekp_date)->format('d/m/Y');
@@ -701,12 +766,16 @@ class ProtocolController extends Controller
         // αλλάζω τη μορφή ημερομηνίας για καταχώριση στη βάση
         $in_date = null;
         $out_date = null;
+        $diekp_eos = null;
         $diekp_date = null;
         if ($data['in_date']) {
             $in_date = Carbon::createFromFormat('d/m/Y', $data['in_date'])->format('Ymd');
         }
         if ($data['out_date']) {
             $out_date = Carbon::createFromFormat('d/m/Y', $data['out_date'])->format('Ymd');
+        }
+        if ($data['diekp_eos']) {
+            $diekp_eos = Carbon::createFromFormat('d/m/Y', $data['diekp_eos'])->format('Ymd');
         }
         if ($data['diekp_date']) {
             $diekp_date = Carbon::createFromFormat('d/m/Y', $data['diekp_date'])->format('Ymd');
@@ -760,6 +829,7 @@ class ProtocolController extends Controller
                 'in_arxi_ekdosis' => $data['in_arxi_ekdosis'],
                 'in_paraliptis' => $data['in_paraliptis'],
                 'diekperaiosi' => isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : '',
+                'diekp_eos' => $diekp_eos,
                 'in_perilipsi' => $data['in_perilipsi'],
                 'out_date' => $out_date,
                 'diekp_date' => $diekp_date,
@@ -945,11 +1015,13 @@ class ProtocolController extends Controller
             'protocoldate' => 'regex:/^\d{2}\/\d{2}\/\d{4}$/',
             'in_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
             'out_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
+            'diekp_eos' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
             'diekp_date' => 'nullable|regex:/^\d{2}\/\d{2}\/\d{4}$/',
         ], [
             'protocoldate.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
             'in_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
             'out_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
+            'diekp_eos.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
             'diekp_date.regex' => "Η ημερομηνία πρέπει να έχει τη μορφή 'ηη/μμ/εεεε'.<br>&nbsp;",
         ])->validate();
 
@@ -978,12 +1050,16 @@ class ProtocolController extends Controller
         // αλλαγή μορφής ημνιων για αποθήκευση στη ΒΔ
         $in_date = null;
         $out_date = null;
+        $diekp_eos = null;
         $diekp_date = null;
         if ($data['in_date']) {
             $in_date = Carbon::createFromFormat('d/m/Y', $data['in_date'])->format('Ymd');
         }
         if ($data['out_date']) {
             $out_date = Carbon::createFromFormat('d/m/Y', $data['out_date'])->format('Ymd');
+        }
+        if ($data['diekp_eos']) {
+            $diekp_eos = Carbon::createFromFormat('d/m/Y', $data['diekp_eos'])->format('Ymd');
         }
         if ($data['diekp_date']) {
             $diekp_date = Carbon::createFromFormat('d/m/Y', $data['diekp_date'])->format('Ymd');
@@ -1023,6 +1099,7 @@ class ProtocolController extends Controller
                 'in_arxi_ekdosis' => $data['in_arxi_ekdosis'],
                 'in_paraliptis' => $data['in_paraliptis'],
                 'diekperaiosi' => isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : '',
+                'diekp_eos' => $diekp_eos,
                 'in_perilipsi' => $data['in_perilipsi'],
                 'out_date' => $out_date,
                 'diekp_date' => $diekp_date,
@@ -1172,8 +1249,9 @@ class ProtocolController extends Controller
         $diekperaiotis = User::find($sendEmailTo)->name;
         $emailTo = User::find($sendEmailTo)->email;
         $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
+        $diekp_eos = $protocol->diekp_eos ? Carbon::createFromFormat('Ymd', $protocol->diekp_eos)->format('d/m/Y') : '';
         // παίρνω το περιεχόμενο του μηνύματος
-        $html = view('diekperaiosiMail', compact('protocol', 'diekperaiotis', 'date'))->render();
+        $html = view('diekperaiosiMail', compact('protocol','diekperaiotis','date', 'diekp_eos'))->render();
         // χρήση του 2ο (εναλλακτικό) mailer
          Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html) {
             $message->subject("Ανάθεση Πρωτοκόλλου για Διεκπεραίωση");
@@ -2040,6 +2118,7 @@ class ProtocolController extends Controller
         $in_perilipsi = isset($data["in_perilipsi"]) ? mb_substr($data["in_perilipsi"], 0, 250) : mb_substr(preg_replace('~^\s+|\s+$~us', "", trim($mailMessage->getTextContent())), 0, 250);
         $paratiriseis = 'παρελήφθη με email';
         $diekperaiosi = isset($data['diekperaiosi']) ? implode(',', $data['diekperaiosi']) : "";
+        $diekp_eos = isset($data["diekp_eos"]) ? Carbon::createFromFormat('d/m/Y', $data["diekp_eos"])->format('Ymd') : null;
         $etos = Carbon::now()->format('Y');
 
         // βρίσκω το νέο Αρ.Πρωτ στην εισαγωγή δεδομένων
@@ -2073,6 +2152,7 @@ class ProtocolController extends Controller
                 'in_arxi_ekdosis' => $in_arxi_ekdosis,
                 'in_paraliptis' => $in_paraliptis,
                 'diekperaiosi' => $diekperaiosi,
+                'diekp_eos' => $diekp_eos,
                 'in_perilipsi' => $in_perilipsi,
                 'out_date' => null,
                 'diekp_date' => null,
@@ -2431,6 +2511,7 @@ class ProtocolController extends Controller
         $sendEmailTo = $request->diekperaiosi;
         $protocol = Protocol::whereId($request->id)->first();
         $protocol->diekperaiosi = $sendEmailTo;
+        $protocol->diekp_eos = $request->diekp_eos ? Carbon::createFromFormat('d/m/Y', $request->diekp_eos)->format('Ymd'): null;
         $protocol->diekp_date = null;
         $protocol->update();
 

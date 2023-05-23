@@ -2,7 +2,7 @@
 
 @section('content')
     @php
-    use ZBateson\MailMimeParser\Header\HeaderConsts;
+        use ZBateson\MailMimeParser\Header\HeaderConsts;
     @endphp
 
     <div class="{{ $wideListProtocol ? 'container-fluid' : 'container' }}">
@@ -32,7 +32,7 @@
                                             τα
                                             <strong>{{ ($aMessage->currentPage() - 1) * $aMessage->perPage() + 1 }}</strong>
                                             έως
-                                            <strong>{{ $aMessage->currentPage() * $aMessage->perPage() > $aMessageNum? $aMessageNum: $aMessage->currentPage() * $aMessage->perPage() }}</strong>
+                                            <strong>{{ $aMessage->currentPage() * $aMessage->perPage() > $aMessageNum ? $aMessageNum : $aMessage->currentPage() * $aMessage->perPage() }}</strong>
                                             από <strong>{{ $aMessageNum }}</strong> εισερχόμενα emails -
                                             ταξινόμηση
                                             <strong>{{ $emailFetchOrderDesc ? 'φθίνουσα' : 'αύξουσα' }}</strong>
@@ -55,7 +55,7 @@
                                     </div>
                             @endif
                             <div class="form-control-static col-md-1 col-sm-1 text-right">
-                                <a href="{{ URL::to('/') }}/home/list" class="active" role="button"
+                                <a href="{{ URL::to(config('landing-page.page.' . auth()->user()->role_id)) }}" class="active" role="button"
                                     title="Λίστα Πρωτοκόλλου"> <img src="{{ URL::to('/') }}/images/protocol.png"
                                         height=25 /></a>
                             </div>
@@ -83,8 +83,11 @@
                                         $subject = $mailMessage->getHeaderValue(HeaderConsts::SUBJECT);
                                     @endphp
 
+                                    {{-- ΠΕΔΙΑ ΦΟΡΜΑΣ --}}
                                     @if ($mailMessage->getAttachmentCount() || $alwaysShowFakelosInViewEmails)
+                                        {{-- ΠΡΩΤΗ ΓΡΑΜΜΗ --}}
                                         <div class="row ">
+                                            {{-- ΦΑΚΕΛΟΣ --}}
                                             <div class="col-md-1 col-sm-1 form-control-static small text-center">
                                                 <strong>Φάκελος</strong>
                                             </div>
@@ -99,10 +102,13 @@
                                                     @foreach ($fakeloi as $fakelos)
                                                         <option value='{{ $fakelos['fakelos'] }}'
                                                             title='{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}'
-                                                            style="white-space: pre-wrap; width: 500px;">{{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}</option>
+                                                            style="white-space: pre-wrap; width: 500px;">
+                                                            {{ $fakelos['fakelos'] }} - {{ $fakelos['describe'] }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            {{-- ΘΕΜΑ --}}
                                             <div class="col-md-1 col-sm-1 form-control-static small text-center">
                                                 <strong>Θέμα</strong>
                                             </div>
@@ -113,11 +119,13 @@
                                                     value="{{ $subject }}" title='Θέμα'>
                                                 <div id="themaList" class="col-md-12 col-sm-12"></div>
                                             </div>
+                                            {{-- ΚΟΥΜΠΙΑ --}}
                                             <div class="col-md-2 col-sm-2 text-right">
                                                 <input id="uid" type="hidden" class="form-control" name="uid"
                                                     value="{{ $Uid }}">
                                                 <input id="sendReceipt{{ $Uid }}" type="hidden"
-                                                    class="form-control" name="sendReceipt{{ $Uid }}" value="0">
+                                                    class="form-control" name="sendReceipt{{ $Uid }}"
+                                                    value="0">
                                                 <a href="{{ URL::to('/') }}/setEmailRead/{{ $Uid }}"
                                                     class="" role="button" title="Σήμανση ως Αναγνωσμένο"
                                                     tabindex=-1> <img src="{{ URL::to('/') }}/images/mark-read.png"
@@ -135,9 +143,11 @@
                                                         height="25" /></a>
                                             </div>
                                         </div>
+                                        {{-- ΤΕΛΟΣ ΠΡΩΤΗ ΓΡΑΜΜΗ --}}
 
-
+                                        {{-- ΔΕΥΤΕΡΗ ΓΡΑΜΜΗ --}}
                                         <div class="row bg-success">
+                                            {{-- ΑΡΙΘΜΟΣ ΕΙΣΕΡΧΟΜΕΝΟΥ --}}
                                             <div class="col-md-1 col-sm-1 small text-center">
                                                 <strong>Αριθ.<br>Εισερχ.</strong>
                                             </div>
@@ -148,16 +158,19 @@
                                                     value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('H:i:s') }}"
                                                     title='3. Αριθμός εισερχομένου εγγράφου'>
                                             </div>
+                                            {{-- ΗΜΝΙΑ ΕΙΣΕΡΧΟΜΕΝΟΥ --}}
                                             <div class="col-md-1 col-sm-1 small text-center">
                                                 <strong>Ημνία<br>Εισερχ.</strong>
                                             </div>
                                             <div id="in_dateDiv"
                                                 class="col-md-2 col-sm-2 {{ $errors->has('in_date') ? ' has-error' : '' }}">
-                                                <input id="in_date" type="text" class="form-control datepicker text-center"
-                                                    name="in_date" placeholder="in_date"
+                                                <input id="in_date" type="text"
+                                                    class="form-control datepicker text-center" name="in_date"
+                                                    placeholder="in_date"
                                                     value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('d/m/Y') }}"
                                                     title='5. Χρονολογία εισερχομένου εγγράφου'>
                                             </div>
+                                            {{-- ΤΟΠΟΣ ΕΚΔΟΣΗΣ --}}
                                             <div class="col-md-1 col-sm-1 small text-center">
                                                 <strong>Τόπος<br>Έκδοσης</strong>
                                             </div>
@@ -172,8 +185,11 @@
                                                 <div id="in_topos_ekdosisList" class="col-md-12 col-sm-12"></div>
                                             </div>
                                         </div>
+                                        {{-- ΤΕΛΟΣ ΔΕΥΤΕΡΗ ΓΡΑΜΜΗ --}}
 
+                                        {{-- ΤΡΙΤΗ ΓΡΑΜΜΗ --}}
                                         <div class="row bg-success">
+                                            {{-- ΑΡΧΗ ΕΚΔΟΣΗΣ --}}
                                             <div class="col-md-6 col-sm-6 ">
                                                 <div class="row">
                                                     <div class="col-md-2 col-sm-2 small text-center">
@@ -190,6 +206,7 @@
                                                         <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12"></div>
                                                     </div>
                                                 </div>
+                                                {{-- ΠΑΡΑΛΗΠΤΗΣ --}}
                                                 <div class="row">
                                                     <div class="col-md-2 col-sm-2 small text-center form-control-static">
                                                         <strong>Παραλήπτης</strong>
@@ -205,6 +222,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            {{-- ΠΕΡΙΛΗΨΗ --}}
                                             <div class="col-md-6 col-sm-6 ">
                                                 <div class="row">
                                                     <div class="col-md-2 col-sm-2 small text-center form-control-static">
@@ -212,21 +230,22 @@
                                                     </div>
                                                     <div id="in_perilipsiDiv"
                                                         class="col-md-10 col-sm-10 {{ $errors->has('in_perilipsi') ? ' has-error' : '' }}">
-                                                        <textarea id="in_perilipsi" type="text" class="form-control"
-                                                            name="in_perilipsi" placeholder="in_perilipsi" value=""
-                                                            title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('~^\s+|\s+$~us', '', trim($mailMessage->getTextContent())), 0, 250) }}</textarea>
+                                                        <textarea id="in_perilipsi" type="text" class="form-control" name="in_perilipsi" placeholder="in_perilipsi"
+                                                            value="" title='6. Περίληψη εισερχομένου εγγράφου'>{{ mb_substr(preg_replace('~^\s+|\s+$~us', '', trim($mailMessage->getTextContent())), 0, 250) }}</textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        {{-- ΤΕΛΟΣ ΤΡΙΤΗ ΓΡΑΜΜΗ --}}
 
-
+                                        {{-- ΤΕΤΑΡΤΗ ΓΡΑΜΜΗ --}}
                                         <div class="row ">
+                                            {{-- ΔΙΕΚΠΕΡΑΙΩΣΗ --}}
                                             <div class="col-md-1 col-sm-1 small text-center form-control-static">
                                                 <strong>Διεκπεραίωση</strong>
                                             </div>
                                             <div id="diekperaiosi{{ $Uid }}Div"
-                                                class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                                                class="col-md-2 col-sm-2 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
 
                                                 <select id="diekperaiosi{{ $Uid }}" multiple
                                                     class="form-control selectpicker " style="text-overflow:hidden;"
@@ -246,59 +265,77 @@
                                                         @endforeach
                                                     </optgroup>
                                                 </select>
-                                                <input id="sendEmailTo{{ $Uid }}" name="sendEmailTo" type="hidden"
-                                                    value="" />
+                                                <input id="sendEmailTo{{ $Uid }}" name="sendEmailTo"
+                                                    type="hidden" value="" />
+                                            </div>
+                                            {{-- ΔΙΕΚΠΕΡΑΙΩΣΗ ΕΩΣ ΗΜΝΙΑ --}}
+                                            <div class="col-md-1 col-sm-1 small text-center">
+                                                <strong>Διεκπεραίωση<br>έως Ημνία</strong>
                                             </div>
 
+                                            <div id="diekp_eosDiv"
+                                                class="col-md-2 col-sm-2 {{ $errors->has('diekp_eos') ? ' has-error' : '' }}">
+                                                <input id="diekp_eos" type="text" {{-- data-value="{{ $protocol->diekp_eos }}" --}}
+                                                    class="form-control @if (!$forbidenChangeDiekperaiosiSelect) datepicker @endif text-center inout"
+                                                    name="diekp_eos" placeholder="diekp_eos"
+                                                    value="{{ old('diekp_eos') ? old('diekp_eos') : '' }}"
+                                                    title='Διεκπεραίωση έως την Ημνία'
+                                                    @if ($forbidenChangeDiekperaiosiSelect) readonly @endif>
+                                            </div>
+                                            {{-- ΧΡΟΝΟΣ ΔΙΑΤΗΡΗΣΗΣ --}}
                                             @if ($allowUserChangeKeepSelect)
                                                 <div class="col-md-1 col-sm-1 small text-center form-control-static">
                                                     <strong>Χρόνος διατήρησης</strong>
                                                 </div>
-                                                <div class="col-md-3 col-sm-3">
+                                                <div class="col-md-2 col-sm-2">
                                                     <select id="keep{{ $Uid }}"
                                                         class="form-control small selectpicker"
-                                                        name="keep{{ $Uid }}" title='Χρόνος Διατήρησης'>
-                                                    @else
-                                                        <div class="col-md-1 col-sm-1 small text-center form-control-static"
-                                                            title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
-                                                            <strong>Χρόνος διατήρησης</strong>
-                                                        </div>
-                                                        <div class="col-md-3 col-sm-3"
-                                                            title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
-                                                            <select id="keep{{ $Uid }}"
-                                                                class="form-control small selectpicker" data-value=""
-                                                                onchange="this.value = this.getAttribute('data-value');"
-                                                                name="keep{{ $Uid }}" title='Χρόνος Διατήρησης'>
-                                            @endif
-                                            <option value=''></option>
-                                            @foreach ($years as $year)
-                                                <option value='{{ $year->keep }}'
-                                                    title='{{ $year->keep }} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }}'>
-                                                    {{ $year->keep }} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }}
-                                                </option>
-                                            @endforeach
-                                            @foreach ($words as $word)
-                                                <option value='{{ $word->keep_alt }}' title='{{ $word->keep_alt }}'>
-                                                    {{ $word->keep_alt }}</option>
-                                            @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 col-sm-4">
-                                            <div class="row">
-                                                <div class="col-md-3 col-sm-3 small text-center">
-                                                    <strong>Απάντηση<br>σε email</strong>
+                                                        name="keep{{ $Uid }}"
+                                                        title='Χρόνος Διατήρησης'>
+                                            @else
+                                                <div class="col-md-1 col-sm-1 small text-center form-control-static"
+                                                    title='Οι ρυθμίσεις δεν επιτρέπουν να αλλάξετε την επιλογή'>
+                                                    <strong>Χρόνος διατήρησης</strong>
                                                 </div>
-                                                <div
-                                                    class="col-md-9 col-sm-9 {{ $errors->has('reply_to') ? ' has-error' : '' }}">
-                                                    <input id="reply_to" type="text" class="form-control" name="reply_to"
-                                                        placeholder="reply_to"
-                                                        value="{{ $mailMessage->getHeader(HeaderConsts::REPLY_TO) &&$mailMessage->getHeader(HeaderConsts::REPLY_TO)->getRawValue()? $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getAddresses()[0]->getEmail(): $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() }}"
-                                                        title='5. Αρχή που το έχει εκδώσει'>
-                                                    <div id="in_arxi_ekdosisList" class="col-md-12 col-sm-12"></div>
+                                                <div class="col-md-2 col-sm-2">
+                                                    <select id="keep{{ $Uid }}"
+                                                        class="form-control small selectpicker" data-value=""
+                                                        onchange="this.value = this.getAttribute('data-value');"
+                                                        name="keep{{ $Uid }}"
+                                                        title='Δεν επιτρέπεται αλλαγή'>
+                                            @endif
+                                                        <option value=''></option>
+                                                        @foreach ($years as $year)
+                                                            <option value='{{ $year->keep }}'
+                                                                title='{{ $year->keep }} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }}'>
+                                                                {{ $year->keep }} {{ $year->keep > 1 ? 'χρόνια' : 'χρόνο' }}
+                                                            </option>
+                                                        @endforeach
+                                                        @foreach ($words as $word)
+                                                            <option value='{{ $word->keep_alt }}' title='{{ $word->keep_alt }}'>
+                                                                {{ $word->keep_alt }}</option>
+                                                            @endforeach
+                                                    </select>
+                                                </div>
+
+                                            {{-- ΑΠΑΝΤΗΣΗ ΣΕ EMAIL --}}
+                                            <div class="col-md-3 col-sm-3">
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-3 small text-center">
+                                                        <strong>Απάντηση<br>σε email</strong>
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 {{ $errors->has('reply_to') ? ' has-error' : '' }}">
+                                                        <input id="reply_to" type="text" class="form-control"
+                                                                name="reply_to" placeholder="reply_to"
+                                                                value="{{ $mailMessage->getHeader(HeaderConsts::REPLY_TO) && $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getRawValue()? $mailMessage->getHeader(HeaderConsts::REPLY_TO)->getAddresses()[0]->getEmail(): $mailMessage->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail() }}"
+                                                                title='Απάντηση σε email'>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                            </div>
+                                        {{-- ΤΕΛΟΣ ΤΕΤΑΡΤΗ ΓΡΑΜΜΗ --}}
+
+                            {{-- ΠΡΟΒΟΛΗ ΤΩΝ EMAIL --}}
                             <div class="row bg-info">
                                 <div class="col-md-3 col-sm-3 form-control-static ">Στοιχεία email</div>
                             </div>
@@ -315,8 +352,8 @@
                                     <input id="in_date" type="hidden" class="form-control text-center" name="in_date"
                                         placeholder="in_date"
                                         value="{{ \Carbon\Carbon::parse($mailMessage->getHeader(HeaderConsts::DATE)->getDateTime())->timezone($timeZone)->format('d/m/Y') }}">
-                                    <input id="thema" type="hidden" class="form-control" name="thema" placeholder="thema"
-                                        value="{{ $subject }}">
+                                    <input id="thema" type="hidden" class="form-control" name="thema"
+                                        placeholder="thema" value="{{ $subject }}">
                                     <a href="{{ URL::to('/') }}/setEmailRead/{{ $Uid }}" class=""
                                         role="button" title="Σήμανση ως Αναγνωσμένο" tabindex=-1> <img
                                             src="{{ URL::to('/') }}/images/mark-read.png" height="25" /></a>
@@ -409,7 +446,8 @@
                             <div class="row">
                                 <div class="col-md-12 col-sm-12  ">
                                     <iframe id="ifr{{ $Uid }}"
-                                        src="{{ asset('tmp/' . $emailFilePaths[$uid]) }}" width="100%" frameBorder="0"
+                                        src="{{ asset('tmp/' . $emailFilePaths[$uid]) }}" width="100%"
+                                        frameBorder="0"
                                         onload="this.style.height=(this.contentWindow.document.body.scrollHeight+10)+'px';">></iframe>
                                 </div>
                             </div>
@@ -447,6 +485,12 @@
                             </div>
                         @endif
                         </form>
+                </div>
+                {{-- ΕΠΙΣΤΡΟΦΗ ΚΟΡΥΦΗ --}}
+                <div class='row'>
+                    <div class="col-md-12 col-sm-12 text-center">
+                        <a href="#">&#8686; Στην κορυφή &#8686;</a>
+                    </div>
                 </div>
                 @endforeach
                 @endif
@@ -504,6 +548,7 @@
             if (emailHasAttachments[uid] || alwaysShowFakelosInViewEmails) {
                 if (!formValidate(uid)) return
             }
+
             var thema = $("#frm" + uid).find('input[name="thema"]').val().trim()
             var in_num = $("#frm" + uid).find('input[name="in_num"]').val().trim()
             var in_date = $("#frm" + uid).find('input[name="in_date"]').val().trim()
@@ -635,7 +680,7 @@
             var fakelos = $('#fakelos' + uid).val()
             var in_num = $("#frm" + uid).find('input[name="in_num"]').val().trim()
             var in_date = $("#frm" + uid).find('input[name="in_date"]').val().trim()
-            var in_topos_ekdosis = $("#frm" + uid).find('input[name="in_topos_ekdosis"]').val().trim()
+            //var in_topos_ekdosis = $("#frm" + uid).find('input[name="in_topos_ekdosis"]').val().trim()
             var in_arxi_ekdosis = $("#frm" + uid).find('input[name="in_arxi_ekdosis"]').val().trim()
             var in_paraliptis = $("#frm" + uid).find('input[name="in_paraliptis"]').val().trim()
             var in_perilipsi = $("#frm" + uid).find('textarea[name="in_perilipsi"]').val().trim()
@@ -654,10 +699,12 @@
                     msgStr += "<li>την ημ/νια έκδοσης</li>"
                     $("#frm" + uid + ' div#in_dateDiv').addClass('has-error')
                 }
+                /*
                 if (!in_topos_ekdosis && (in_num || in_date || in_arxi_ekdosis)) {
                     msgStr += "<li>τον τόπο έκδοσης</li>"
                     $("#frm" + uid + ' div#in_topos_ekdosisDiv').addClass('has-error')
                 }
+                */
                 if (!in_arxi_ekdosis && (in_num || in_date || in_topos_ekdosis)) {
                     msgStr += "<li>την αρχή έκδοσης</li>"
                     $("#frm" + uid + ' div#in_arxi_ekdosisDiv').addClass('has-error')

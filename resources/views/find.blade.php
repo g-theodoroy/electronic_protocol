@@ -210,7 +210,7 @@
                                 </div>
                                 <div
                                     class="col-md-1 col-sm-1 col-md-offset-3 col-sm-offset-3 form-control-static text-right">
-                                    <a href="{{ URL::to('/home/list') }}" class="" role="button"
+                                    <a href="{{ URL::to(config('landing-page.page.' . auth()->user()->role_id)) }}" class="" role="button"
                                         title="Πρωτόκολλο"> <img src="{{ URL::to('/') }}/images/protocol.png"
                                             height="30" /></a>
                                 </div>

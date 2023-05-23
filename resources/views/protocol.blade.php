@@ -290,7 +290,7 @@
                                     <input id="sendEmailTo" name="sendEmailTo" type="hidden" value="" />
                                     @if ($forbidenChangeDiekperaiosiSelect)
                                         <div
-                                            class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                                            class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
                                             <select id="diekperaiosi" multiple class="form-control selectpicker"
                                                 style="text-overflow:hidden;" name="diekperaiosi[]"
                                                 title='Διεκπεραίωση - Ενημέρωση'
@@ -313,7 +313,7 @@
                                         </div>
                                     @else
                                         <div
-                                            class="col-md-5 col-sm-5 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
+                                            class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
                                             <div class="row">
                                                 <div class="col=md-11 col-sm-11">
                                                     <select id="diekperaiosi" multiple class="form-control selectpicker"
@@ -337,7 +337,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col=md-1 col-sm-1 form-control-static"
-                                                    style="padding-left: 5px;padding-right: 5px;"
+                                                    style="padding-left: 5px;padding-right: 5px;cursor:pointer"
                                                     onclick="javascript:anathesiSe()" title="Ανάθεση πρωτοκόλλου"><img
                                                         src="{{ URL::to('/') }}/images/todo.png" height=20 /></div>
                                             </div>
@@ -345,7 +345,23 @@
                                     @endif
 
                                     <div class="col-md-1 col-sm-1 small text-center">
-                                        <strong>Ημνία<br>Διεκπεραίωσης</strong>
+                                        <strong>Διεκπεραίωση<br>έως Ημνία</strong>
+                                    </div>
+                                    
+                                             <div id="diekp_eosDiv"
+                                                class="col-md-1 col-sm-1 {{ $errors->has('diekp_eos') ? ' has-error' : '' }}">
+                                                    <input id="diekp_eos" type="text" 
+                                                        data-value="{{ $diekp_eos }}"
+                                                        class="form-control @if ( !$forbidenChangeDiekperaiosiSelect) datepicker @endif text-center inout"
+                                                        name="diekp_eos" placeholder="diekp_eos"
+                                                        value="{{ old('diekp_eos') ? old('diekp_eos') : $diekp_eos }}"
+                                                        title='11. Διεκπεραίωση έως την Ημνία' 
+                                                        @if ($forbidenChangeDiekperaiosiSelect) readonly @endif>
+                                    </div>
+
+
+                                    <div class="col-md-1 col-sm-1 small text-center">
+                                        <strong>Διεκπεραιώθηκε<br>την Ημνία </strong>
                                     </div>
 
                                     <div class="col-md-5 col-sm-5">
@@ -357,9 +373,9 @@
                                                         class="form-control  @if (!$diekpDateReadonly) datepicker @endif  text-center inout"
                                                         name="diekp_date" placeholder="diekp_date"
                                                         value="{{ old('diekp_date') ? old('diekp_date') : $diekp_date }}"
-                                                        title='11. Ημερομηνία διεκπεραίωσης' {{ $diekpDateReadonly }}>
+                                                        title='11. Διεκπεραιώθηκε την Ημνία' {{ $diekpDateReadonly }}>
                                                     <div class="input-group-btn {{ $readerVisible }}"
-                                                        style="padding-left: 5px;padding-right: 5px;"
+                                                        style="padding-left: 5px;padding-right: 5px;cursor:pointer"
                                                         onclick="javascript:setDiekperaiomeno()"
                                                         title="Σήμανση ως Διεκπεραιωμένο"><img
                                                             src="{{ URL::to('/') }}/images/done.png" height=20 /></div>
@@ -378,7 +394,7 @@
                                                         value="{{ old('sxetiko') ? old('sxetiko') : $protocol->sxetiko }}"
                                                         title='12. Σχετικοί αριθμοί' {{ $outReadonly }}>
                                                     <div class="input-group-btn"
-                                                        style="padding-left: 5px;padding-right: 5px;"
+                                                        style="padding-left: 5px;padding-right: 5px;cursor:pointer"
                                                         onclick="javascript:findSxetiko()"
                                                         title="Μετάβαση στο σχετικό Πρωτόκολλο"><img
                                                             src="{{ URL::to('/') }}/images/find.ico" height=20 /></div>
@@ -523,7 +539,7 @@
                                             class="{{ $submitVisible }}" role="button"
                                             title="Καθάρισμα συνημμένων αρχείων"> <img
                                                 src="{{ URL::to('/') }}/images/clear.ico" height="20" /></a>
-                                        <a href="{{ URL::to('/') }}/home/list" class="active" role="button"
+                                        <a href="{{ URL::to(config('landing-page.page.' . auth()->user()->role_id)) }}" class="active" role="button"
                                             title="Λίστα Πρωτοκόλλου"> <img src="{{ URL::to('/') }}/images/protocol.png"
                                                 height=25 /></a>
                                     </div>
@@ -1073,14 +1089,17 @@
 
         function anathesiSe() {
             var oldId = $('#diekperaiosi').attr('data-value')
+            var oldDateEos = $('#diekp_eos').attr('data-value')
             var newId = $('#diekperaiosi').val() ? $('#diekperaiosi').val().join(',') : ''
+            var newDateEos = $('#diekp_eos').val() ? $('#diekp_eos').val() : null
+
             if (!newId) {
                 toastr.error(
                     "<center><h4>Λάθος !!!</h4></center><hr>Επιλέξτε σε ποιον θα ανατεθεί το πρωτόκολλο<br> &nbsp;")
                 return
-            } else if (newId == oldId) {
-                toastr.error(
-                    "<center><h4>Λάθος !!!</h4></center><hr>Το παρόν πρωτόκολλο έχει ήδη ανατεθεί και έχουν ήδη ενημερωθεί οι επιλεγμένοι χρήστες<br> &nbsp;"
+            } else if (newId == oldId && newDateEos == oldDateEos) {
+                toastr.info(
+                    "<center><h4>Ενημέρωση !!!</h4></center><hr>Το παρόν πρωτόκολλο έχει ήδη ανατεθεί και έχουν ήδη ενημερωθεί οι επιλεγμένοι χρήστες<br> &nbsp;"
                 )
                 return
             }
@@ -1091,7 +1110,8 @@
                 data: {
                     '_token': '{{ csrf_token() }}',
                     'id': {{ $protocol->id | null }},
-                    'diekperaiosi': newId
+                    'diekperaiosi': newId,
+                    'diekp_eos': newDateEos
                 },
                 success: function(response) {
                     location.reload()

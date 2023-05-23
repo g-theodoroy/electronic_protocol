@@ -68,7 +68,7 @@
                                 @endif
                             </div>
                             <div class="col-md-2 col-sm-2 text-center col-md-offset-2 col-sm-offset-2">
-                                <a href="{{ URL::to('/home/list') }}" class="" role="button"
+                                <a href="{{ URL::to(config('landing-page.page.' . auth()->user()->role_id)) }}" class="" role="button"
                                     title="Πρωτόκολλο"> <img src="{{ URL::to('/') }}/images/protocol.png"
                                         height="30" /></a>
                             </div>

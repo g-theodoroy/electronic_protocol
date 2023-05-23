@@ -27,6 +27,7 @@ class CreateProtocolsTable extends Migration
             $table->string('in_arxi_ekdosis')->nullable();
             $table->string('in_paraliptis')->nullable();
             $table->string('diekperaiosi')->nullable();
+            $table->integer('diekp_eos')->unsigned()->nullable();
             $table->string('in_perilipsi')->nullable();
             $table->integer('out_date')->unsigned()->nullable();
             $table->integer('diekp_date')->unsigned()->nullable();
