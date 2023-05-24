@@ -1688,7 +1688,9 @@ class ProtocolController extends Controller
 
         if ($target == 'xls') {
             $filename = $this->filter_filename(Config::getConfigValueOf('ipiresiasName') . " - εξαγωγή πρωτοκόλλου σε xls - " . Carbon::now()->format('Ymd-Hms') . '.xlsx', false);
-            return Excel::download(new ProtocolExport("printedXls", compact('protocols', 'etos', 'datetime')), $filename);
+            $response = Excel::download(new ProtocolExport("printedXls", compact('protocols', 'etos', 'datetime')), $filename);
+            ob_end_clean();
+            return $response;
         }
         return view('printed', compact('protocols', 'etos', 'datetime'));
     }
