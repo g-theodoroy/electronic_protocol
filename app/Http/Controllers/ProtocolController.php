@@ -2554,9 +2554,7 @@ class ProtocolController extends Controller
         if (!file_exists($dir . $messageUid . '.eml')) return null;
         // διαβάζω τα περιεχόμενα του email
         $mailParser = new MailMimeParser();
-        $handle = fopen($dir . $messageUid . '.eml', 'r');
-        $mailMessage = $mailParser->parse($handle);         // returns `Message`
-        fclose($handle);
+        $mailMessage = $mailParser->parse(fopen($dir . $messageUid . '.eml', 'r'), true);         // returns `Message`
         return $mailMessage;
     }
 

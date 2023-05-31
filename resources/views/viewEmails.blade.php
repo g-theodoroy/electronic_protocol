@@ -67,7 +67,7 @@
                         @foreach ($aSortedMessage as $oMessage)
                             @php
                                 $Uid = $oMessage->getUid();
-                                $mailMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
+                                $mailMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody(), true);
                             @endphp
                             <div class="panel panel-default col-md-12 col-sm-12  ">
                                 <form name="frm{{ $Uid }}" id="frm{{ $Uid }}" class="form-horizontal"
@@ -540,7 +540,7 @@
             var emailHasAttachments = []
             @foreach ($aMessage as $oMessage)
                 @php
-                    $chkMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody());
+                    $chkMessage = ZBateson\MailMimeParser\Message::from($oMessage->getHeader()->raw . $oMessage->getRawBody(), true);
                 @endphp
                 emailHasAttachments[{{ $Uid }}] = {{ $chkMessage->getAttachmentCount() ? 'true' : 'false' }}
             @endforeach
