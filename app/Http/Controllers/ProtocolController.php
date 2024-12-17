@@ -1135,7 +1135,7 @@ class ProtocolController extends Controller
                     $savedPath = $attachment->savedPath;
                     $newPath = str_replace($oldFakelos, $data['fakelos'], $savedPath);
                     // αν υπάρχει το αρχείο
-                    if (Storage::exists($attachment->savedPath) && $newPath !== $savedPath) {
+                    if ($savedPath && Storage::exists($attachment->savedPath) && $newPath !== $savedPath) {
                         // το μετακινώ στον νέο φάκελο
                         Storage::move($savedPath, $newPath);
                     }
@@ -1336,9 +1336,9 @@ class ProtocolController extends Controller
         $savedPath = $attachment->savedPath;
         $trashPath = str_replace('arxeio', 'trash', $savedPath);
         // αν υπάρχει το αρχείο
-        if (Storage::exists($attachment->savedPath)) {
+        if ($savedPath && Storage::exists($attachment->savedPath)) {
             // το μετακινώ στον Κάδο Ανακύκλωσης
-            if (Storage::exists($trashPath)) Storage::delete($trashPath);
+            if ($trashPath && Storage::exists($trashPath)) Storage::delete($trashPath);
             Storage::move($savedPath, $trashPath);
         }
         // διαγράφω την καταχώριση στη ΒΔ (softDelete)
