@@ -1,4 +1,4 @@
-@extends('layouts.app',  ['allowregister' => $allowregister ])
+@extends('layouts.app',  ['allowregister' => $allowregister ?? false ])
 
 @section('content')
 <div class="container">
