@@ -1252,9 +1252,10 @@ class ProtocolController extends Controller
         $diekp_eos = $protocol->diekp_eos ? Carbon::createFromFormat('Ymd', $protocol->diekp_eos)->format('d/m/Y') : '';
         // παίρνω το περιεχόμενο του μηνύματος
         $html = view('diekperaiosiMail', compact('protocol','diekperaiotis','date', 'diekp_eos'))->render();
+        $thema = $protocol->thema;
         // χρήση του 2ο (εναλλακτικό) mailer
-         Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html) {
-            $message->subject("Ανάθεση Πρωτοκόλλου για Διεκπεραίωση");
+         Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html, $thema) {
+            $message->subject("Ανάθεση Πρωτοκόλλου για Διεκπεραίωση" . " με θέμα \"" . $thema . "\"");
             $message->setBody($html, 'text/html');
             $message->to($emailTo);
         });
@@ -1280,10 +1281,10 @@ class ProtocolController extends Controller
         $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         // παίρνω το περιεχόμενο του μηνύματος
         $html = view('diekpInformMail', compact('protocol', 'diekperaiotis', 'date'))->render();
+        $thema = $protocol->thema;
         // χρήση του 2ο (εναλλακτικό) mailer
-        Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html) {
-
-            $message->subject("Ενημέρωση για Πρωτόκολλο");
+        Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html, $thema) {
+            $message->subject("Ενημέρωση για Πρωτόκολλο" . " με θέμα \"" . $thema . "\"");
             $message->setBody($html, 'text/html');
             $message->to($emailTo);
         });
