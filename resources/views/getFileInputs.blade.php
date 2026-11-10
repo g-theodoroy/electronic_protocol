@@ -7,7 +7,7 @@
                         <img src="{{ URL::to('/') }}/images/find.ico" height=20 />
                     </span>
                     <span class="fileinput-exists"><img src="{{ URL::to('/') }}/images/edit.ico" height=20 /></span>
-                    <input id="att{{ $k }}" type="file" name="att{{ $k }}"></span>
+                    <input id="att{{ $k }}" type="file" name="att{{ $k }}" onchange="validateFile(this)"></span>
                 <span class="fileinput-filename"></span>
                 <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none"
                     title="Διαγραφή"><img src="{{ URL::to('/') }}/images/delete.ico" height=20 /></a>
@@ -17,7 +17,7 @@
                         <img src="{{ URL::to('/') }}/images/find.ico" height=20 />
                     </span>
                     <span class="fileinput-exists"><img src="{{ URL::to('/') }}/images/edit.ico" height=20 /></span>
-                    <input id="att{{ $k + 1 }}" type="file" name="att{{ $k + 1 }}"></span>
+                    <input id="att{{ $k + 1 }}" type="file" name="att{{ $k + 1 }}" onchange="validateFile(this)"></span>
                 <span class="fileinput-filename"></span>
                 <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none"
                     title="Διαγραφή"><img src="{{ URL::to('/') }}/images/delete.ico" height=20 /></a>
@@ -27,7 +27,7 @@
                         <img src="{{ URL::to('/') }}/images/find.ico" height=20 />
                     </span>
                     <span class="fileinput-exists"><img src="{{ URL::to('/') }}/images/edit.ico" height=20 /></span>
-                    <input id="att{{ $k + 1 }}" type="file" name="att{{ $k + 2 }}"></span>
+                    <input id="att{{ $k + 1 }}" type="file" name="att{{ $k + 2 }}" onchange="validateFile(this)"></span>
                 <span class="fileinput-filename"></span>
                 <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none"
                     title="Διαγραφή"><img src="{{ URL::to('/') }}/images/delete.ico" height=20 /></a>

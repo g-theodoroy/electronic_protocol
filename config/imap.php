@@ -56,8 +56,8 @@ return [
 
         'sch' => [ // account identifier
             'host' => 'mail.sch.gr',
-            'port' => 143,
-            'encryption' => 'tls', // Supported: false, 'ssl', 'tls'
+            'port' => 993,
+            'encryption' => 'ssl', // Supported: false, 'ssl', 'tls'
             'validate_cert' => true,
             'username' => '',
             'password' => '',

@@ -101,8 +101,9 @@ class ProtocolController extends Controller
         $this->middleware('limitList', ['only' => ['printprotocols', 'printAttachments']]);
     }
 
-    private function diekperaiosiConcatRawStr(){
-        if(config('database.default') == 'sqlite') return "`diekperaiosi` || ','";
+    private function diekperaiosiConcatRawStr()
+    {
+        if (config('database.default') == 'sqlite') return "`diekperaiosi` || ','";
         return "CONCAT(`diekperaiosi`, ',')";
     }
 
@@ -110,12 +111,12 @@ class ProtocolController extends Controller
     public function index(Protocol $protocol, $copyAsNew = null)
     {
 
-        if($copyAsNew){
+        if ($copyAsNew) {
             $protocol->id = null;
             $protocol->etos = null;
             $protocol->protocolnum = null;
             $protocol->protocoldate = null;
-                }
+        }
 
 
         // αν δεν είναι νέο πρωτόκολλο και οι συγγραφείς περιορίζονται στη λίστα διεκπεραιωσης
@@ -160,19 +161,17 @@ class ProtocolController extends Controller
         }
 
         // βρίσκω τους όλους ενεργούς χρήστες
-        $activeusers = Active::users()->mostRecent()->get();
+        $activeusers = User::activeOnline()->get(); 
         $activeusers2show = [];
         foreach ($activeusers as $actuser) {
             if ($showUserInfo == 1) {
-                $activeusers2show[] = $actuser['user']['username'];
+                $activeusers2show[] = $actuser->username;
             } elseif ($showUserInfo == 2) {
-                $activeusers2show[] = $actuser['user']['name'];
+                $activeusers2show[] = $actuser->name;
             }
         }
         // μετράω μόνο τους Διαχειριστές και Συγγραφείς που έχουν δικαίωμα να γράψουν
-        $activeuserscount = Active::users()->whereHas('user', function ($q) {
-            $q->where('role_id', '!=', Role::whereRole('Αναγνώστης')->first()->id);
-        })->count();
+        $activeuserscount = User::activeOnline()->where('role_id', '!=', Role::whereRole('Αναγνώστης')->first()->id)->count();
         // αν είναι πάνω από ένας δεν εμφανίζω τον επόμενο Αρ.Πρωτ.
         $newprotocolnumvisible = 'active';
         if ($activeuserscount > 1 and !$protocol->id) {
@@ -184,7 +183,7 @@ class ProtocolController extends Controller
         $newprotocoldate = Carbon::now()->format('d/m/Y');
         $class = 'bg-info';
         $protocoltitle = 'Νέο Πρωτόκολλο';
-        if($copyAsNew) $protocoltitle = 'Αντιγραφή ως Νέο Πρωτόκολλο';
+        if ($copyAsNew) $protocoltitle = 'Αντιγραφή ως Νέο Πρωτόκολλο';
 
         $protocolUser = '';
         if ($protocol->etos) {
@@ -512,13 +511,13 @@ class ProtocolController extends Controller
         $showUserInfo = $settings['showUserInfo'] ?? Config::getConfigValueOf('showUserInfo');
 
         // βρίσκω τους όλους ενεργούς χρήστες
-        $activeusers = Active::users()->mostRecent()->get();
+        $activeusers = User::activeOnline()->get();
         $activeusers2show = [];
         foreach ($activeusers as $actuser) {
             if ($showUserInfo == 1) {
-                $activeusers2show[] = $actuser['user']['username'];
+                $activeusers2show[] = $actuser->username;
             } elseif ($showUserInfo == 2) {
-                $activeusers2show[] = $actuser['user']['name'];
+                $activeusers2show[] = $actuser->name;
             }
         }
 
@@ -528,19 +527,19 @@ class ProtocolController extends Controller
 
         // Παίρνω το query
         // Αν έχει έρθει το field
-        if($_GET['field'] ?? false){
+        if ($_GET['field'] ?? false) {
             $field = $_GET['field'];
             $sort = $_GET['sort'] ?? 'asc';
             // ελέγχω ότι υπάρχει στα fields του πίνακα protocols
             // αλλιώς επαναφέρω τα default
-            if(!array_key_exists( $field, array_merge($this->protocolfields, $this->protocolExtraSortFields ))){
+            if (!array_key_exists($field, array_merge($this->protocolfields, $this->protocolExtraSortFields))) {
                 $field = 'protocolnum';
                 $sort = 'desc';
-            }else{
+            } else {
                 // εντάξει το field - έλεγχος του σορταρίσματος
                 if (!in_array($sort, ['asc', 'desc'])) {
                     $sort = 'asc';
-                } 
+                }
             }
         }
 
@@ -594,7 +593,7 @@ class ProtocolController extends Controller
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . "%")->whereNull('diekp_date');
                 $protocoltitle = "Όλοι οι χρήστες, προς Διεκπεραίωση";
             } elseif ($filter == 'e') {
-                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . "%")->wherenotNull('diekp_date');
+                $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . "%");
                 $protocoltitle = "Όλοι οι χρήστες, προς Ενημέρωση";
             } elseif ($filter == 'f') {
                 $protocols = $protocols->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . "%")->wherenotNull('diekp_date');
@@ -610,7 +609,7 @@ class ProtocolController extends Controller
 
         $fakelosDescription = Keepvalue::all()->pluck('describe', 'fakelos');
 
-        $now = Carbon::now()->format('Ymd');
+        $now = Carbon::today();
 
         // αλλάζω τη μορφή στις ημερομηνίες και παίρνω την περιγραφή του φακέλου Φ.
         foreach ($protocols as $protocol) {
@@ -625,12 +624,13 @@ class ProtocolController extends Controller
             }
 
             $deadLineClass = '';
-            if($protocol->diekp_eos){
-                $deadLineDif = $protocol->diekp_eos - $now;
+            if ($protocol->diekp_eos) {
+                $deadline = Carbon::createFromFormat('Ymd', $protocol->diekp_eos)->startOfDay();
+                $deadLineDif = $now->diffInDays($deadline, false);
                 if ($deadLineDif < 1) $deadLineClass = 'bg-danger';
                 if ($deadLineDif < 3 && $deadLineDif > 0) $deadLineClass = 'bg-warning';
                 if ($deadLineDif < 6 && $deadLineDif > 2) $deadLineClass = 'bg-info';
-                if($protocol->diekp_date) $deadLineClass = '';
+                if ($protocol->diekp_date) $deadLineClass = '';
             }
             $protocol->deadLineClass = $deadLineClass;
 
@@ -897,7 +897,7 @@ class ProtocolController extends Controller
                     // αν είναι η διατήρηση αριθμός πρόσθέτω χρόνια
                     // για να φτιάξω την Ημνια λήξης
                     $dt = Carbon::createFromFormat('d/m/Y', request()->protocoldate);
-                    $dt->addYears($data['keep']);
+                    $dt->addYears((int) $data['keep']);
                     $expires = $dt->format('Ymd');
                 }
                 try {
@@ -913,7 +913,8 @@ class ProtocolController extends Controller
                         [
                             'keep' => $data['keep'],
                             'expires' => $expires,
-                    ]);
+                        ]
+                    );
                 } catch (\Throwable $e) {
                     // αν υπάρχει λάθος το γράφω στο log
                     report($e);
@@ -1186,7 +1187,7 @@ class ProtocolController extends Controller
                     // αν η διατήρηση είναι αριθμός
                     // προσθέτω χρόνια και φτιάχνω ημνια λήξης
                     $dt = Carbon::createFromFormat('d/m/Y', request()->protocoldate);
-                    $dt->addYears($data['keep']);
+                    $dt->addYears((int) $data['keep']);
                     $expires = $dt->format('Ymd');
                 }
                 // αποθήκευση συνημμένου στη ΒΔ
@@ -1202,7 +1203,8 @@ class ProtocolController extends Controller
                         [
                             'keep' => $data['keep'],
                             'expires' => $expires,
-                    ]);
+                        ]
+                    );
                 } catch (\Throwable $e) {
                     // σε λάθος στέλνω στο log
                     report($e);
@@ -1251,10 +1253,10 @@ class ProtocolController extends Controller
         $date = Carbon::createFromFormat('Ymd', $protocol->protocoldate)->format('d/m/Y');
         $diekp_eos = $protocol->diekp_eos ? Carbon::createFromFormat('Ymd', $protocol->diekp_eos)->format('d/m/Y') : '';
         // παίρνω το περιεχόμενο του μηνύματος
-        $html = view('diekperaiosiMail', compact('protocol','diekperaiotis','date', 'diekp_eos'))->render();
+        $html = view('diekperaiosiMail', compact('protocol', 'diekperaiotis', 'date', 'diekp_eos'))->render();
         $thema = $protocol->thema;
         // χρήση του 2ο (εναλλακτικό) mailer
-         Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html, $thema) {
+        Mail::mailer('intra-mail')->send([], [], function ($message) use ($emailTo, $html, $thema) {
             $message->subject("Ανάθεση Πρωτοκόλλου για Διεκπεραίωση" . " με θέμα \"" . $thema . "\"");
             $message->setBody($html, 'text/html');
             $message->to($emailTo);
@@ -1469,6 +1471,7 @@ class ProtocolController extends Controller
 
     public function getFindData()
     {
+        $sqlite = env('DB_CONNECTION') == 'sqlite';
 
         $maxRowsInFindPage = Config::getConfigValueOf('maxRowsInFindPage');
         $diekpStr = 'd';
@@ -1477,6 +1480,7 @@ class ProtocolController extends Controller
         $attachmentfields = $this->attachmentfields;
 
         $wherevalues = [];
+        $filtervalues = [];
         $whereNullFields = [];
         $whereAttachmentvalues = [];
         $whereNullAttachmentvalues = [];
@@ -1526,7 +1530,8 @@ class ProtocolController extends Controller
                             $wherevalues[] = [request('searchField1'), $searchData];
                         }
                     } else {
-                        $wherevalues[] = [request('searchField1'), 'LIKE', '%' . request('searchData1') . '%'];
+                        if (!$sqlite) $wherevalues[] = [request('searchField1'), 'LIKE', '%' . request('searchData1') . '%'];
+                        if ($sqlite) $filtervalues[] = [request('searchField1'), request('searchData1')];
                     }
                 }
             }
@@ -1548,7 +1553,8 @@ class ProtocolController extends Controller
                             $wherevalues[] = [request('searchField2'), $searchData];
                         }
                     } else {
-                        $wherevalues[] = [request('searchField2'), 'LIKE', '%' . request('searchData2') . '%'];
+                        if (!$sqlite) $wherevalues[] = [request('searchField2'), 'LIKE', '%' . request('searchData2') . '%'];
+                        if ($sqlite) $filtervalues[] = [request('searchField2'), request('searchData2')];
                     }
                 }
             }
@@ -1570,27 +1576,29 @@ class ProtocolController extends Controller
                             $wherevalues[] = [request('searchField3'), $searchData];
                         }
                     } else {
-                        $wherevalues[] = [request('searchField3'), 'LIKE', '%' . request('searchData3') . '%'];
+                        if (!$sqlite) $wherevalues[] = [request('searchField3'), 'LIKE', '%' . request('searchData3') . '%'];
+                        if ($sqlite) $filtervalues[] = [request('searchField3'), request('searchData3')];
                     }
                 }
             }
         }
-        if (!$wherevalues and !$whereAttachmentvalues and !$whereNullFields and !$whereNullAttachmentvalues) {
+
+        if (!$wherevalues and !$whereAttachmentvalues and !$whereNullFields and !$whereNullAttachmentvalues and !$filtervalues) {
             return;
         }
+
         $foundProtocolsCount = null;
         $protocols = Protocol::with('attachments');
         foreach ($whereNullFields as $whereNullField) {
             $protocols = $protocols->whereNull($whereNullField);
         }
+        // Restrict results even when SQLite applies text filters in memory.
+        if ($this->limitProtocolAccessList()) {
+            $protocols = $protocols->where(function ($query) {
+                $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
+            });
+        }
         if ($wherevalues) {
-            // αν η ρύθμιση για Συγγραφείς και Αναγνώστες είναι ΝΑΙ περιορισμός στη λίστα
-            // φιλτράρω τα μηνύματα. Επιτρέπονται μόνο όσα είναι για διεκπεραίωση - ενημέρωση - δημιουργήθηκαν από αυτούς
-            if ($this->limitProtocolAccessList()) {
-                $protocols = $protocols->where(function ($query) {
-                    $query->where(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'd' . Auth::user()->id . ",%")->orWhere(DB::raw($this->diekperaiosiConcatRawStr()), 'like', "%" . 'e' . Auth::user()->id . ",%")->orWhere('user_id', Auth::user()->id);
-                });
-            }
             $protocols = $protocols->where($wherevalues);
         }
         foreach ($whereNullAttachmentvalues as $whereNullAttachmentvalue) {
@@ -1605,9 +1613,34 @@ class ProtocolController extends Controller
         }
         $protocols = $protocols->orderby('protocoldate', 'desc')->orderby('protocolnum', 'desc');
 
-        $foundProtocolsCount = $protocols->count();
+        // Ο πίνακας $filtervalues γεμίζει μόνο αν η ΒΔ είναι sqlite
+        // άρα αν η ΒΔ δεν είναι sqlite
+        if (!$filtervalues) {
+            // βρίσκω τον αριθμό και paginate
+            $foundProtocolsCount = $protocols->count();
+            $protocols = $protocols->paginate($maxRowsInFindPage);
+        } else {
+            // διαβάζω στις ρυθμίσεις πόσα πρέπι να πάρω
+            $take = Config::getConfigValueOf('maxRowsInXlsExport');
+            // default 5000
+            if (!$take) $take = 5000;
 
-        $protocols = $protocols->paginate($maxRowsInFindPage);
+            // η ΒΔ είναι sqlite φορτώνω τα πρωτόκολλα στη μνήμη !!!
+            /// παίρνω μόνο τα τελευταία
+            $protocols = $protocols->take($take)->get();
+
+            foreach ($filtervalues as $fv) {
+                // φιλτράρω 
+                $protocols = $protocols->filter(function ($item) use ($fv) {
+                    if (str_contains($this->uc_without_accents($item[$fv[0]]), $this->uc_without_accents($fv[1]))) {
+                        return $item;
+                    }
+                });
+            }
+            // βρίσκω τον αριθμό και paginate collection ( macro στον AppserviceProvider)
+            $foundProtocolsCount = $protocols->count();
+            $protocols = $protocols->paginate($maxRowsInFindPage);
+        }
 
 
         $userNames = User::pluck('name', 'id');
@@ -2211,7 +2244,7 @@ class ProtocolController extends Controller
         $expires = null;
         if ($keep and is_numeric($keep)) {
             $dt = Carbon::createFromFormat('Ymd', $protocol->protocoldate);
-            $dt->addYears($keep);
+            $dt->addYears((int) $keep);
             $expires = $dt->format('Ymd');
         }
 
@@ -2242,7 +2275,7 @@ class ProtocolController extends Controller
                 $content = $oAttachment->getContent();
                 $mimeType = $oAttachment->getContentType();
                 $filename = $oAttachment->getFilename();
- 
+
 
                 // αφαίρεση απαγορευμένων χαρακτήρων από το όνομα του συνημμένου
                 $filename = $this->filter_filename($filename, false);
@@ -2514,7 +2547,7 @@ class ProtocolController extends Controller
         $sendEmailTo = $request->diekperaiosi;
         $protocol = Protocol::whereId($request->id)->first();
         $protocol->diekperaiosi = $sendEmailTo;
-        $protocol->diekp_eos = $request->diekp_eos ? Carbon::createFromFormat('d/m/Y', $request->diekp_eos)->format('Ymd'): null;
+        $protocol->diekp_eos = $request->diekp_eos ? Carbon::createFromFormat('d/m/Y', $request->diekp_eos)->format('Ymd') : null;
         $protocol->diekp_date = null;
         $protocol->update();
 
@@ -2660,73 +2693,42 @@ class ProtocolController extends Controller
             $savedPath = "$dir/$filenameToStore";
             Storage::put($savedPath, $content);
             // ορίζω το mimeType με βάση την κατάληξη του αρχείου pdf ή docx
-            if (substr($filenameToStore, -3) == 'pdf'){
+            if (substr($filenameToStore, -3) == 'pdf') {
                 $mimeType = 'application/pdf';
             } elseif (substr($filenameToStore, -4) == 'docx') {
                 $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            } else{
+            } elseif (substr($filenameToStore, -3) == 'odt') {
+                $mimeType = 'application/vnd.oasis.opendocument.text';
+            } else {
                 $mimeType = null;
             }
         }
-        // ορίζω τα mimeTypes σε μεταβλητές
-        $docx = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        $pdf = 'application/pdf';
 
-        if ($mimeType == $pdf) {
+        if ($mimeType) {
             try {
-                copy(storage_path("app/$savedPath"), "pdfToStamp.pdf");
+                copy(storage_path("app/$savedPath"), "toStamp." . pathinfo($filenameToStore, PATHINFO_EXTENSION));
 
-                $pdfWatermark  = WatermarkFactory::load('pdfToStamp.pdf')
-                ->outputFile('stampedPdf.pdf')
-                ->setImage('arPr.png')
-                ->opacity(config('stamp.opacity'));
+                $watermark  = WatermarkFactory::load("toStamp." . pathinfo($filenameToStore, PATHINFO_EXTENSION))
+                    ->outputFile("stamped." . pathinfo($filenameToStore, PATHINFO_EXTENSION))
+                    ->setImage('arPr.png')
+                    ->opacity(config('stamp.opacity'));
                 if (config('stamp.section') == 'header') {
-                    $pdfWatermark = $pdfWatermark->sectionHeader();
+                    $watermark = $watermark->sectionHeader();
                 } else {
-                    $pdfWatermark = $pdfWatermark->sectionFooter();
+                    $watermark = $watermark->sectionFooter();
                 }
                 if (config('stamp.align') == 'left') {
-                    $pdfWatermark = $pdfWatermark->alignLeft(config('stamp.x'), config('stamp.y'));
+                    $watermark = $watermark->alignLeft(config('stamp.x'), config('stamp.y'));
                 } else {
-                    $pdfWatermark = $pdfWatermark->alignRight(config('stamp.x'), config('stamp.y'));
-                }
-                $pdfWatermark = $pdfWatermark->generate();
-
-                rename("stampedPdf.pdf", storage_path("app/$savedPath"));
-                if (file_exists('pdfToStamp.pdf')) unlink('pdfToStamp.pdf');
-            } catch (\Throwable $e) {
-                if ($file) {
-                    $savedPath = $file->storeas($dir, $filenameToStore);
-                }
-                if ($content) {
-                    $savedPath = $dir . $filenameToStore;
-                    Storage::put($savedPath, $content);
-                }
-            }
-        }
-        if ($mimeType == $docx) {
-            try {
-                copy(storage_path("app/$savedPath"), "docxToStamp.docx");
-                $wordWatermark = WatermarkFactory::load('docxToStamp.docx')
-                ->outputFile('stampedDocx.docx')
-                ->setImage('arPr.png');
-                if (config('stamp.section') == 'header') {
-                    $wordWatermark =  $wordWatermark->sectionHeader();
-                } else {
-                    $wordWatermark =  $wordWatermark->sectionFooter();
-                }
-                if (config('stamp.align') == 'left') {
-                    $wordWatermark =  $wordWatermark->alignLeft(config('stamp.x'), config('stamp.y'));
-                } else {
-                    $wordWatermark =  $wordWatermark->alignRight(config('stamp.x'), config('stamp.y'));
+                    $watermark = $watermark->alignRight(config('stamp.x'), config('stamp.y'));
                 }
                 if (config('stamp.onlyFirstPage')) {
-                    $wordWatermark =  $wordWatermark->onlyFirstPage();
-                }
-                $wordWatermark =  $wordWatermark->generate();
+                    $watermark =  $watermark->onlyFirstPage();
+                }               
+                $watermark = $watermark->generate();
 
-                rename("stampedDocx.docx", storage_path("app/$savedPath"));
-                if (file_exists('docxToStamp.docx')) unlink('docxToStamp.docx');
+                rename("stamped." . pathinfo($filenameToStore, PATHINFO_EXTENSION), storage_path("app/$savedPath"));
+                if (file_exists( "toStamp." . pathinfo($filenameToStore, PATHINFO_EXTENSION))) unlink("toStamp." . pathinfo($filenameToStore, PATHINFO_EXTENSION));
             } catch (\Throwable $e) {
                 if ($file) {
                     $savedPath = $file->storeas($dir, $filenameToStore);
@@ -2737,6 +2739,29 @@ class ProtocolController extends Controller
                 }
             }
         }
+
         return $savedPath;
+    }
+
+    public function uc_without_accents($string, $enc = "utf-8")
+    {
+        return strtr(
+            mb_strtoupper($string, $enc),
+            array(
+                'Ά' => 'Α',
+                'Έ' => 'Ε',
+                'Ί' => 'Ι',
+                'Ή' => 'Η',
+                'Ύ' => 'Υ',
+                'Ό' => 'Ο',
+                'Ώ' => 'Ω',
+                'A' => 'A',
+                'A' => 'A',
+                'A' => 'A',
+                'A' => 'A',
+                'Y' => 'Y',
+                'ΐ' => 'Ϊ'
+            )
+        );
     }
 }

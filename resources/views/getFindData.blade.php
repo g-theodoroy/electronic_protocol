@@ -28,18 +28,18 @@
             @if ($i % 2)
                 <div class="row line" onclick="window.location.href='{{ URL::to('/') }}/home/{{ $protocol->id }}'">
                 @else
-                    <div class="row line line2" onclick="window.location.href='{{ URL::to('/') }}/home/{{ $protocol->id }}'">
+                    <div class="row line line2"
+                        onclick="window.location.href='{{ URL::to('/') }}/home/{{ $protocol->id }}'">
             @endif
             <div class="col-md-1 col-sm-1 text-center ">
-                  <a href="{{ URL::to('/') }}/home/{{ $protocol->id }}/1"
-                    class="" role="button" title="Αντιγραφή ως Νέο"> <img
-                    src="{{ URL::to('/') }}/images/copy-stamp.png" height="20" />
+                <a href="{{ URL::to('/') }}/home/{{ $protocol->id }}/1" class="" role="button"
+                    title="Αντιγραφή ως Νέο"> <img src="{{ URL::to('/') }}/images/copy-stamp.png" height="20" />
                 </a>
                 {{ $protocol->protocolnum }}
             </div>
             <div class="col-md-1 col-sm-1 text-center ">{{ $protocol->protocoldate }}</div>
             @if (array_key_exists($searchField1, $attachmentfields))
-                <div class="col-md-5 col-sm-5 ">
+                <div class="col-md-4 col-sm-4 ">
                     <ul class='list-inline'>
                         @foreach ($protocol->attachments()->get() as $attachment)
                             <li>
@@ -49,7 +49,14 @@
                     </ul>
                 </div>
             @else
-                <div class="col-md-5 col-sm-5 ">{!! str_ireplace($searchData1, "<mark><strong>$searchData1</strong></mark>", $protocol->$searchField1) !!}</div>
+                {{-- <div class="col-md-4 col-sm-4 ">{!! str_ireplace($searchData1, "<mark><strong>$searchData1</strong></mark>", $protocol->$searchField1) !!}</div> --}}
+                @php($sv1 = [mb_strtolower($searchData1), mb_strtoupper($searchData1), mb_ucfirst(mb_strtolower($searchData1))])
+                <div class="col-md-4 col-sm-4 ">{!! str_ireplace(
+                    $sv1,
+                    array_map(fn($value) => "<mark><strong>$value</strong></mark>", $sv1),
+                    $protocol->$searchField1,
+                ) !!}
+                </div>
             @endif
             @if (array_key_exists($searchField2, $attachmentfields))
                 <div class="col-md-3 col-sm-3 ">
@@ -61,10 +68,17 @@
                         @endforeach
                 </div>
             @else
-                <div class="col-md-3 col-sm-3 ">{!! str_ireplace($searchData2, "<mark><strong>$searchData2</strong></mark>", $protocol->$searchField2) !!}</div>
+                {{-- <div class="col-md-3 col-sm-3 ">{!! str_ireplace($searchData2, "<mark><strong>$searchData2</strong></mark>", $protocol->$searchField2) !!}</div> --}}
+                @php($sv2 = [mb_strtolower($searchData2), mb_strtoupper($searchData2), mb_ucfirst(mb_strtolower($searchData2))])
+                <div class="col-md-3 col-sm-3 ">{!! str_ireplace(
+                    $sv2,
+                    array_map(fn($value) => "<mark><strong>$value</strong></mark>", $sv2),
+                    $protocol->$searchField2,
+                ) !!}
+                </div>
             @endif
             @if (array_key_exists($searchField3, $attachmentfields))
-                <div class="col-md-2 col-sm-2 ">
+                <div class="col-md-3 col-sm-3 ">
                     <ul class='list-inline'>
                         @foreach ($protocol->attachments as $attachment)
                             <li>
@@ -73,9 +87,18 @@
                         @endforeach
                 </div>
             @else
-                <div class="col-md-2 col-sm-2 ">{!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $protocol->$searchField3) !!}</div>
+                {{-- <div class="col-md-2 col-sm-2 ">{!! str_ireplace($searchData3, "<mark><strong>$searchData3</strong></mark>", $protocol->$searchField3) !!}</div> --}}
+                @php($sv3 = [mb_strtolower($searchData3), mb_strtoupper($searchData3), mb_ucfirst(mb_strtolower($searchData3))])
+                <div class="col-md-3 col-sm-3"> {!! str_ireplace(
+                    $sv3,
+                    array_map(function ($value3) {
+                        return "<mark><strong>$value3</strong></mark>";
+                    }, $sv3),
+                    $protocol->$searchField3,
+                ) !!}
+                </div>
             @endif
- </div>
+</div>
 @php($i++)
 @endforeach
 @else
@@ -94,15 +117,17 @@
 </script>
 
 <style>
-    .line{
-        padding-top:7px;
-        padding-bottom:5px;
-        cursor:pointer; 
+    .line {
+        padding-top: 7px;
+        padding-bottom: 5px;
+        cursor: pointer;
     }
-    .line:hover{
-        background-color:#E6E6E6
+
+    .line:hover {
+        background-color: #E6E6E6
     }
-    .line2{
-        background-color:WhiteSmoke
+
+    .line2 {
+        background-color: WhiteSmoke
     }
 </style>

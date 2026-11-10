@@ -7,7 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 use App\Notifications\ResetPasswordNotification; 
-
+use Illuminate\Support\Facades\DB;
+    
 class User extends Authenticatable
 {
     use Notifiable;
@@ -59,7 +60,7 @@ class User extends Authenticatable
     /**
      * Βρίσκω τον αριθμό των διαχειριστών
      * αφου βρω τον id του Διαχειριστή
-     * @var array
+     * @var int
      */
     public function get_num_of_admins(){
         return User::whereRoleId(Role::whereRole('Διαχειριστής')->first()->id)->wherenotNull('active')->count();
@@ -83,4 +84,21 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Scope a query to only include online users based on session activity.
+     */
+    public function scopeActiveOnline($query, int $minutes = 5)
+    {
+        // Convert minutes to a Unix timestamp
+        $cutoff = time() - ($minutes * 60);
+
+        return $query->whereExists(function ($subQuery) use ($cutoff) {
+            $subQuery->select(DB::raw(1))
+                ->from('sessions')
+                ->whereColumn('sessions.user_id', 'users.id') // Cleaner than whereRaw
+                ->where('last_activity', '>=', $cutoff);
+        });
+    }
+
 }

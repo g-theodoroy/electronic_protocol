@@ -61,8 +61,8 @@ return [
 
     // στοίχιση left ή right    // default left
 
-    'align' => 'left',
-    //'align' => 'right',
+    //'align' => 'left',
+    'align' => 'right',
 
 
     // απόσταση από σελίδα 
@@ -70,8 +70,8 @@ return [
     // x αριστερά - δεξιά       // default 30
     // y πάνω - κάτω            // default 25
 
-    'x' => 30,
-    'y' => 25,
+    'x' => 10,
+    'y' => 5,
 
 
     // μόνο στα pdf 
@@ -80,7 +80,6 @@ return [
     'opacity' => 1.0,
 
 
-    // μόνο στα docx
     // μόνο στην 1η σελίδα      // default false
 
     'onlyFirstPage' => false

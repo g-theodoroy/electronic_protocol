@@ -7,6 +7,8 @@ use App\Config;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,14 +35,13 @@ class AppServiceProvider extends ServiceProvider
         try {
             View::share('myActiveUsers', User::my_active_users());
             View::share('myUsers', User::my_users());
-            View::share('myUsers', User::my_users());
 
             $ipiresiasName = Config::getConfigValueOf('ipiresiasName');
             View::share('ipiresiasName', $ipiresiasName);
             $titleColor = Config::getConfigValueOf('titleColor');
             $titleColorStyle = '';
             if ($titleColor) {
-                $titleColorStyle = "style='background:" . $titleColor . "'" ;
+                $titleColorStyle = "style='background:" . $titleColor . "'";
             }
             View::share('titleColorStyle', $titleColorStyle);
             $defaultImapEmail = Config::getConfigValueOf('defaultImapEmail');
@@ -55,7 +56,32 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             report($e);
             // καμία ενέργεια απλά πιάνει το λάθος
-      	    // γιατί χτύπαγε στη δημιουργία των πινάκων με php artisan:migrate
+            // γιατί χτύπαγε στη δημιουργία των πινάκων με php artisan:migrate
         }
+
+
+        /**
+         * Paginate a standard Laravel Collection.
+         *
+         * @param int $perPage
+         * @param int $total
+         * @param int $page
+         * @param string $pageName
+         * @return array
+         */
+        Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page'): LengthAwarePaginator {
+            $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
+
+            return new LengthAwarePaginator(
+                $this->forPage($page, $perPage)->values(),
+                $total ?: $this->count(),
+                $perPage,
+                $page,
+                [
+                    'path' => LengthAwarePaginator::resolveCurrentPath(),
+                    'pageName' => $pageName,
+                ]
+            );
+        });
     }
 }

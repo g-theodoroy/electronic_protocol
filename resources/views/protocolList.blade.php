@@ -12,9 +12,7 @@
                         </div>
                         <div class="col-md-10 col-sm-10 small text-left">
                             @foreach ($activeusers2show as $user2show)
-                                {{ $user2show }}@if (!$loop->last)
-                                    ,
-                                @endif
+                                {{ $user2show }}@if (!$loop->last), @endif
                             @endforeach
                         </div>
                     @endif

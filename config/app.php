@@ -166,7 +166,6 @@ return [
          * Package Service Providers...
          */
         
-        Rainwater\Active\ActiveServiceProvider::class,
         Webklex\IMAP\Providers\LaravelServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
@@ -230,7 +229,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Active' => Rainwater\Active\ActiveFacade::class,
         'Client' => Webklex\IMAP\Facades\Client::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],

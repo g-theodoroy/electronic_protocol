@@ -705,10 +705,19 @@
 
         function getKeep4Fakelos() {
             var fak = $("#fakelos").val()
-            $.get("{{ URL::to('/') }}/getKeep4Fakelos/" + fak, function(data) {
-                $("#keep").attr('data-value', data)
-                $("#keep").val(data).change()
-            });
+
+            if (!fak) {
+                return
+            }
+
+            $.get("{{ URL::to('/') }}/getKeep4Fakelos/" + encodeURIComponent(fak), function(data) {
+                var keep = (data === null || data === undefined) ? '' : String(data).trim()
+
+                $("#keep")
+                    .attr('data-value', keep)       // used by the locked-select onchange handler
+                    .selectpicker('val', keep)      // set the value through bootstrap-select
+                    .selectpicker('refresh')        // redraw the dropdown
+            })
         }
 
         @if ($time2update > 0)
@@ -1123,6 +1132,17 @@
                 }
             });
 
+        }
+
+        function validateFile(input) {
+            var file = input.files[0];
+            if (file) {
+                var fileSize = file.size / 1024 / 1024; // in MB
+                if (fileSize > parseFloat('{{ ini_get('upload_max_filesize') }}')) { 
+                    alert('Μεγάλο αρχείο (' + fileSize.toFixed(2) + ' MB).\n\nΤο μέγεθος του αρχείου δεν \nπρέπει να υπερβαίνει τα ' + parseFloat('{{ ini_get('upload_max_filesize') }}') + ' MB.');
+                    input.value = ''; 
+                }
+            }
         }
     </script>
 
