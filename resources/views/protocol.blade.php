@@ -292,7 +292,7 @@
                                         <div
                                             class="col-md-3 col-sm-3 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
                                             <select id="diekperaiosi" multiple class="form-control selectpicker"
-                                                style="text-overflow:hidden;" name="diekperaiosi[]"
+                                                style="text-overflow:ellipsis;" name="diekperaiosi[]"
                                                 title='Διεκπεραίωση - Ενημέρωση'
                                                 data-value="{{ $protocol->diekperaiosi }}" disabled="disabled">
                                                 <optgroup label="Διεκπεραίωση" data-max-options="1">
@@ -317,7 +317,7 @@
                                             <div class="row">
                                                 <div class="col=md-11 col-sm-11">
                                                     <select id="diekperaiosi" multiple class="form-control selectpicker"
-                                                        style="text-overflow:hidden;" name="diekperaiosi[]"
+                                                        style="text-overflow:ellipsis;" name="diekperaiosi[]"
                                                         title='Διεκπεραίωση - Ενημέρωση'
                                                         data-value="{{ $protocol->diekperaiosi }}">
                                                         <optgroup label="Διεκπεραίωση" data-max-options="1">
@@ -722,43 +722,57 @@
 
         @if ($time2update > 0)
             function startTimer(duration, display) {
-            var timer = duration, minutes, seconds
-            interval = setInterval(function () {
-            minutes = parseInt(timer / 60, 10)
-            seconds = parseInt(timer % 60, 10)
-        
-            //minutes = minutes < 10 ? "0" + minutes : minutes seconds=seconds < 10 ? "0" + seconds : seconds
-                display.textContent='Δυνατότητα επεξεργασίας: ' + minutes + ":" + seconds + ' λεπτά' 
-                if (--timer < 0) {
-                    window.location.reload() } }, 1000) 
-                } 
+                var timer = duration, minutes, seconds
+                var interval = setInterval(function() {
+                    minutes = parseInt(timer / 60, 10)
+                    seconds = parseInt(timer % 60, 10)
+
+                    display.textContent = 'Δυνατότητα επεξεργασίας: ' + minutes + ":" + seconds + ' λεπτά'
+                    if (--timer < 0) {
+                        clearInterval(interval)
+                        window.location.reload()
+                    }
+                }, 1000)
+            }
         @endif
 
-        window.onload = function() {
+        // Fix 6: addEventListener instead of window.onload (does not overwrite other handlers)
+        window.addEventListener('load', function() {
             @if ($time2update > 0)
                 var duration = {{ $time2update }},
-                display = document.querySelector('#timer')
+                    display = document.querySelector('#timer')
                 startTimer(duration, display);
             @endif
             @if (!$allowedEmailUsers || strpos($allowedEmailUsers, Auth::user()->username) !== false)
                 $.ajax({
-                url: '{{ URL::to('/') }}/getEmailNum',
-                success: function(data){
-                if(data > 0){
-                $('#emailNumDiv').html(`<a href="{{ URL::to('/') }}/viewEmails" id="emailNum" class="active" role="button"
-                    title="" style="display:block"><img src="{{ URL::to('/') }}/images/email-in.png" height=30 /></a>`)
-                $('#emailNum').prop('title', "Eισερχόμενα email: " + data);
-                $('#emailNum').show();
-                }
-                }
+                    url: '{{ URL::to('/') }}/getEmailNum',
+                    success: function(data) {
+                        if (data > 0) {
+                            $('#emailNumDiv').html(`<a href="{{ URL::to('/') }}/viewEmails" id="emailNum" class="active" role="button"
+                                title="" style="display:block"><img src="{{ URL::to('/') }}/images/email-in.png" height=30 /></a>`)
+                            $('#emailNum').prop('title', "Eισερχόμενα email: " + data);
+                            $('#emailNum').show();
+                        }
+                    }
                 })
             @endif
-        }
+        })
+
+        // Fix 2: debounced getValues, term sent as query parameter, previous request aborted
+        var getValuesTimers = {}
+        var getValuesRequests = {}
 
         function getValues(id, field, divId, multi) {
             @if (!$allowListValuesMatchingInput)
                 return
             @endif
+            clearTimeout(getValuesTimers[id])
+            getValuesTimers[id] = setTimeout(function() {
+                runGetValues(id, field, divId, multi)
+            }, 250)
+        }
+
+        function runGetValues(id, field, divId, multi) {
             var searchStr = $('#' + id).val().trim()
             if (searchStr == '') {
                 clearDiv(divId)
@@ -769,9 +783,15 @@
                 clearDiv(divId)
                 return
             }
-            $.ajax({
-                url: '{{ URL::to('/') }}/getValues/' + term + '/' + field + '/' + id + '/' + divId + '/' +
-                    multi,
+            if (getValuesRequests[id]) {
+                getValuesRequests[id].abort()
+            }
+            getValuesRequests[id] = $.ajax({
+                url: '{{ URL::to('/') }}/getValues/' + encodeURIComponent(field) + '/' + encodeURIComponent(id) +
+                    '/' + encodeURIComponent(divId) + '/' + multi,
+                data: {
+                    term: term
+                },
                 success: function(data) {
                     if (data) {
                         var front = '<ul id="' + id +
@@ -780,9 +800,11 @@
                         $('#' + divId).html(front + data + end)
                         $('#' + divId).show()
                     } else {
-                        $('#' + divId).empty()
-                        $('#' + divId).hide()
+                        clearDiv(divId)
                     }
+                },
+                error: function(xhr, status) {
+                    if (status !== 'abort') clearDiv(divId)
                 }
             })
         }
@@ -912,12 +934,12 @@
             });
         }
 
+        // Fix 1: ignore the empty trailing term left by appendValue()
         function findSxetiko() {
-            var sxetiko = $('#sxetiko').val().trim()
-            if (!sxetiko) {
+            var terms = split($('#sxetiko').val()).filter(Boolean)
+            if (!terms.length) {
                 return
             }
-            var terms = split($('#sxetiko').val());
             for (var i = 0; i < terms.length; i++) {
                 if (!/^\d+[/]\d{4}$/.test(terms[i])) {
                     toastr.error(
@@ -933,7 +955,7 @@
                 var msg = '';
                 for (var i = 0; i < terms.length; i++) {
                     var data = terms[i].split(/\//);
-                    href = "{{ URL::to('/goto') }}" + "/" + data[1] + "/" + data[0] + "?find=1"
+                    var href = "{{ URL::to('/goto') }}" + "/" + data[1] + "/" + data[0] + "?find=1"
                     msg += '<br><a href="' + href + '">Αρ. Πρωτ: ' + data[0] + ', έτος: ' + data[1] + '</a>'
                 }
                 toastr.info("<center><h4>Μετάβαση σε</h4><hr></center>" + msg + "<br>&nbsp;</center>")

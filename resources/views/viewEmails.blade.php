@@ -248,7 +248,7 @@
                                                 class="col-md-2 col-sm-2 {{ $errors->has('diekperaiosi') ? ' has-error' : '' }}">
 
                                                 <select id="diekperaiosi{{ $Uid }}" multiple
-                                                    class="form-control selectpicker " style="text-overflow:hidden;"
+                                                    class="form-control selectpicker " style="text-overflow:ellipsis;"
                                                     name="diekperaiosi[]" title='Διεκπεραίωση - Ενημέρωση'
                                                     data-value="{{ $protocol->diekperaiosi ?? '' }}"
                                                     @if ($forbidenChangeDiekperaiosiSelect) disabled="disabled" @endif>

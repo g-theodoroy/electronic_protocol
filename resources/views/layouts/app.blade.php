@@ -245,6 +245,7 @@
         </div>
 
         <!-- Scripts -->
+        <!-- 
         <script src="{{ asset('js/app.js') }}"></script>
         <script src="{{ asset('js/npm.js') }}"></script>
         <script src="{{ asset('js/fileinput.js') }}"></script>
@@ -252,15 +253,22 @@
         <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
         <script src="{{ asset('js/toastr.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
+        -->
 
+        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
+        <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
+        <script src="{{ asset('js/fileinput.js') }}"></script>
+        <script src="{{ asset('js/toastr.min.js') }}"></script>
 
         <script>
 
-        $('.datepicker').datepicker({
+            $(document).ready(function () {
+                $('.datepicker').datepicker({
+                    format: 'dd/mm/yyyy'
+                });
+            });
 
-           format: 'dd/mm/yyyy'
-
-         });
             toastr.options = {
               "closeButton": true,
               "debug": false,
