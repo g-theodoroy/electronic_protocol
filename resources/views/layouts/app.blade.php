@@ -14,7 +14,7 @@
     <!--    <link href="{{ asset('css/app.css') }}" rel="stylesheet"> -->
         <link href="{{ asset('css/jasny-bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/bootstrap-datepicker3.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap-select.min.css') }}" rel="stylesheet">
         <link rel="icon" href="{{ URL::asset('favicon.ico') }}" type="image/x-icon" />
@@ -244,21 +244,12 @@
             @yield('content')
         </div>
 
-        <!-- Scripts -->
-        <!-- 
-        <script src="{{ asset('js/app.js') }}"></script>
-        <script src="{{ asset('js/npm.js') }}"></script>
-        <script src="{{ asset('js/fileinput.js') }}"></script>
-        <script src="{{ asset('js/jquery.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
-        <script src="{{ asset('js/toastr.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
-        -->
 
         <script src="{{ asset('js/app.js') }}"></script>
-        <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
+        <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
-        <script src="{{ asset('js/fileinput.js') }}"></script>
+        <!-- <script src="{{ asset('js/fileinput.js') }}"></script> -->
+        <script src="{{ asset('js/jasny-bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/toastr.min.js') }}"></script>
 
         <script>
