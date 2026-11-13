@@ -955,7 +955,7 @@
                 var msg = '';
                 for (var i = 0; i < terms.length; i++) {
                     var data = terms[i].split(/\//);
-                    var href = "{{ URL::to('/goto') }}" + "/" + data[1] + "/" + data[0] + "?find=1"
+                    href = "{{ URL::to('/goto') }}" + "/" + data[1] + "/" + data[0] + "?find=1"
                     msg += '<br><a href="' + href + '">Αρ. Πρωτ: ' + data[0] + ', έτος: ' + data[1] + '</a>'
                 }
                 toastr.info("<center><h4>Μετάβαση σε</h4><hr></center>" + msg + "<br>&nbsp;</center>")

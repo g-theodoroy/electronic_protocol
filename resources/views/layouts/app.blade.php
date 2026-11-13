@@ -12,14 +12,19 @@
 
         <!-- Styles -->
     <!--    <link href="{{ asset('css/app.css') }}" rel="stylesheet"> -->
-        <link href="{{ asset('css/jasny-bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/jasny-bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap-datepicker3.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap-select.min.css') }}" rel="stylesheet">
         <link rel="icon" href="{{ URL::asset('favicon.ico') }}" type="image/x-icon" />
         <style>
 
+            /* Global pagination margins */
+            .pagination {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
 
             .dropdown-submenu {
                 position: relative;
