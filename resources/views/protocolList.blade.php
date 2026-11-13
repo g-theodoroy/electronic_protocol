@@ -24,19 +24,17 @@
                 @endif
 
                 {{-- ΤΙΤΛΟΣ --}}
-                <div class="row">
-                    <div class="col-md-1 col-sm-1 col-xs-1 panel-heading h1 text-center"
-                         {!! $titleColorStyle !!}>&nbsp;</div>
+                <div class="col-md-1 col-sm-1 col-xs-1 panel-heading h1 text-center protocol-title-grey"
+                    {!! $titleColorStyle !!}>&nbsp;</div>
 
-                    <div class="col-md-10 col-sm-10 col-xs-10 panel-heading h1 text-center"
-                         {!! $titleColorStyle !!}>
-                        {{ $protocoltitle }}
-                    </div>
-
-                    <div id="emailNumDiv"
-                         class="col-md-1 col-sm-1 col-xs-1 panel-heading h1 text-center"
-                         {!! $titleColorStyle !!}>&nbsp;</div>
+                <div class="col-md-10 col-sm-10 col-xs-10 panel-heading h1 text-center protocol-title-grey"
+                    {!! $titleColorStyle !!}>
+                    {{ $protocoltitle }}
                 </div>
+
+                <div id="emailNumDiv"
+                    class="col-md-1 col-sm-1 col-xs-1 panel-heading h1 text-center protocol-title-grey"
+                    {!! $titleColorStyle !!}>&nbsp;</div>
 
                 <div class="panel-body">
 
@@ -985,6 +983,11 @@
     hr {
         margin: 3px;
     }
+
+    .protocol-title-grey {
+    background-color: #f5f5f5 !important;
+    }
+
 </style>
 
 @endsection
