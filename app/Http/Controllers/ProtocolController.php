@@ -1875,7 +1875,7 @@ class ProtocolController extends Controller
             return 0;
         }
         if (!$oClient->getFolder(config('imapFolders.inbox'))) {
-            $oClient->createFolder(config('imapFolders.inbox'));
+            $oClient->createFolder(config('imapFolders.inbox'), false);
         }
         // επιλέγω τον φάκελο INBOX
         $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
@@ -1940,7 +1940,7 @@ class ProtocolController extends Controller
         $words = Keepvalue::whereNotNull('keep_alt')->select('keep_alt')->distinct()->orderby('keep_alt', 'asc')->get();
         // σύνδεση στον φάκελο INBOX
         if (!$oClient->getFolder(config('imapFolders.inbox'))) {
-            $oClient->createFolder(config('imapFolders.inbox'));
+            $oClient->createFolder(config('imapFolders.inbox'), false);
         }
         // επιλέγω τον φάκελο INBOX
         $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
@@ -2042,11 +2042,11 @@ class ProtocolController extends Controller
         }
         // αν δεν υπάρχει ο φάκελος INBOX.beenRead τον φτιάχνω
         if (!$oClient->getFolder(config('imapFolders.beenRead'))) {
-            $oClient->createFolder(config('imapFolders.beenRead'));
+            $oClient->createFolder(config('imapFolders.beenRead'), false);
         }
 
         if (!$oClient->getFolder(config('imapFolders.inbox'))) {
-            $oClient->createFolder(config('imapFolders.inbox'));
+            $oClient->createFolder(config('imapFolders.inbox'), false);
         }
         // επιλέγω τον φάκελο INBOX
         $oFolder = $oClient->getFolder(config('imapFolders.inbox'));
@@ -2390,10 +2390,10 @@ class ProtocolController extends Controller
         }
         // αν δεν υπάρχει ο φακελος INBOX.inProtocol τον φτιάχνω
         if (!$oClient->getFolder(config('imapFolders.inProtocol'))) {
-            $oClient->createFolder(config('imapFolders.inProtocol'));
+            $oClient->createFolder(config('imapFolders.inProtocol'), false);
         }
         if (!$oClient->getFolder(config('imapFolders.inbox'))) {
-            $oClient->createFolder(config('imapFolders.inbox'));
+            $oClient->createFolder(config('imapFolders.inbox'), false);
         }
         // επιλέγω τον φάκελο INBOX
         $oFolder = $oClient->getFolder(config('imapFolders.inbox'));

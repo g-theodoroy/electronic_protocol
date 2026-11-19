@@ -22,7 +22,7 @@
 
             /* Global pagination margins */
             .pagination {
-                margin-top: 0;
+                margin-top: 7px;
                 margin-bottom: 0;
             }
 
@@ -258,6 +258,34 @@
         <script src="{{ asset('js/toastr.min.js') }}"></script>
 
         <script>
+            
+            function escapeHtml(value) {
+                return String(value).replace(/[&<>"']/g, function (char) {
+                    return {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#39;'
+                    }[char];
+                });
+            }
+
+            function deleteRecord(id, url) {
+                if (window.deleteInProgress) return;
+                window.deleteInProgress = true;
+
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url.replace(/\/$/, '') + '/' + encodeURIComponent(id);
+
+                form.innerHTML =
+                    '<input type="hidden" name="_token" value="{{ csrf_token() }}">' +
+                    '<input type="hidden" name="_method" value="DELETE">';
+
+                document.body.appendChild(form);
+                form.submit();
+            }
 
             $(document).ready(function () {
                 $('.datepicker').datepicker({

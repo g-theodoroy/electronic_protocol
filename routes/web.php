@@ -47,13 +47,13 @@ Route::get('users', 'UserController@index');
 Route::post('users', 'UserController@store');
 Route::get('users/{user}', 'UserController@index');
 Route::post('users/{user}', 'UserController@update');
-Route::get('users/del/{user}', 'UserController@delete');
+Route::delete('users/del/{user}', 'UserController@delete');
 
 Route::get('keep', 'KeepvalueController@index');
 Route::post('keep', 'KeepvalueController@store');
 Route::get('keep/{keepvalue}', 'KeepvalueController@index');
 Route::post('keep/{keepvalue}', 'KeepvalueController@update');
-Route::get('keep/del/{keepvalue}', 'KeepvalueController@delete');
+Route::delete('keep/del/{keepvalue}', 'KeepvalueController@delete');
 
 Route::get('/home', 'ProtocolController@index');
 Route::get('/chkForUpdates', 'ProtocolController@chkForUpdates');

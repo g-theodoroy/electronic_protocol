@@ -63,7 +63,7 @@ class UserController extends Controller
 
 
         $data = request()->all();
-        $active = $data['active'] == "on" ? 1 : null;
+        $active = isset($data['active']) ? 1 : 0;
 
         User::create([
             'name' => $data['name'],
@@ -86,7 +86,7 @@ class UserController extends Controller
     public function update($id)
     {
         $data = request()->all();
-        $active = $data['active'] == "on" ? 1 : null;
+        $active = isset($data['active']) ? 1 : 0;
 
         $validatevalues = [
             'name' => 'required|max:255',

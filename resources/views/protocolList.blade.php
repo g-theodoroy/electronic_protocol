@@ -951,8 +951,8 @@
         .affix {
             top: 0;
             position: fixed;
-            left: 47px;
-            right: 47px;
+            left: 30px;
+            right: 30px;
             z-index: 777;
         }
     }
@@ -961,6 +961,36 @@
         .affix {
             position: static;
         }
+    }
+
+    /* Compact header when it becomes sticky */
+    .affix > .row.bg-primary:first-child,
+    .affix > .row.bg-primary:last-child {
+        display: none;
+    }
+
+    /* Reduce vertical spacing */
+    .affix > .row.bg-primary:not(:first-child):not(:last-child) {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    /* Hide line breaks and horizontal separators in sticky header */
+    .affix > .row.bg-primary:not(:first-child):not(:last-child) br,
+    .affix > .row.bg-primary:not(:first-child):not(:last-child) hr {
+        display: none !important;
+    }
+
+    /* Smaller header text */
+    .affix > .row.bg-primary strong {
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    /* Reduce column spacing */
+    .affix > .row.bg-primary:not(:first-child):not(:last-child) > div {
+        padding-top: 2px;
+        padding-bottom: 2px;
     }
 
     .line {
@@ -987,6 +1017,7 @@
     .protocol-title-grey {
     background-color: #f5f5f5 !important;
     }
+
 
 </style>
 

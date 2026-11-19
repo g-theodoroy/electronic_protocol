@@ -17,20 +17,32 @@
     </style>
 
     <script>
+
         function chkdelete(id, name) {
 
             var html =
-                "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>"
-            var msg = '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή χρήστη ' + name + '. Είστε σίγουροι;<br>&nbsp;</center>'
+                "<center><button type='button' id='confirmationRevertYes' class='btn btn-primary'>Ναί</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' id='confirmationRevertNo' class='btn btn-primary'>Όχι</button></center>";
+
+            var msg =
+                '<center><h4>Διαγραφή ?</h4><hr>Διαγραφή χρήστη ' +
+                escapeHtml(name) +
+                '. Είστε σίγουροι;<br>&nbsp;</center>';
+
             var $toast = toastr.warning(html, msg);
+
             $toast.delegate('#confirmationRevertYes', 'click', function() {
-                $(location).attr('href', "{{ URL::to('/') }}" + "/users/del/" + id)
+                deleteRecord(id, "{{ url('/users/del') }}");
                 $toast.remove();
             });
+
             $toast.delegate('#confirmationRevertNo', 'click', function() {
                 $toast.remove();
             });
         }
+
+
+
+
     </script>
 
     <div class="container">
@@ -46,7 +58,7 @@
                                 action="{{ url('/users') }}{{ $user->id ? '/' . $user->id : '' }}">
                                 {{ csrf_field() }}
 
-                                @if ($users->links())
+                                @if ($users->hasPages())
                                     <div class='row'>
                                         <div class="col-md-12 col-sm-12 small text-center">
                                             <span class="small">{{ $users->links() }}</span>
@@ -76,7 +88,7 @@
                                     <div class='col-md-1 col-sm-1  h4'>
                                         <strong>Ρόλος</strong>
                                     </div>
-                                    <div class='col-md-1 col-sm-1  h4'>
+                                    <div class='col-md-2 col-sm-2  h4'>
                                         <strong>Ενεργός</strong>
                                     </div>
                                 </div>
@@ -108,48 +120,32 @@
                                         <div class='row'>
                                             <div class="col-md-6 col-sm-6">
                                                 <input id="password" type="password" class="form-control col-md-1 col-sm-1"
-                                                    name="password" placeholder="passwd" required>
+                                                    name="password" placeholder="passwd" {{ $user->id ? '' : 'required' }}>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
                                                 <input id="password-confirmation" type="password"
                                                     class="form-control  col-md-1 col-sm-1" name="password_confirmation"
-                                                    placeholder="confirm" required>
+                                                    placeholder="confirm" {{ $user->id ? '' : 'required' }}>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-md-3 col-sm-3 ">
                                         <div class='row'>
-                                            <div
-                                                class="col-md-5 col-sm-5 {{ $errors->has('name') ? ' has-error' : '' }}">
+                                            <div class="col-md-5 col-sm-5 {{ $errors->has('role_id') ? ' has-error' : '' }}">
                                                 <select id="role_id" class="form-control" name="role_id" required>
-                                                    <option value="" selected placeholder="role_id"></option>
+                                                    <option value=""></option>
                                                     @foreach ($roles as $role)
-                                                        @if (old('role_id'))
-                                                            @if (old('role_id') == $user->role_id)
-                                                                <option value="{{ $role->id }}" selected>
-                                                                    {{ $role->role }}</option>
-                                                            @else
-                                                                <option value="{{ $role->id }}">{{ $role->role }}
-                                                                </option>
-                                                            @endif
-                                                        @else
-                                                            @if ($role->id == $user->role_id)
-                                                                <option value="{{ $role->id }}" selected>
-                                                                    {{ $role->role }}</option>
-                                                            @else
-                                                                <option value="{{ $role->id }}">{{ $role->role }}
-                                                                </option>
-                                                            @endif
-                                                        @endif
+                                                        <option value="{{ $role->id }}"
+                                                            {{ (string) old('role_id', $user->role_id) === (string) $role->id ? 'selected' : '' }}>
+                                                            {{ $role->role }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-md-2 col-sm-2 text-center">
-                                                <input type="hidden" id="active" name="active" value="0">
                                                 <input type="checkbox" class="form-control" id="active" name="active"
                                                     @if ($user->active) checked @endif
-                                                    @if (!$user->id) checked @endif>
+                                                    @if (!$user->id) checked @endif >
                                             </div>
                                             <div class="col-md-5 col-sm-5 text-center">
                                                 <a href="javascript:document.forms['myForm'].submit();"
@@ -222,7 +218,7 @@
                         @php($i++)
                         @endforeach
 
-                        @if ($users->links() and $users->count() > $users->perPage() / 2)
+                        @if ($users->hasPages() and $users->count() > $users->perPage() / 2)
                             <div class='row'>
                                 <div class="col-md-12 col-sm-12 small text-center">
                                     <span class="small">{{ $users->links() }}</span>
