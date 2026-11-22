@@ -63,7 +63,7 @@ class UserController extends Controller
 
 
         $data = request()->all();
-        $active = isset($data['active']) ? 1 : 0;
+         $active = isset($data['active']) ? 1 : 0;
 
         User::create([
             'name' => $data['name'],
